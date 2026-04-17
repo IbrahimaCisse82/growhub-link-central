@@ -29,6 +29,8 @@ import GrantBudgetChart from "@/components/grants/GrantBudgetChart";
 import GrantAlertsPanel from "@/components/grants/GrantAlertsPanel";
 import GrantAddendumTab, { useGrantAddendums } from "@/components/grants/GrantAddendumTab";
 import GrantFicheRecapTab from "@/components/grants/GrantFicheRecapTab";
+import EntityCommentsPanel from "@/components/shared/EntityCommentsPanel";
+import AISuggestPanel from "@/components/ai/AISuggestPanel";
 
 const fmt = (n: number) => new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 }).format(n);
 
@@ -200,7 +202,19 @@ export default function GrantDetailPage() {
           <TabsTrigger value="tracking">Suivi</TabsTrigger>
           <TabsTrigger value="info">Infos</TabsTrigger>
           <TabsTrigger value="history">Historique ({grantChanges?.length ?? 0})</TabsTrigger>
+          <TabsTrigger value="discussion">💬 Discussion & IA</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="discussion" className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="bg-card border border-border rounded-xl p-4">
+            <EntityCommentsPanel entityType="grant" entityId={id!} />
+          </div>
+          <div className="space-y-3">
+            <AISuggestPanel mode="risk_analysis" context={{ name: grant?.name, code: grant?.code, status: grant?.status, amount_total: grant?.amount_total, amount_disbursed: grant?.amount_disbursed, end_date: grant?.end_date }} />
+            <AISuggestPanel mode="summary" context={{ name: grant?.name, organization: grant?.organization, amount_total: grant?.amount_total, amount_disbursed: grant?.amount_disbursed, status: grant?.status }} />
+            <AISuggestPanel mode="next_actions" context={{ name: grant?.name, status: grant?.status, end_date: grant?.end_date }} />
+          </div>
+        </TabsContent>
 
         {/* Budget Tab with Chart */}
         <TabsContent value="budget" className="space-y-4">

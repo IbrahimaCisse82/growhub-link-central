@@ -14,6 +14,8 @@ import WorkPackageCard from "@/components/projects/WorkPackageCard";
 import InlineEditField from "@/components/projects/InlineEditField";
 import { buildWorkPackages } from "@/lib/workPackageUtils";
 import EntityDocumentsTab from "@/components/shared/EntityDocumentsTab";
+import EntityCommentsPanel from "@/components/shared/EntityCommentsPanel";
+import AISuggestPanel from "@/components/ai/AISuggestPanel";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProfile } from "@/hooks/useAssignableUsers";
 import { EditProjectDialog } from "@/components/dialogs/EditEntityDialogs";
@@ -294,7 +296,19 @@ export default function ProjetDetailPage() {
           <TabsTrigger value="budget">Budget ({budgetLines?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="bailleurs">Bailleurs ({projectGrants?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
+          <TabsTrigger value="discussion">💬 Discussion & IA</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="discussion" className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="bg-card border border-border rounded-xl p-4">
+            <EntityCommentsPanel entityType="project" entityId={id!} />
+          </div>
+          <div className="space-y-3">
+            <AISuggestPanel mode="risk_analysis" context={{ name: project?.name, status: project?.status, progress: project?.progress, description: project?.description }} />
+            <AISuggestPanel mode="next_actions" context={{ name: project?.name, status: project?.status, progress: project?.progress }} />
+            <AISuggestPanel mode="summary" context={{ name: project?.name, description: project?.description, status: project?.status, progress: project?.progress }} />
+          </div>
+        </TabsContent>
 
         {/* 1. Introduction */}
         <TabsContent value="introduction" className="mt-4">
