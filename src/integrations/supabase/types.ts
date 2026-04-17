@@ -1012,6 +1012,36 @@ export type Database = {
           },
         ]
       }
+      digest_email_log: {
+        Row: {
+          id: string
+          notifications_count: number
+          period_end: string
+          period_start: string
+          sent_at: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          notifications_count?: number
+          period_end: string
+          period_start: string
+          sent_at?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          notifications_count?: number
+          period_end?: string
+          period_start?: string
+          sent_at?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       entity_comments: {
         Row: {
           author_id: string
@@ -3956,6 +3986,10 @@ export type Database = {
           rank: number
           sender_id: string
         }[]
+      }
+      should_notify: {
+        Args: { _category: string; _user_id: string }
+        Returns: boolean
       }
       start_conversation: {
         Args: { _other_user_id: string; _title?: string }
