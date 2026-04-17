@@ -10,6 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useStartup, useStartupMembers, useStartupProjects, useStartupSessions, useStartupRisks } from "@/hooks/useStartupDetail";
 import StartupKpiTab from "@/components/startups/StartupKpiTab";
 import EntityDocumentsTab from "@/components/shared/EntityDocumentsTab";
+import EntityCommentsPanel from "@/components/shared/EntityCommentsPanel";
+import AISuggestPanel from "@/components/ai/AISuggestPanel";
 import { useStartupHealthScore } from "@/hooks/useStartupKpis";
 
 const riskColor: Record<string, "green" | "amber" | "rose" | "gray"> = { low: "green", medium: "amber", high: "rose", critical: "rose" };
@@ -124,7 +126,19 @@ export default function StartupDetailPage() {
           <TabsTrigger value="sessions">Coaching ({sessions?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="documents">📁 Documents</TabsTrigger>
           {risks && risks.length > 0 && <TabsTrigger value="risks">Risques ({risks.length})</TabsTrigger>}
+          <TabsTrigger value="discussion">💬 Discussion & IA</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="discussion" className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="bg-card border border-border rounded-xl p-4">
+            <EntityCommentsPanel entityType="startup" entityId={id!} />
+          </div>
+          <div className="space-y-3">
+            <AISuggestPanel mode="mentor_match" context={{ name: startup.name, sector: startup.sector, stage: startup.stage, country: startup.country }} />
+            <AISuggestPanel mode="summary" context={{ name: startup.name, sector: startup.sector, stage: startup.stage, team_size: startup.team_size, revenue_monthly: startup.revenue_monthly }} />
+            <AISuggestPanel mode="next_actions" context={{ name: startup.name, stage: startup.stage, sector: startup.sector }} />
+          </div>
+        </TabsContent>
 
         <TabsContent value="kpis" className="mt-4">
           <StartupKpiTab startupId={startup.id} />
