@@ -3050,6 +3050,287 @@ export type Database = {
           },
         ]
       }
+      project_template_assumptions: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          label: string
+          notes: string | null
+          sort_order: number | null
+          template_id: string
+          unit: string | null
+          value: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          label: string
+          notes?: string | null
+          sort_order?: number | null
+          template_id: string
+          unit?: string | null
+          value?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          label?: string
+          notes?: string | null
+          sort_order?: number | null
+          template_id?: string
+          unit?: string | null
+          value?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_template_assumptions_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "project_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_template_budget_details: {
+        Row: {
+          activity: string
+          category: string | null
+          code: string
+          created_at: string
+          id: string
+          nomenclature_code: string | null
+          quantity: number | null
+          sort_order: number | null
+          template_id: string
+          total: number | null
+          unit: string | null
+          unit_cost: number | null
+          work_package: string
+          year_1: number | null
+          year_2: number | null
+          year_3: number | null
+          year_4: number | null
+          year_5: number | null
+        }
+        Insert: {
+          activity: string
+          category?: string | null
+          code: string
+          created_at?: string
+          id?: string
+          nomenclature_code?: string | null
+          quantity?: number | null
+          sort_order?: number | null
+          template_id: string
+          total?: number | null
+          unit?: string | null
+          unit_cost?: number | null
+          work_package: string
+          year_1?: number | null
+          year_2?: number | null
+          year_3?: number | null
+          year_4?: number | null
+          year_5?: number | null
+        }
+        Update: {
+          activity?: string
+          category?: string | null
+          code?: string
+          created_at?: string
+          id?: string
+          nomenclature_code?: string | null
+          quantity?: number | null
+          sort_order?: number | null
+          template_id?: string
+          total?: number | null
+          unit?: string | null
+          unit_cost?: number | null
+          work_package?: string
+          year_1?: number | null
+          year_2?: number | null
+          year_3?: number | null
+          year_4?: number | null
+          year_5?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_template_budget_details_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "project_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_template_budget_lines: {
+        Row: {
+          category: string | null
+          code: string
+          created_at: string
+          id: string
+          label: string
+          marqueur_climat: string | null
+          marqueur_genre: string | null
+          notes: string | null
+          parent_code: string | null
+          sort_order: number | null
+          template_id: string
+          total_cost: number | null
+          year1: number | null
+          year2: number | null
+          year3: number | null
+          year4: number | null
+          year5: number | null
+        }
+        Insert: {
+          category?: string | null
+          code: string
+          created_at?: string
+          id?: string
+          label: string
+          marqueur_climat?: string | null
+          marqueur_genre?: string | null
+          notes?: string | null
+          parent_code?: string | null
+          sort_order?: number | null
+          template_id: string
+          total_cost?: number | null
+          year1?: number | null
+          year2?: number | null
+          year3?: number | null
+          year4?: number | null
+          year5?: number | null
+        }
+        Update: {
+          category?: string | null
+          code?: string
+          created_at?: string
+          id?: string
+          label?: string
+          marqueur_climat?: string | null
+          marqueur_genre?: string | null
+          notes?: string | null
+          parent_code?: string | null
+          sort_order?: number | null
+          template_id?: string
+          total_cost?: number | null
+          year1?: number | null
+          year2?: number | null
+          year3?: number | null
+          year4?: number | null
+          year5?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_template_budget_lines_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "project_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_template_sections: {
+        Row: {
+          created_at: string
+          default_content: Json | null
+          description: string | null
+          id: string
+          is_required: boolean
+          section_number: string
+          section_type: string
+          sort_order: number
+          subtitle: string | null
+          template_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          default_content?: Json | null
+          description?: string | null
+          id?: string
+          is_required?: boolean
+          section_number: string
+          section_type?: string
+          sort_order?: number
+          subtitle?: string | null
+          template_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          default_content?: Json | null
+          description?: string | null
+          id?: string
+          is_required?: boolean
+          section_number?: string
+          section_type?: string
+          sort_order?: number
+          subtitle?: string | null
+          template_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_template_sections_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "project_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_templates: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean
+          is_default: boolean
+          name: string
+          section_count: number | null
+          source_document: string | null
+          updated_at: string
+          version: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          is_default?: boolean
+          name: string
+          section_count?: number | null
+          source_document?: string | null
+          updated_at?: string
+          version?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          is_default?: boolean
+          name?: string
+          section_count?: number | null
+          source_document?: string | null
+          updated_at?: string
+          version?: string | null
+        }
+        Relationships: []
+      }
       projects: {
         Row: {
           applications_end_date: string | null
