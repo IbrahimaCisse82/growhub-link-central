@@ -42,12 +42,18 @@ export default function CreateProjectDialog({ children, programId }: { children:
           supabase.from("project_template_assumptions").select("*").eq("template_id", templateId).order("sort_order"),
         ]);
 
-        // Insert budget lines
+        // Insert budget lines (7 WP : WP1-4, GC, SE, total)
         if (linesRes.data?.length) {
           const lines = linesRes.data.map(l => ({
             project_id: project.id,
-            code: l.code, label: l.label, section: l.section, category: l.category,
-            year1: 0, year2: 0, year3: 0, year4: 0, year5: 0, sort_order: l.sort_order,
+            code: l.code,
+            label: l.label,
+            section: l.parent_code ?? l.code,
+            category: l.category,
+            year1: 0, year2: 0, year3: 0, year4: 0, year5: 0,
+            marker_gender: l.marqueur_genre,
+            marker_climate: l.marqueur_climat,
+            notes: l.notes,
           }));
           await supabase.from("project_budget_lines").insert(lines);
         }
@@ -59,7 +65,6 @@ export default function CreateProjectDialog({ children, programId }: { children:
             code: d.code, activity: d.activity, work_package: d.work_package,
             category: d.category, unit: d.unit, quantity: d.quantity, unit_cost: d.unit_cost,
             year_1: 0, year_2: 0, year_3: 0, year_4: 0, year_5: 0,
-            marker_gender: d.marker_gender, marker_climate: d.marker_climate,
             sort_order: d.sort_order,
           }));
           await supabase.from("project_budget_details").insert(details);
@@ -69,7 +74,11 @@ export default function CreateProjectDialog({ children, programId }: { children:
         if (assumpRes.data?.length) {
           const assumps = assumpRes.data.map(a => ({
             project_id: project.id,
-            category: a.category, label: a.label, value: a.value, unit: a.unit, notes: a.notes,
+            section: a.category,
+            label: a.label,
+            value: String(a.value ?? ""),
+            detail: a.unit ?? null,
+            note: a.notes ?? null,
             sort_order: a.sort_order,
           }));
           await supabase.from("project_budget_assumptions").insert(assumps);
