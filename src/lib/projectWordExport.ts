@@ -140,7 +140,7 @@ export async function exportProjectWord(data: ProjectWordData) {
   children.push(new Paragraph({ spacing: { before: 200 }, alignment: AlignmentType.CENTER, border: { bottom: { style: BorderStyle.SINGLE, size: 16, color: NAVY, space: 2 } }, children: [new TextRun({ text: "" })] }));
 
   // Tableau d'identification
-  const coverRows: [string, string][] = [
+  const coverRowsAll: [string, string][] = [
     ["Intitulé du projet", project.name || ""],
     ["Pays", project.country || ""],
     ["Zones d'intervention", (project.locations as string[])?.join(", ") || nl(meta.lieux_implementation)],
@@ -150,7 +150,8 @@ export async function exportProjectWord(data: ProjectWordData) {
     ["Budget total", totalWithContingency ? `${fmtNum(totalWithContingency)} USD` : nl(meta.budget_total_label)],
     ["Alignement ODD", nl(meta.alignement_odd)],
     ["Version du document", nl(meta.version_document)],
-  ].filter(([, v]) => v);
+  ];
+  const coverRows: [string, string][] = coverRowsAll.filter((r): r is [string, string] => Boolean(r[1]));
 
   children.push(new Paragraph({ spacing: { before: 480 }, children: [new TextRun({ text: "" })] }));
   children.push(new Table({
