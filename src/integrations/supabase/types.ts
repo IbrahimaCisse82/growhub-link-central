@@ -1042,6 +1042,93 @@ export type Database = {
         }
         Relationships: []
       }
+      email_send_log: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          message_id: string | null
+          metadata: Json | null
+          recipient_email: string
+          status: string
+          template_name: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          message_id?: string | null
+          metadata?: Json | null
+          recipient_email: string
+          status: string
+          template_name: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          message_id?: string | null
+          metadata?: Json | null
+          recipient_email?: string
+          status?: string
+          template_name?: string
+        }
+        Relationships: []
+      }
+      email_send_state: {
+        Row: {
+          auth_email_ttl_minutes: number
+          batch_size: number
+          id: number
+          retry_after_until: string | null
+          send_delay_ms: number
+          transactional_email_ttl_minutes: number
+          updated_at: string
+        }
+        Insert: {
+          auth_email_ttl_minutes?: number
+          batch_size?: number
+          id?: number
+          retry_after_until?: string | null
+          send_delay_ms?: number
+          transactional_email_ttl_minutes?: number
+          updated_at?: string
+        }
+        Update: {
+          auth_email_ttl_minutes?: number
+          batch_size?: number
+          id?: number
+          retry_after_until?: string | null
+          send_delay_ms?: number
+          transactional_email_ttl_minutes?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      email_unsubscribe_tokens: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          token: string
+          used_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          token: string
+          used_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          token?: string
+          used_at?: string | null
+        }
+        Relationships: []
+      }
       entity_comments: {
         Row: {
           author_id: string
@@ -2063,6 +2150,38 @@ export type Database = {
         }
         Relationships: []
       }
+      invitation_reminders: {
+        Row: {
+          id: string
+          invitation_id: string
+          reminder_type: string
+          sent_at: string
+          sent_by: string
+        }
+        Insert: {
+          id?: string
+          invitation_id: string
+          reminder_type?: string
+          sent_at?: string
+          sent_by: string
+        }
+        Update: {
+          id?: string
+          invitation_id?: string
+          reminder_type?: string
+          sent_at?: string
+          sent_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invitation_reminders_invitation_id_fkey"
+            columns: ["invitation_id"]
+            isOneToOne: false
+            referencedRelation: "invitations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invitations: {
         Row: {
           accepted_at: string | null
@@ -2670,10 +2789,14 @@ export type Database = {
           full_name: string
           id: string
           is_approved: boolean
+          is_suspended: boolean
+          last_active_at: string | null
           linkedin_url: string | null
           organization: string | null
           phone: string | null
           position: string | null
+          suspended_at: string | null
+          suspension_reason: string | null
           updated_at: string
           user_id: string
         }
@@ -2685,10 +2808,14 @@ export type Database = {
           full_name?: string
           id?: string
           is_approved?: boolean
+          is_suspended?: boolean
+          last_active_at?: string | null
           linkedin_url?: string | null
           organization?: string | null
           phone?: string | null
           position?: string | null
+          suspended_at?: string | null
+          suspension_reason?: string | null
           updated_at?: string
           user_id: string
         }
@@ -2700,10 +2827,14 @@ export type Database = {
           full_name?: string
           id?: string
           is_approved?: boolean
+          is_suspended?: boolean
+          last_active_at?: string | null
           linkedin_url?: string | null
           organization?: string | null
           phone?: string | null
           position?: string | null
+          suspended_at?: string | null
+          suspension_reason?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -3811,6 +3942,30 @@ export type Database = {
           },
         ]
       }
+      suppressed_emails: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          metadata: Json | null
+          reason: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          metadata?: Json | null
+          reason: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          metadata?: Json | null
+          reason?: string
+        }
+        Relationships: []
+      }
       survey_responses: {
         Row: {
           answers: Json | null
@@ -4244,6 +4399,14 @@ export type Database = {
         }
         Returns: undefined
       }
+      delete_email: {
+        Args: { message_id: number; queue_name: string }
+        Returns: boolean
+      }
+      enqueue_email: {
+        Args: { payload: Json; queue_name: string }
+        Returns: number
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -4255,6 +4418,23 @@ export type Database = {
       is_conversation_member: {
         Args: { _conversation_id: string; _user_id: string }
         Returns: boolean
+      }
+      move_to_dlq: {
+        Args: {
+          dlq_name: string
+          message_id: number
+          payload: Json
+          source_queue: string
+        }
+        Returns: number
+      }
+      read_email_batch: {
+        Args: { batch_size: number; queue_name: string; vt: number }
+        Returns: {
+          message: Json
+          msg_id: number
+          read_ct: number
+        }[]
       }
       search_messages: {
         Args: { _channel_id?: string; _query: string }
