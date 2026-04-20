@@ -65,6 +65,7 @@ const EventDetailPage = lazy(() => import("@/pages/app/EventDetailPage"));
 const FunnelBuilderPage = lazy(() => import("@/pages/app/FunnelBuilderPage"));
 const HrPage = lazy(() => import("@/pages/app/HrPage"));
 const PublicApplicationPage = lazy(() => import("@/pages/public/PublicApplicationPage"));
+const UnsubscribePage = lazy(() => import("@/pages/public/UnsubscribePage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
@@ -102,6 +103,7 @@ const App = () => (
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<Navigate to="/login" replace />} />
               <Route path="/postuler" element={<PublicApplicationPage />} />
+              <Route path="/unsubscribe" element={<UnsubscribePage />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/app" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
