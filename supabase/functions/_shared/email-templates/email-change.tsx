@@ -45,4 +45,4 @@ const h1 = { fontSize: '24px', fontWeight: 700 as const, color: '#0d1f2e', margi
 const text = { fontSize: '15px', color: '#334155', lineHeight: '1.6', margin: '0 0 16px' }
 const link = { color: '#00a283', textDecoration: 'underline' }
 const button = { backgroundColor: '#00a283', color: '#ffffff', fontSize: '14px', fontWeight: 600 as const, borderRadius: '8px', padding: '12px 28px', textDecoration: 'none', display: 'inline-block', margin: '12px 0' }
-const footer = { fontSize: '11px', color: '#94a3b8', margin: '32px 0 0', borderTop: '1px solid #e2e8f0", paddingTop: '16px' }
+const footer = { fontSize: '11px', color: '#94a3b8', margin: '32px 0 0', borderTop: '1px solid #e2e8f0', paddingTop: '16px' }
