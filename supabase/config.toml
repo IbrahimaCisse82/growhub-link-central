@@ -3,6 +3,9 @@ project_id = "ylaeamzzatebohcwepak"
 [functions.invite-user]
 verify_jwt = false
 
+[functions.resend-invitation]
+verify_jwt = false
+
 [functions.elearning-ai]
 verify_jwt = false
 
