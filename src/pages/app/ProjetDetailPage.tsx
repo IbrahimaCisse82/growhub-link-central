@@ -21,6 +21,9 @@ import { useUserProfile } from "@/hooks/useAssignableUsers";
 import { EditProjectDialog } from "@/components/dialogs/EditEntityDialogs";
 import ValidateEntityDialog from "@/components/dialogs/ValidateEntityDialog";
 import { exportProjectPdf } from "@/lib/projectPdfExport";
+import { exportProjectWord } from "@/lib/projectWordExport";
+import { exportBudgetToExcel } from "@/lib/budgetExcelExport";
+import { toast } from "sonner";
 
 const statusMap: Record<string, { label: string; color: "green" | "blue" | "amber" | "gray" }> = {
   active: { label: "Actif", color: "green" },
@@ -216,9 +219,25 @@ export default function ProjetDetailPage() {
                 <p className="text-xs text-muted-foreground">Chef de projet : <span className="text-foreground font-medium">{projectManager.full_name}</span></p>
               )}
             </div>
-            <div className="flex gap-2 shrink-0">
+            <div className="flex gap-2 shrink-0 flex-wrap">
               <GhButton size="sm" variant="ghost" onClick={() => exportProjectPdf({ project, logFrame: logFrame ?? null, toc: toc ?? null, indicators: indicators ?? [], budgetLines: budgetLines ?? [], budgetDetails: budgetDetails ?? [], risks: projectRisks ?? [], milestones: milestones ?? [], partners: projectPartners ?? [] })}>
-                📄 Export PDF
+                📄 PDF
+              </GhButton>
+              <GhButton size="sm" variant="ghost" onClick={async () => {
+                try {
+                  await exportProjectWord({ project, logFrame: logFrame ?? null, toc: toc ?? null, indicators: indicators ?? [], budgetLines: budgetLines ?? [], budgetDetails: budgetDetails ?? [], risks: projectRisks ?? [], milestones: milestones ?? [], partners: projectPartners ?? [] });
+                  toast.success("Document Word généré");
+                } catch (e) { toast.error("Erreur export Word"); console.error(e); }
+              }}>
+                📝 Word
+              </GhButton>
+              <GhButton size="sm" variant="ghost" onClick={async () => {
+                try {
+                  await exportBudgetToExcel({ projectId: project.id, projectName: project.code || project.name || "PAERID", currency: "USD" });
+                  toast.success("Budget Excel généré");
+                } catch (e) { toast.error("Erreur export Excel"); console.error(e); }
+              }}>
+                💰 Budget Excel
               </GhButton>
               {isAdmin && (
                 <>
