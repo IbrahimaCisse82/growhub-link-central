@@ -908,6 +908,418 @@ export type Database = {
           },
         ]
       }
+      crm_contreparties: {
+        Row: {
+          address: string | null
+          city: string | null
+          contact_email: string | null
+          contact_person: string | null
+          contact_phone: string | null
+          country: string | null
+          created_at: string
+          created_by: string | null
+          email: string | null
+          id: string
+          is_active: boolean | null
+          is_client: boolean | null
+          is_funder: boolean | null
+          is_supplier: boolean | null
+          name: string
+          ninea: string | null
+          notes: string | null
+          party_type: Database["public"]["Enums"]["crm_party_type"]
+          phone: string | null
+          startup_id: string | null
+          tax_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          contact_email?: string | null
+          contact_person?: string | null
+          contact_phone?: string | null
+          country?: string | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_client?: boolean | null
+          is_funder?: boolean | null
+          is_supplier?: boolean | null
+          name: string
+          ninea?: string | null
+          notes?: string | null
+          party_type: Database["public"]["Enums"]["crm_party_type"]
+          phone?: string | null
+          startup_id?: string | null
+          tax_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          contact_email?: string | null
+          contact_person?: string | null
+          contact_phone?: string | null
+          country?: string | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_client?: boolean | null
+          is_funder?: boolean | null
+          is_supplier?: boolean | null
+          name?: string
+          ninea?: string | null
+          notes?: string | null
+          party_type?: Database["public"]["Enums"]["crm_party_type"]
+          phone?: string | null
+          startup_id?: string | null
+          tax_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_contreparties_startup_id_fkey"
+            columns: ["startup_id"]
+            isOneToOne: false
+            referencedRelation: "startups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_invoice_lines: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          invoice_id: string
+          line_total: number | null
+          quantity: number
+          sort_order: number | null
+          tax_rate: number | null
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          invoice_id: string
+          line_total?: number | null
+          quantity?: number
+          sort_order?: number | null
+          tax_rate?: number | null
+          unit_price?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          invoice_id?: string
+          line_total?: number | null
+          quantity?: number
+          sort_order?: number | null
+          tax_rate?: number | null
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_invoice_lines_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "crm_invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_invoices: {
+        Row: {
+          amount_paid: number | null
+          contrepartie_id: string
+          created_at: string
+          created_by: string | null
+          currency: string
+          direction: Database["public"]["Enums"]["crm_invoice_direction"]
+          due_date: string | null
+          exchange_rate: number | null
+          grant_id: string | null
+          id: string
+          invoice_number: string
+          issue_date: string
+          notes: string | null
+          paid_at: string | null
+          payment_terms: string | null
+          pdf_url: string | null
+          project_id: string | null
+          reference: string | null
+          sent_at: string | null
+          status: Database["public"]["Enums"]["crm_invoice_status"]
+          subscription_id: string | null
+          subtotal: number | null
+          tax_amount: number | null
+          tax_rate: number | null
+          total: number | null
+          updated_at: string
+        }
+        Insert: {
+          amount_paid?: number | null
+          contrepartie_id: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          direction?: Database["public"]["Enums"]["crm_invoice_direction"]
+          due_date?: string | null
+          exchange_rate?: number | null
+          grant_id?: string | null
+          id?: string
+          invoice_number: string
+          issue_date?: string
+          notes?: string | null
+          paid_at?: string | null
+          payment_terms?: string | null
+          pdf_url?: string | null
+          project_id?: string | null
+          reference?: string | null
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["crm_invoice_status"]
+          subscription_id?: string | null
+          subtotal?: number | null
+          tax_amount?: number | null
+          tax_rate?: number | null
+          total?: number | null
+          updated_at?: string
+        }
+        Update: {
+          amount_paid?: number | null
+          contrepartie_id?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          direction?: Database["public"]["Enums"]["crm_invoice_direction"]
+          due_date?: string | null
+          exchange_rate?: number | null
+          grant_id?: string | null
+          id?: string
+          invoice_number?: string
+          issue_date?: string
+          notes?: string | null
+          paid_at?: string | null
+          payment_terms?: string | null
+          pdf_url?: string | null
+          project_id?: string | null
+          reference?: string | null
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["crm_invoice_status"]
+          subscription_id?: string | null
+          subtotal?: number | null
+          tax_amount?: number | null
+          tax_rate?: number | null
+          total?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_invoices_contrepartie_id_fkey"
+            columns: ["contrepartie_id"]
+            isOneToOne: false
+            referencedRelation: "crm_contreparties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_invoices_grant_id_fkey"
+            columns: ["grant_id"]
+            isOneToOne: false
+            referencedRelation: "grants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_invoices_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_invoices_subscription_fk"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "crm_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          id: string
+          invoice_id: string
+          notes: string | null
+          payment_date: string
+          payment_method: string | null
+          recorded_by: string | null
+          reference: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          id?: string
+          invoice_id: string
+          notes?: string | null
+          payment_date?: string
+          payment_method?: string | null
+          recorded_by?: string | null
+          reference?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          invoice_id?: string
+          notes?: string | null
+          payment_date?: string
+          payment_method?: string | null
+          recorded_by?: string | null
+          reference?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_payments_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "crm_invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_subscription_occurrences: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          due_date: string
+          id: string
+          invoice_id: string | null
+          is_paid: boolean | null
+          notes: string | null
+          paid_at: string | null
+          subscription_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          due_date: string
+          id?: string
+          invoice_id?: string | null
+          is_paid?: boolean | null
+          notes?: string | null
+          paid_at?: string | null
+          subscription_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          due_date?: string
+          id?: string
+          invoice_id?: string | null
+          is_paid?: boolean | null
+          notes?: string | null
+          paid_at?: string | null
+          subscription_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_subscription_occurrences_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "crm_invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_subscription_occurrences_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "crm_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_subscriptions: {
+        Row: {
+          amount: number
+          auto_invoice: boolean | null
+          category: string | null
+          contrepartie_id: string
+          created_at: string
+          created_by: string | null
+          currency: string
+          description: string | null
+          end_date: string | null
+          frequency: Database["public"]["Enums"]["crm_subscription_frequency"]
+          id: string
+          name: string
+          next_due_date: string
+          notes: string | null
+          start_date: string
+          status: Database["public"]["Enums"]["crm_subscription_status"]
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          auto_invoice?: boolean | null
+          category?: string | null
+          contrepartie_id: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          description?: string | null
+          end_date?: string | null
+          frequency?: Database["public"]["Enums"]["crm_subscription_frequency"]
+          id?: string
+          name: string
+          next_due_date?: string
+          notes?: string | null
+          start_date?: string
+          status?: Database["public"]["Enums"]["crm_subscription_status"]
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          auto_invoice?: boolean | null
+          category?: string | null
+          contrepartie_id?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          description?: string | null
+          end_date?: string | null
+          frequency?: Database["public"]["Enums"]["crm_subscription_frequency"]
+          id?: string
+          name?: string
+          next_due_date?: string
+          notes?: string | null
+          start_date?: string
+          status?: Database["public"]["Enums"]["crm_subscription_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_subscriptions_contrepartie_id_fkey"
+            columns: ["contrepartie_id"]
+            isOneToOne: false
+            referencedRelation: "crm_contreparties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       data_collection_forms: {
         Row: {
           created_at: string | null
@@ -4482,6 +4894,21 @@ export type Database = {
         | "due_diligence"
         | "accepted"
         | "rejected"
+      crm_invoice_direction: "emise" | "recue"
+      crm_invoice_status:
+        | "brouillon"
+        | "envoyee"
+        | "payee_partiel"
+        | "payee"
+        | "en_retard"
+        | "annulee"
+      crm_party_type: "client" | "bailleur" | "fournisseur" | "partenaire"
+      crm_subscription_frequency:
+        | "mensuel"
+        | "trimestriel"
+        | "semestriel"
+        | "annuel"
+      crm_subscription_status: "actif" | "suspendu" | "termine"
       event_type:
         | "demo_day"
         | "workshop"
@@ -4646,6 +5073,23 @@ export const Constants = {
         "accepted",
         "rejected",
       ],
+      crm_invoice_direction: ["emise", "recue"],
+      crm_invoice_status: [
+        "brouillon",
+        "envoyee",
+        "payee_partiel",
+        "payee",
+        "en_retard",
+        "annulee",
+      ],
+      crm_party_type: ["client", "bailleur", "fournisseur", "partenaire"],
+      crm_subscription_frequency: [
+        "mensuel",
+        "trimestriel",
+        "semestriel",
+        "annuel",
+      ],
+      crm_subscription_status: ["actif", "suspendu", "termine"],
       event_type: [
         "demo_day",
         "workshop",

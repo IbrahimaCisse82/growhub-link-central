@@ -8,7 +8,7 @@ import {
   AlertTriangle, FileText, Settings as SettingsIcon, Filter, Triangle, CircleDot, GraduationCap,
   Users, Link2, Headphones, CalendarDays, BookOpen, ClipboardList, BarChart3, DollarSign,
   PieChart, Wallet, Store, Handshake, Diamond, MessageCircle, FolderOpen, LineChart,
-  FileBarChart, Zap, LogOut, Globe, UserCog, type LucideIcon
+  FileBarChart, Zap, LogOut, Globe, UserCog, Receipt, type LucideIcon
 } from "lucide-react";
 
 interface NavItem {
@@ -91,6 +91,7 @@ function useNavGroups() {
       label: t("nav.management") || "Management",
       items: [
         { label: "RH & Paie", icon: UserCog, path: "/app/rh" },
+        { label: "CRM & Facturation", icon: Receipt, path: "/app/crm" },
       ],
     },
     {
