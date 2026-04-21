@@ -280,7 +280,7 @@ export default function CrmPage() {
                   {filteredInvoices?.map((i) => {
                     const remaining = Number(i.total) - Number(i.amount_paid || 0);
                     return (
-                      <tr key={i.id} className="border-t border-border hover:bg-secondary/30">
+                      <tr key={i.id} className="border-t border-border hover:bg-secondary/30 cursor-pointer" onClick={() => setDetailInvoiceId(i.id)}>
                         <td className="p-3 font-mono text-xs">{i.invoice_number}</td>
                         <td className="p-3 text-xs">{new Date(i.issue_date).toLocaleDateString("fr-FR")}</td>
                         <td className="p-3">{(i.contrepartie as any)?.name || "—"}</td>
@@ -289,10 +289,13 @@ export default function CrmPage() {
                         <td className="p-3 text-right font-mono font-semibold">{remaining > 0 ? fmt(remaining, i.currency) : "—"}</td>
                         <td className="p-3"><Badge className={statusBadge[i.status as InvoiceStatus]}>{statusLabel[i.status as InvoiceStatus]}</Badge></td>
                         <td className="p-3 text-xs text-muted-foreground">{i.due_date ? new Date(i.due_date).toLocaleDateString("fr-FR") : "—"}</td>
-                        <td className="p-3">
+                        <td className="p-3" onClick={(e) => e.stopPropagation()}>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreHorizontal size={14} /></Button></DropdownMenuTrigger>
                             <DropdownMenuContent>
+                              <DropdownMenuItem onClick={() => setDetailInvoiceId(i.id)}>
+                                <FileText size={14} className="mr-2" /> Voir détail
+                              </DropdownMenuItem>
                               <DropdownMenuItem onClick={() => downloadPdf(i.id)}><FileDown size={14} className="mr-2" /> Télécharger PDF</DropdownMenuItem>
                               {remaining > 0 && i.status !== "annulee" && (
                                 <DropdownMenuItem onClick={() => setPaymentInvoice({ id: i.id, remaining, currency: i.currency })}>
@@ -336,6 +339,8 @@ export default function CrmPage() {
                 sub={s}
                 expanded={openOccurrencesFor === s.id}
                 onToggle={() => setOpenOccurrencesFor(openOccurrencesFor === s.id ? null : s.id)}
+                onEdit={() => setEditingSub(s)}
+                onDelete={() => confirm("Supprimer cet abonnement et ses échéances ?") && deleteSub.mutate(s.id)}
               />
             ))}
             {!subscriptions?.length && (
@@ -348,6 +353,9 @@ export default function CrmPage() {
       <CreateContrepartieDialog open={openContrepartie} onOpenChange={setOpenContrepartie} />
       <CreateInvoiceDialog open={openInvoice} onOpenChange={setOpenInvoice} />
       <CreateSubscriptionDialog open={openSub} onOpenChange={setOpenSub} />
+      <EditContrepartieDialog open={!!editingParty} onOpenChange={(v) => !v && setEditingParty(null)} contrepartie={editingParty} />
+      <EditSubscriptionDialog open={!!editingSub} onOpenChange={(v) => !v && setEditingSub(null)} subscription={editingSub} />
+      <InvoiceDetailDialog open={!!detailInvoiceId} onOpenChange={(v) => !v && setDetailInvoiceId(null)} invoiceId={detailInvoiceId} />
       {paymentInvoice && (
         <RecordPaymentDialog
           open={!!paymentInvoice}
@@ -361,7 +369,7 @@ export default function CrmPage() {
   );
 }
 
-function SubscriptionCard({ sub, expanded, onToggle }: { sub: any; expanded: boolean; onToggle: () => void }) {
+function SubscriptionCard({ sub, expanded, onToggle, onEdit, onDelete }: { sub: any; expanded: boolean; onToggle: () => void; onEdit: () => void; onDelete: () => void }) {
   const { data: occurrences } = useSubscriptionOccurrences(expanded ? sub.id : undefined);
   const markPaid = useMarkOccurrencePaid();
   return (
@@ -371,6 +379,7 @@ function SubscriptionCard({ sub, expanded, onToggle }: { sub: any; expanded: boo
           <div className="flex items-center gap-2">
             <h4 className="font-semibold truncate">{sub.name}</h4>
             <Badge variant={sub.status === "actif" ? "default" : "secondary"} className="text-xs">{sub.status}</Badge>
+            {sub.auto_invoice && <Badge variant="outline" className="text-[10px]">Auto-facturation</Badge>}
           </div>
           <div className="text-xs text-muted-foreground mt-0.5 truncate">{(sub.contrepartie as any)?.name}</div>
           {sub.category && <Badge variant="outline" className="text-xs mt-1">{sub.category}</Badge>}
