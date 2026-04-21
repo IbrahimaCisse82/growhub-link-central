@@ -21,3 +21,7 @@ project_id = "ylaeamzzatebohcwepak"
     verify_jwt = true
   [functions.weekly-digest]
     verify_jwt = false
+  [functions.send-invoice-email]
+    verify_jwt = true
+  [functions.crm-daily-job]
+    verify_jwt = false
