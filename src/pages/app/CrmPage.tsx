@@ -68,6 +68,9 @@ export default function CrmPage() {
   const [openSub, setOpenSub] = useState(false);
   const [paymentInvoice, setPaymentInvoice] = useState<any | null>(null);
   const [openOccurrencesFor, setOpenOccurrencesFor] = useState<string | null>(null);
+  const [editingParty, setEditingParty] = useState<any | null>(null);
+  const [editingSub, setEditingSub] = useState<any | null>(null);
+  const [detailInvoiceId, setDetailInvoiceId] = useState<string | null>(null);
 
   const { data: stats } = useCrmStats();
   const { data: parties } = useContreparties(partyFilter);
@@ -77,6 +80,7 @@ export default function CrmPage() {
   const deleteParty = useDeleteContrepartie();
   const deleteInv = useDeleteInvoice();
   const updateStatus = useUpdateInvoiceStatus();
+  const deleteSub = useDeleteSubscription();
 
   const filteredParties = parties?.filter((p) =>
     !search || p.name.toLowerCase().includes(search.toLowerCase()) || p.email?.toLowerCase().includes(search.toLowerCase())
