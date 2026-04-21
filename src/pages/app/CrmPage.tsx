@@ -391,7 +391,11 @@ function SubscriptionCard({ sub, expanded, onToggle, onEdit, onDelete }: { sub: 
       </div>
       <div className="flex items-center justify-between mt-3 pt-3 border-t border-border text-xs">
         <span className="text-muted-foreground">Prochaine : <span className="font-medium text-foreground">{new Date(sub.next_due_date).toLocaleDateString("fr-FR")}</span></span>
-        <Button variant="ghost" size="sm" onClick={onToggle}>{expanded ? "Masquer" : "Échéances"}</Button>
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="sm" onClick={onToggle}>{expanded ? "Masquer" : "Échéances"}</Button>
+          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onEdit}><Edit2 size={12} /></Button>
+          <Button variant="ghost" size="icon" className="h-7 w-7 text-red-600" onClick={onDelete}><Trash2 size={12} /></Button>
+        </div>
       </div>
       {expanded && (
         <div className="mt-3 pt-3 border-t border-border space-y-1 max-h-60 overflow-y-auto">
