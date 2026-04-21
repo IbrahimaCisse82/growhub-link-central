@@ -145,7 +145,7 @@ export default function CrmPage() {
             <h3 className="font-semibold mb-3 text-sm">Factures à surveiller</h3>
             <div className="space-y-2">
               {invoices?.filter((i) => i.status === "en_retard" || i.status === "envoyee").slice(0, 5).map((i) => (
-                <div key={i.id} className="flex items-center justify-between text-sm p-2 rounded bg-secondary/40">
+                <div key={i.id} onClick={() => setDetailInvoiceId(i.id)} className="flex items-center justify-between text-sm p-2 rounded bg-secondary/40 hover:bg-secondary cursor-pointer transition">
                   <div className="flex items-center gap-3">
                     <Badge className={statusBadge[i.status as InvoiceStatus]}>{statusLabel[i.status as InvoiceStatus]}</Badge>
                     <span className="font-mono text-xs">{i.invoice_number}</span>
