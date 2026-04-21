@@ -5,7 +5,7 @@ import {
 } from 'npm:@react-email/components@0.0.22'
 import type { TemplateEntry } from './registry.ts'
 
-const SITE_NAME = 'GrowHub Accelerator'
+const SITE_NAME = 'Grow Hub Management System'
 
 interface ReminderProps {
   inviteUrl?: string
