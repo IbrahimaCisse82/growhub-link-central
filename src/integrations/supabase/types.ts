@@ -1049,6 +1049,7 @@ export type Database = {
           id: string
           invoice_number: string
           issue_date: string
+          last_reminder_sent_at: string | null
           notes: string | null
           paid_at: string | null
           payment_terms: string | null
@@ -1056,6 +1057,7 @@ export type Database = {
           project_id: string | null
           reference: string | null
           sent_at: string | null
+          sent_to_email: string | null
           status: Database["public"]["Enums"]["crm_invoice_status"]
           subscription_id: string | null
           subtotal: number | null
@@ -1077,6 +1079,7 @@ export type Database = {
           id?: string
           invoice_number: string
           issue_date?: string
+          last_reminder_sent_at?: string | null
           notes?: string | null
           paid_at?: string | null
           payment_terms?: string | null
@@ -1084,6 +1087,7 @@ export type Database = {
           project_id?: string | null
           reference?: string | null
           sent_at?: string | null
+          sent_to_email?: string | null
           status?: Database["public"]["Enums"]["crm_invoice_status"]
           subscription_id?: string | null
           subtotal?: number | null
@@ -1105,6 +1109,7 @@ export type Database = {
           id?: string
           invoice_number?: string
           issue_date?: string
+          last_reminder_sent_at?: string | null
           notes?: string | null
           paid_at?: string | null
           payment_terms?: string | null
@@ -1112,6 +1117,7 @@ export type Database = {
           project_id?: string | null
           reference?: string | null
           sent_at?: string | null
+          sent_to_email?: string | null
           status?: Database["public"]["Enums"]["crm_invoice_status"]
           subscription_id?: string | null
           subtotal?: number | null
