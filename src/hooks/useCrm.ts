@@ -240,6 +240,48 @@ export function useCreateSubscription() {
   });
 }
 
+export function useUpdateSubscription() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ...payload }: any) => {
+      const { data, error } = await supabase.from("crm_subscriptions").update(payload).eq("id", id).select().single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["crm-subscriptions"] });
+      toast({ title: "Abonnement mis à jour" });
+    },
+    onError: (e: any) => toast({ title: "Erreur", description: e.message, variant: "destructive" }),
+  });
+}
+
+export function useDeleteSubscription() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("crm_subscriptions").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["crm-subscriptions"] });
+      toast({ title: "Abonnement supprimé" });
+    },
+  });
+}
+
+export function useSendInvoiceEmail() {
+  return useMutation({
+    mutationFn: async ({ invoice_id, recipient_email, custom_message, mode }: { invoice_id: string; recipient_email?: string; custom_message?: string; mode: "send" | "reminder" }) => {
+      const { data, error } = await supabase.functions.invoke("send-invoice-email", {
+        body: { invoice_id, recipient_email, custom_message, mode },
+      });
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
 export function useMarkOccurrencePaid() {
   const qc = useQueryClient();
   return useMutation({

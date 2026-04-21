@@ -194,11 +194,15 @@ export default function InvoiceDetailDialog({ open, onOpenChange, invoiceId }: P
         </DialogContent>
       </Dialog>
 
-      <RecordPaymentDialog
-        open={paymentOpen}
-        onOpenChange={setPaymentOpen}
-        invoice={inv ? { id: inv.id, remaining, currency: inv.currency } : null}
-      />
+      {inv && (
+        <RecordPaymentDialog
+          open={paymentOpen}
+          onOpenChange={setPaymentOpen}
+          invoiceId={inv.id}
+          remaining={remaining}
+          currency={inv.currency}
+        />
+      )}
     </>
   );
 }
