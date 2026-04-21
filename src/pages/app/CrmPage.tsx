@@ -12,13 +12,17 @@ import {
 import {
   useContreparties, useInvoices, useSubscriptions, useCrmStats,
   useDeleteContrepartie, useDeleteInvoice, useUpdateInvoiceStatus,
-  useInvoice, useMarkOccurrencePaid, useSubscriptionOccurrences,
+  useMarkOccurrencePaid, useSubscriptionOccurrences, useDeleteSubscription,
   type PartyType, type InvoiceStatus,
 } from "@/hooks/useCrm";
 import CreateContrepartieDialog from "@/components/dialogs/CreateContrepartieDialog";
 import CreateInvoiceDialog from "@/components/dialogs/CreateInvoiceDialog";
 import CreateSubscriptionDialog from "@/components/dialogs/CreateSubscriptionDialog";
 import RecordPaymentDialog from "@/components/dialogs/RecordPaymentDialog";
+import EditContrepartieDialog from "@/components/dialogs/EditContrepartieDialog";
+import EditSubscriptionDialog from "@/components/dialogs/EditSubscriptionDialog";
+import InvoiceDetailDialog from "@/components/dialogs/InvoiceDetailDialog";
+import { Edit2 } from "lucide-react";
 import { exportInvoicePdf } from "@/lib/invoicePdfExport";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
