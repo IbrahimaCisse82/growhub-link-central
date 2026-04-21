@@ -94,6 +94,42 @@ Deno.serve(async (req) => {
     }
     result.reminders_sent = reminded;
 
+    // 4) Subscription due-date alerts (J-7) → in-app notification to creator
+    const in7days = new Date(Date.now() + 7 * 86400_000).toISOString().slice(0, 10);
+    const { data: upcomingOccs } = await supabase
+      .from("crm_subscription_occurrences")
+      .select("id, due_date, amount, currency, subscription:crm_subscriptions(name, created_by, contrepartie:crm_contreparties(name))")
+      .eq("is_paid", false)
+      .gte("due_date", today)
+      .lte("due_date", in7days)
+      .limit(50);
+
+    let alerted = 0;
+    for (const occ of upcomingOccs ?? []) {
+      const sub: any = occ.subscription;
+      if (!sub?.created_by) continue;
+      // Avoid duplicate notifications: check if one already exists for this occurrence today
+      const { data: existing } = await supabase
+        .from("notifications")
+        .select("id")
+        .eq("user_id", sub.created_by)
+        .ilike("link", `%crm%`)
+        .gte("created_at", today)
+        .limit(1);
+      if (existing && existing.length > 0) continue;
+
+      const days = Math.max(0, Math.round((new Date(occ.due_date).getTime() - Date.now()) / 86400_000));
+      await supabase.from("notifications").insert({
+        user_id: sub.created_by,
+        title: `⏰ Échéance abonnement dans ${days}j`,
+        content: `${sub.name} (${sub.contrepartie?.name ?? ""}) — ${Number(occ.amount).toLocaleString("fr-FR")} ${occ.currency} due le ${occ.due_date}`,
+        type: "info",
+        link: "/app/crm",
+      });
+      alerted++;
+    }
+    result.subscription_alerts = alerted;
+
     return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
