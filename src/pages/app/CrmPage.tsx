@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Building2, FileText, Repeat, TrendingUp, AlertCircle, Wallet, Plus, Search,
-  Download, CheckCircle2, MoreHorizontal, Trash2, FileDown, CreditCard
+  Download, CheckCircle2, MoreHorizontal, Trash2, FileDown, CreditCard, BarChart3,
 } from "lucide-react";
 import {
   useContreparties, useInvoices, useSubscriptions, useCrmStats,
@@ -22,8 +22,11 @@ import RecordPaymentDialog from "@/components/dialogs/RecordPaymentDialog";
 import EditContrepartieDialog from "@/components/dialogs/EditContrepartieDialog";
 import EditSubscriptionDialog from "@/components/dialogs/EditSubscriptionDialog";
 import InvoiceDetailDialog from "@/components/dialogs/InvoiceDetailDialog";
+import CrmAnalyticsTab from "@/components/crm/CrmAnalyticsTab";
 import { Edit2 } from "lucide-react";
 import { exportInvoicePdf } from "@/lib/invoicePdfExport";
+import { exportToCSV } from "@/lib/exportUtils";
+import { exportToExcel } from "@/lib/excelExport";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
@@ -62,6 +65,9 @@ export default function CrmPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<InvoiceStatus | "all">("all");
   const [directionFilter, setDirectionFilter] = useState<"all" | "emise" | "recue">("all");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const [minAmount, setMinAmount] = useState("");
 
   const [openContrepartie, setOpenContrepartie] = useState(false);
   const [openInvoice, setOpenInvoice] = useState(false);
@@ -85,15 +91,100 @@ export default function CrmPage() {
   const filteredParties = parties?.filter((p) =>
     !search || p.name.toLowerCase().includes(search.toLowerCase()) || p.email?.toLowerCase().includes(search.toLowerCase())
   );
-  const filteredInvoices = invoices?.filter((i) =>
-    !search || i.invoice_number.toLowerCase().includes(search.toLowerCase()) || (i.contrepartie as any)?.name?.toLowerCase().includes(search.toLowerCase())
-  );
+
+  const filteredInvoices = useMemo(() => {
+    return invoices?.filter((i: any) => {
+      if (search) {
+        const q = search.toLowerCase();
+        const match = i.invoice_number.toLowerCase().includes(q) || (i.contrepartie as any)?.name?.toLowerCase().includes(q);
+        if (!match) return false;
+      }
+      if (dateFrom && i.issue_date < dateFrom) return false;
+      if (dateTo && i.issue_date > dateTo) return false;
+      if (minAmount && Number(i.total) < Number(minAmount)) return false;
+      return true;
+    });
+  }, [invoices, search, dateFrom, dateTo, minAmount]);
 
   const downloadPdf = async (invId: string) => {
     const { data } = await import("@/integrations/supabase/client").then((m) =>
       m.supabase.from("crm_invoices").select("*, contrepartie:crm_contreparties(*), lines:crm_invoice_lines(*)").eq("id", invId).single()
     );
     if (data) exportInvoicePdf(data as any);
+  };
+
+  const exportPartiesCsv = () => {
+    if (!filteredParties?.length) return;
+    exportToCSV(
+      filteredParties.map((p: any) => ({
+        name: p.name, type: p.party_type, email: p.email, phone: p.phone,
+        city: p.city, country: p.country, ninea: p.ninea, contact: p.contact_person,
+      })),
+      "contreparties",
+      [
+        { key: "name", label: "Nom" }, { key: "type", label: "Type" },
+        { key: "email", label: "Email" }, { key: "phone", label: "Téléphone" },
+        { key: "city", label: "Ville" }, { key: "country", label: "Pays" },
+        { key: "ninea", label: "NINEA" }, { key: "contact", label: "Contact" },
+      ]
+    );
+  };
+
+  const exportInvoicesXlsx = () => {
+    if (!filteredInvoices?.length) return;
+    exportToExcel(
+      [{
+        name: "Factures",
+        rows: filteredInvoices.map((i: any) => ({
+          number: i.invoice_number,
+          date: i.issue_date,
+          due_date: i.due_date || "",
+          contrepartie: (i.contrepartie as any)?.name || "",
+          direction: i.direction === "emise" ? "Vente" : "Achat",
+          status: statusLabel[i.status as InvoiceStatus],
+          subtotal: Number(i.subtotal || 0),
+          tax: Number(i.tax_amount || 0),
+          total: Number(i.total || 0),
+          paid: Number(i.amount_paid || 0),
+          remaining: Number(i.total || 0) - Number(i.amount_paid || 0),
+          currency: i.currency,
+        })),
+        columns: [
+          { key: "number", label: "N°" }, { key: "date", label: "Date" },
+          { key: "due_date", label: "Échéance" }, { key: "contrepartie", label: "Contrepartie" },
+          { key: "direction", label: "Type" }, { key: "status", label: "Statut" },
+          { key: "subtotal", label: "Sous-total" }, { key: "tax", label: "TVA" },
+          { key: "total", label: "Total" }, { key: "paid", label: "Payé" },
+          { key: "remaining", label: "Reste dû" }, { key: "currency", label: "Devise" },
+        ],
+      }],
+      "factures-crm"
+    );
+  };
+
+  const exportSubsCsv = () => {
+    if (!subscriptions?.length) return;
+    exportToCSV(
+      subscriptions.map((s: any) => ({
+        name: s.name,
+        contrepartie: (s.contrepartie as any)?.name || "",
+        amount: Number(s.amount),
+        currency: s.currency,
+        frequency: s.frequency,
+        status: s.status,
+        start: s.start_date,
+        next: s.next_due_date,
+        auto: s.auto_invoice ? "Oui" : "Non",
+      })),
+      "abonnements",
+      [
+        { key: "name", label: "Nom" }, { key: "contrepartie", label: "Contrepartie" },
+        { key: "amount", label: "Montant" }, { key: "currency", label: "Devise" },
+        { key: "frequency", label: "Fréquence" }, { key: "status", label: "Statut" },
+        { key: "start", label: "Début" }, { key: "next", label: "Prochaine échéance" },
+        { key: "auto", label: "Auto-facturation" },
+      ]
+    );
   };
 
   return (
@@ -134,6 +225,7 @@ export default function CrmPage() {
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList>
           <TabsTrigger value="dashboard">Vue d'ensemble</TabsTrigger>
+          <TabsTrigger value="analytics"><BarChart3 size={14} className="mr-1" /> Analytics</TabsTrigger>
           <TabsTrigger value="contreparties">Contreparties</TabsTrigger>
           <TabsTrigger value="invoices">Factures</TabsTrigger>
           <TabsTrigger value="subscriptions">Abonnements</TabsTrigger>
@@ -162,6 +254,11 @@ export default function CrmPage() {
           </Card>
         </TabsContent>
 
+        {/* ANALYTICS */}
+        <TabsContent value="analytics" className="mt-4">
+          <CrmAnalyticsTab />
+        </TabsContent>
+
         {/* CONTREPARTIES */}
         <TabsContent value="contreparties" className="space-y-4 mt-4">
           <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -181,7 +278,10 @@ export default function CrmPage() {
                 </SelectContent>
               </Select>
             </div>
-            <Button onClick={() => setOpenContrepartie(true)}><Plus size={14} className="mr-1" /> Nouvelle contrepartie</Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={exportPartiesCsv}><Download size={14} className="mr-1" /> Export CSV</Button>
+              <Button onClick={() => setOpenContrepartie(true)}><Plus size={14} className="mr-1" /> Nouvelle contrepartie</Button>
+            </div>
           </div>
 
           <Card>
@@ -232,13 +332,13 @@ export default function CrmPage() {
         {/* INVOICES */}
         <TabsContent value="invoices" className="space-y-4 mt-4">
           <div className="flex items-center justify-between gap-3 flex-wrap">
-            <div className="flex items-center gap-2 flex-1 min-w-[280px]">
-              <div className="relative flex-1 max-w-sm">
+            <div className="flex items-center gap-2 flex-1 min-w-[280px] flex-wrap">
+              <div className="relative flex-1 max-w-xs min-w-[200px]">
                 <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
                 <Input className="pl-8" placeholder="N° ou contrepartie..." value={search} onChange={(e) => setSearch(e.target.value)} />
               </div>
               <Select value={directionFilter} onValueChange={(v) => setDirectionFilter(v as any)}>
-                <SelectTrigger className="w-[160px]"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="w-[140px]"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Toutes</SelectItem>
                   <SelectItem value="emise">Émises</SelectItem>
@@ -246,7 +346,7 @@ export default function CrmPage() {
                 </SelectContent>
               </Select>
               <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
-                <SelectTrigger className="w-[160px]"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="w-[150px]"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Tous statuts</SelectItem>
                   <SelectItem value="brouillon">Brouillon</SelectItem>
@@ -256,8 +356,17 @@ export default function CrmPage() {
                   <SelectItem value="en_retard">En retard</SelectItem>
                 </SelectContent>
               </Select>
+              <Input type="date" className="w-[150px]" placeholder="Du" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} title="Date émission ≥" />
+              <Input type="date" className="w-[150px]" placeholder="Au" value={dateTo} onChange={(e) => setDateTo(e.target.value)} title="Date émission ≤" />
+              <Input type="number" className="w-[130px]" placeholder="Montant min" value={minAmount} onChange={(e) => setMinAmount(e.target.value)} />
+              {(dateFrom || dateTo || minAmount) && (
+                <Button variant="ghost" size="sm" onClick={() => { setDateFrom(""); setDateTo(""); setMinAmount(""); }}>Réinitialiser</Button>
+              )}
             </div>
-            <Button onClick={() => setOpenInvoice(true)}><Plus size={14} className="mr-1" /> Nouvelle facture</Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={exportInvoicesXlsx}><Download size={14} className="mr-1" /> Export Excel</Button>
+              <Button onClick={() => setOpenInvoice(true)}><Plus size={14} className="mr-1" /> Nouvelle facture</Button>
+            </div>
           </div>
 
           <Card>
@@ -329,7 +438,10 @@ export default function CrmPage() {
         <TabsContent value="subscriptions" className="space-y-4 mt-4">
           <div className="flex items-center justify-between">
             <div className="text-sm text-muted-foreground">Suivez vos abonnements récurrents et leurs échéances</div>
-            <Button onClick={() => setOpenSub(true)}><Plus size={14} className="mr-1" /> Nouvel abonnement</Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={exportSubsCsv}><Download size={14} className="mr-1" /> Export CSV</Button>
+              <Button onClick={() => setOpenSub(true)}><Plus size={14} className="mr-1" /> Nouvel abonnement</Button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">

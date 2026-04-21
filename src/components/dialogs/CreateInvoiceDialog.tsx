@@ -7,6 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Trash2, Plus } from "lucide-react";
 import { useCreateInvoice, useContreparties, type InvoiceDirection } from "@/hooks/useCrm";
+import { useProjects } from "@/hooks/useProjects";
+import { useGrants } from "@/hooks/useGrants";
 
 interface Line {
   description: string;
@@ -24,6 +26,8 @@ interface Props {
 export default function CreateInvoiceDialog({ open, onOpenChange, defaultDirection = "emise" }: Props) {
   const create = useCreateInvoice();
   const { data: parties } = useContreparties("all");
+  const { data: projects } = useProjects();
+  const { data: grants } = useGrants();
   const [form, setForm] = useState({
     direction: defaultDirection,
     contrepartie_id: "",
@@ -34,6 +38,8 @@ export default function CreateInvoiceDialog({ open, onOpenChange, defaultDirecti
     reference: "",
     payment_terms: "Paiement à 30 jours",
     notes: "",
+    project_id: "",
+    grant_id: "",
   });
   const [lines, setLines] = useState<Line[]>([{ description: "", quantity: 1, unit_price: 0, tax_rate: 18 }]);
 
@@ -54,6 +60,8 @@ export default function CreateInvoiceDialog({ open, onOpenChange, defaultDirecti
     await create.mutateAsync({
       ...form,
       due_date: form.due_date || null,
+      project_id: form.project_id || null,
+      grant_id: form.grant_id || null,
       lines: lines.filter((l) => l.description),
     });
     onOpenChange(false);
@@ -114,6 +122,35 @@ export default function CreateInvoiceDialog({ open, onOpenChange, defaultDirecti
               <Input type="number" step="0.1" value={form.tax_rate} onChange={(e) => setForm({ ...form, tax_rate: Number(e.target.value) })} />
             </div>
           </div>
+
+          {/* Lien projet / subvention */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label>Projet (optionnel)</Label>
+              <Select value={form.project_id || "none"} onValueChange={(v) => setForm({ ...form, project_id: v === "none" ? "" : v })}>
+                <SelectTrigger><SelectValue placeholder="Aucun" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">— Aucun —</SelectItem>
+                  {projects?.map((p: any) => (
+                    <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Subvention (optionnel)</Label>
+              <Select value={form.grant_id || "none"} onValueChange={(v) => setForm({ ...form, grant_id: v === "none" ? "" : v })}>
+                <SelectTrigger><SelectValue placeholder="Aucune" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">— Aucune —</SelectItem>
+                  {grants?.map((g: any) => (
+                    <SelectItem key={g.id} value={g.id}>{g.name} {g.code ? `(${g.code})` : ""}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
           <div>
             <Label>Référence</Label>
             <Input value={form.reference} onChange={(e) => setForm({ ...form, reference: e.target.value })} placeholder="Bon de commande, contrat..." />
