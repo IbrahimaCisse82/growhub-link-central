@@ -209,6 +209,9 @@ export default function CrmPage() {
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreHorizontal size={14} /></Button></DropdownMenuTrigger>
                           <DropdownMenuContent>
+                            <DropdownMenuItem onClick={() => setEditingParty(p)}>
+                              <Edit2 size={14} className="mr-2" /> Modifier
+                            </DropdownMenuItem>
                             <DropdownMenuItem className="text-red-600" onClick={() => confirm("Supprimer ?") && deleteParty.mutate(p.id)}>
                               <Trash2 size={14} className="mr-2" /> Supprimer
                             </DropdownMenuItem>
