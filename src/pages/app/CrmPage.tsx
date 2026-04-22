@@ -8,16 +8,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   Building2, FileText, Repeat, TrendingUp, AlertCircle, Wallet, Plus, Search,
   Download, CheckCircle2, MoreHorizontal, Trash2, FileDown, CreditCard, BarChart3,
+  ArrowRightCircle, Receipt, Mail,
 } from "lucide-react";
 import {
   useContreparties, useInvoices, useSubscriptions, useCrmStats,
   useDeleteContrepartie, useDeleteInvoice, useUpdateInvoiceStatus,
   useMarkOccurrencePaid, useSubscriptionOccurrences, useDeleteSubscription,
-  type PartyType, type InvoiceStatus,
+  useQuotes, useDeleteQuote, useConvertQuoteToInvoice, useUpdateQuoteStatus,
+  type PartyType, type InvoiceStatus, type QuoteStatus,
 } from "@/hooks/useCrm";
 import CreateContrepartieDialog from "@/components/dialogs/CreateContrepartieDialog";
 import CreateInvoiceDialog from "@/components/dialogs/CreateInvoiceDialog";
 import CreateSubscriptionDialog from "@/components/dialogs/CreateSubscriptionDialog";
+import CreateQuoteDialog from "@/components/dialogs/CreateQuoteDialog";
+import CreateCreditNoteDialog from "@/components/dialogs/CreateCreditNoteDialog";
+import QuoteDetailDialog from "@/components/dialogs/QuoteDetailDialog";
 import RecordPaymentDialog from "@/components/dialogs/RecordPaymentDialog";
 import EditContrepartieDialog from "@/components/dialogs/EditContrepartieDialog";
 import EditSubscriptionDialog from "@/components/dialogs/EditSubscriptionDialog";
@@ -68,10 +73,18 @@ export default function CrmPage() {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [minAmount, setMinAmount] = useState("");
+  const [quoteStatusFilter, setQuoteStatusFilter] = useState<QuoteStatus | "all">("all");
+  const [quoteSearch, setQuoteSearch] = useState("");
+  const [quoteDateFrom, setQuoteDateFrom] = useState("");
+  const [quoteDateTo, setQuoteDateTo] = useState("");
+  const [quoteMinAmount, setQuoteMinAmount] = useState("");
 
   const [openContrepartie, setOpenContrepartie] = useState(false);
   const [openInvoice, setOpenInvoice] = useState(false);
   const [openSub, setOpenSub] = useState(false);
+  const [openQuote, setOpenQuote] = useState(false);
+  const [creditNoteFor, setCreditNoteFor] = useState<string | null>(null);
+  const [detailQuoteId, setDetailQuoteId] = useState<string | null>(null);
   const [paymentInvoice, setPaymentInvoice] = useState<any | null>(null);
   const [openOccurrencesFor, setOpenOccurrencesFor] = useState<string | null>(null);
   const [editingParty, setEditingParty] = useState<any | null>(null);
@@ -82,11 +95,15 @@ export default function CrmPage() {
   const { data: parties } = useContreparties(partyFilter);
   const { data: invoices } = useInvoices({ direction: directionFilter, status: statusFilter });
   const { data: subscriptions } = useSubscriptions("all");
+  const { data: quotes } = useQuotes({ status: quoteStatusFilter });
 
   const deleteParty = useDeleteContrepartie();
   const deleteInv = useDeleteInvoice();
   const updateStatus = useUpdateInvoiceStatus();
   const deleteSub = useDeleteSubscription();
+  const deleteQuote = useDeleteQuote();
+  const convertQuote = useConvertQuoteToInvoice();
+  const updateQuoteStatus = useUpdateQuoteStatus();
 
   const filteredParties = parties?.filter((p) =>
     !search || p.name.toLowerCase().includes(search.toLowerCase()) || p.email?.toLowerCase().includes(search.toLowerCase())
