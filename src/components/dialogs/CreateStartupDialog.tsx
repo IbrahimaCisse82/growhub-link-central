@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { SECTORS, STARTUP_STAGES } from "@/lib/sectors";
 
 const inputCls = "flex h-10 w-full rounded-lg border border-input bg-surface-2 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-colors";
 
@@ -37,11 +38,16 @@ export default function CreateStartupDialog({ children, cohortId }: { children: 
         <form onSubmit={(e) => { e.preventDefault(); create.mutate(); }} className="space-y-4">
           <div className="space-y-2"><label className="text-sm font-medium text-foreground">Nom *</label><input value={name} onChange={e => setName(e.target.value)} required className={inputCls} /></div>
           <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-2"><label className="text-sm font-medium text-foreground">Secteur</label><input value={sector} onChange={e => setSector(e.target.value)} className={inputCls} placeholder="fintech, agritech…" /></div>
+            <div className="space-y-2"><label className="text-sm font-medium text-foreground">Secteur</label>
+              <select value={sector} onChange={e => setSector(e.target.value)} className={inputCls}>
+                <option value="">— Choisir —</option>
+                {SECTORS.map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+            </div>
             <div className="space-y-2"><label className="text-sm font-medium text-foreground">Stade</label>
               <select value={stage} onChange={e => setStage(e.target.value)} className={inputCls}>
-                <option value="">—</option>
-                <option value="mvp">MVP</option><option value="incubation">Incubation</option><option value="accélération">Accélération</option><option value="croissance">Croissance</option>
+                <option value="">— Choisir —</option>
+                {STARTUP_STAGES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
               </select>
             </div>
           </div>
