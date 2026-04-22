@@ -444,6 +444,7 @@ export function useConvertQuoteToInvoice() {
       const { data: inv, error: invErr } = await supabase
         .from("crm_invoices")
         .insert({
+          invoice_number: "",
           direction: "emise",
           contrepartie_id: q.contrepartie_id,
           issue_date: new Date().toISOString().split("T")[0],
@@ -456,7 +457,7 @@ export function useConvertQuoteToInvoice() {
           grant_id: q.grant_id,
           status: "brouillon",
           created_by: user?.id,
-        })
+        } as any)
         .select()
         .single();
       if (invErr || !inv) throw invErr || new Error("Création facture échouée");
@@ -536,6 +537,7 @@ export function useCreateCreditNote() {
       const { data: cn, error: cnErr } = await supabase
         .from("crm_invoices")
         .insert({
+          invoice_number: "",
           direction: "emise",
           contrepartie_id: src.contrepartie_id,
           issue_date: new Date().toISOString().split("T")[0],
@@ -549,7 +551,7 @@ export function useCreateCreditNote() {
           credit_note_for: source_invoice_id,
           status: "brouillon",
           created_by: user?.id,
-        })
+        } as any)
         .select()
         .single();
       if (cnErr || !cn) throw cnErr || new Error("Création avoir échouée");
