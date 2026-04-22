@@ -8,6 +8,7 @@ export type InvoiceDirection = "emise" | "recue";
 export type InvoiceStatus = "brouillon" | "envoyee" | "payee_partiel" | "payee" | "en_retard" | "annulee";
 export type SubscriptionFrequency = "mensuel" | "trimestriel" | "semestriel" | "annuel";
 export type SubscriptionStatus = "actif" | "suspendu" | "termine";
+export type QuoteStatus = "brouillon" | "envoye" | "accepte" | "refuse" | "expire" | "converti";
 
 // ============ CONTREPARTIES ============
 export function useContreparties(typeFilter?: PartyType | "all") {
