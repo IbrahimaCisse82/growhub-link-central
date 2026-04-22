@@ -73,10 +73,18 @@ export default function CrmPage() {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [minAmount, setMinAmount] = useState("");
+  const [quoteStatusFilter, setQuoteStatusFilter] = useState<QuoteStatus | "all">("all");
+  const [quoteSearch, setQuoteSearch] = useState("");
+  const [quoteDateFrom, setQuoteDateFrom] = useState("");
+  const [quoteDateTo, setQuoteDateTo] = useState("");
+  const [quoteMinAmount, setQuoteMinAmount] = useState("");
 
   const [openContrepartie, setOpenContrepartie] = useState(false);
   const [openInvoice, setOpenInvoice] = useState(false);
   const [openSub, setOpenSub] = useState(false);
+  const [openQuote, setOpenQuote] = useState(false);
+  const [creditNoteFor, setCreditNoteFor] = useState<string | null>(null);
+  const [detailQuoteId, setDetailQuoteId] = useState<string | null>(null);
   const [paymentInvoice, setPaymentInvoice] = useState<any | null>(null);
   const [openOccurrencesFor, setOpenOccurrencesFor] = useState<string | null>(null);
   const [editingParty, setEditingParty] = useState<any | null>(null);
@@ -87,11 +95,15 @@ export default function CrmPage() {
   const { data: parties } = useContreparties(partyFilter);
   const { data: invoices } = useInvoices({ direction: directionFilter, status: statusFilter });
   const { data: subscriptions } = useSubscriptions("all");
+  const { data: quotes } = useQuotes({ status: quoteStatusFilter });
 
   const deleteParty = useDeleteContrepartie();
   const deleteInv = useDeleteInvoice();
   const updateStatus = useUpdateInvoiceStatus();
   const deleteSub = useDeleteSubscription();
+  const deleteQuote = useDeleteQuote();
+  const convertQuote = useConvertQuoteToInvoice();
+  const updateQuoteStatus = useUpdateQuoteStatus();
 
   const filteredParties = parties?.filter((p) =>
     !search || p.name.toLowerCase().includes(search.toLowerCase()) || p.email?.toLowerCase().includes(search.toLowerCase())
