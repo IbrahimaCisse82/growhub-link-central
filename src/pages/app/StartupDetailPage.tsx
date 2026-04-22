@@ -12,6 +12,7 @@ import StartupKpiTab from "@/components/startups/StartupKpiTab";
 import EntityDocumentsTab from "@/components/shared/EntityDocumentsTab";
 import EntityCommentsPanel from "@/components/shared/EntityCommentsPanel";
 import AISuggestPanel from "@/components/ai/AISuggestPanel";
+import StartupBillingTab from "@/components/crm/StartupBillingTab";
 import { useStartupHealthScore } from "@/hooks/useStartupKpis";
 
 const riskColor: Record<string, "green" | "amber" | "rose" | "gray"> = { low: "green", medium: "amber", high: "rose", critical: "rose" };
@@ -124,10 +125,15 @@ export default function StartupDetailPage() {
           <TabsTrigger value="kpis">📊 KPIs</TabsTrigger>
           <TabsTrigger value="projects">Projets ({projects?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="sessions">Coaching ({sessions?.length ?? 0})</TabsTrigger>
+          <TabsTrigger value="billing">💼 Facturation</TabsTrigger>
           <TabsTrigger value="documents">📁 Documents</TabsTrigger>
           {risks && risks.length > 0 && <TabsTrigger value="risks">Risques ({risks.length})</TabsTrigger>}
           <TabsTrigger value="discussion">💬 Discussion & IA</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="billing" className="mt-4">
+          <StartupBillingTab startupId={startup.id} startupName={startup.name} />
+        </TabsContent>
 
         <TabsContent value="discussion" className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="bg-card border border-border rounded-xl p-4">
