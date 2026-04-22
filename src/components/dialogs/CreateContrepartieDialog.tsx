@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,6 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCreateContrepartie, type PartyType } from "@/hooks/useCrm";
+import { useStartups } from "@/hooks/useStartups";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Props {
   open: boolean;
@@ -15,6 +17,8 @@ interface Props {
 
 export default function CreateContrepartieDialog({ open, onOpenChange, defaultType = "client" }: Props) {
   const create = useCreateContrepartie();
+  const { data: startups } = useStartups();
+  const [selectedStartupId, setSelectedStartupId] = useState<string>("");
   const [form, setForm] = useState({
     name: "",
     party_type: defaultType,
@@ -27,14 +31,55 @@ export default function CreateContrepartieDialog({ open, onOpenChange, defaultTy
     tax_id: "",
     contact_person: "",
     notes: "",
+    startup_id: null as string | null,
   });
+
+  const isClient = form.party_type === "client";
+
+  // Charger les infos détaillées (founder email/phone) quand on sélectionne une entreprise
+  useEffect(() => {
+    if (!selectedStartupId || !startups) return;
+    const s = startups.find((x: any) => x.id === selectedStartupId);
+    if (!s) return;
+
+    (async () => {
+      let founderEmail = "";
+      let founderName = "";
+      if (s.founder_id) {
+        const { data: prof } = await supabase
+          .from("profiles")
+          .select("full_name, email")
+          .eq("user_id", s.founder_id)
+          .maybeSingle();
+        founderEmail = prof?.email ?? "";
+        founderName = prof?.full_name ?? "";
+      }
+      setForm((f) => ({
+        ...f,
+        name: s.name ?? "",
+        startup_id: s.id,
+        city: s.city ?? f.city,
+        country: s.country ?? f.country,
+        email: founderEmail || f.email,
+        contact_person: founderName || f.contact_person,
+        notes: s.description ?? f.notes,
+      }));
+    })();
+  }, [selectedStartupId, startups]);
 
   const submit = async () => {
     if (!form.name) return;
     await create.mutateAsync(form);
     onOpenChange(false);
-    setForm({ ...form, name: "", email: "", phone: "", address: "", ninea: "", tax_id: "", contact_person: "", notes: "" });
+    setSelectedStartupId("");
+    setForm({
+      name: "", party_type: defaultType, email: "", phone: "", address: "",
+      city: "", country: "Sénégal", ninea: "", tax_id: "", contact_person: "",
+      notes: "", startup_id: null,
+    });
   };
+
+  const startupOptions = useMemo(() => startups ?? [], [startups]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -43,13 +88,9 @@ export default function CreateContrepartieDialog({ open, onOpenChange, defaultTy
           <DialogTitle>Nouvelle contrepartie</DialogTitle>
         </DialogHeader>
         <div className="grid grid-cols-2 gap-4 py-4">
-          <div className="col-span-2">
-            <Label>Nom *</Label>
-            <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Nom de l'entité" />
-          </div>
           <div>
             <Label>Type *</Label>
-            <Select value={form.party_type} onValueChange={(v) => setForm({ ...form, party_type: v as PartyType })}>
+            <Select value={form.party_type} onValueChange={(v) => { setForm({ ...form, party_type: v as PartyType, startup_id: v === "client" ? form.startup_id : null }); if (v !== "client") setSelectedStartupId(""); }}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="client">Client (entreprise accompagnée)</SelectItem>
@@ -58,6 +99,26 @@ export default function CreateContrepartieDialog({ open, onOpenChange, defaultTy
                 <SelectItem value="partenaire">Partenaire</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          {isClient && (
+            <div>
+              <Label>Entreprise accompagnée</Label>
+              <Select value={selectedStartupId} onValueChange={setSelectedStartupId}>
+                <SelectTrigger><SelectValue placeholder="— Sélectionner —" /></SelectTrigger>
+                <SelectContent className="max-h-[280px]">
+                  {startupOptions.map((s: any) => (
+                    <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-[10px] text-muted-foreground mt-1">Auto-remplit les champs ci-dessous</p>
+            </div>
+          )}
+
+          <div className="col-span-2">
+            <Label>Nom *</Label>
+            <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Nom de l'entité" />
           </div>
           <div>
             <Label>Personne contact</Label>
