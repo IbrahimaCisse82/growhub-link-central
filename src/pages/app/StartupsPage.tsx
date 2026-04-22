@@ -7,10 +7,12 @@ import Pill from "@/components/shared/Pill";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useStartups } from "@/hooks/useStartups";
 import CreateStartupDialog from "@/components/dialogs/CreateStartupDialog";
+import EditStartupDialog from "@/components/dialogs/EditStartupDialog";
 import { exportToCSV, exportToPDF } from "@/lib/exportUtils";
 import CsvImportDialog from "@/components/shared/CsvImportDialog";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { Pencil } from "lucide-react";
 
 const sectorColor: Record<string, "green" | "blue" | "purple" | "rose" | "amber" | "gray"> = { fintech: "blue", agritech: "green", edtech: "purple", healthtech: "rose", cleantech: "green", logistique: "amber" };
 const stageColor: Record<string, "green" | "blue" | "amber" | "gray"> = { mvp: "amber", incubation: "amber", accélération: "green", croissance: "blue", scale: "green" };
@@ -26,6 +28,7 @@ export default function StartupsPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [search, setSearch] = useState("");
+  const [editingStartup, setEditingStartup] = useState<any | null>(null);
   const filtered = startups?.filter(s => !search || s.name.toLowerCase().includes(search.toLowerCase()));
 
   return (
@@ -65,13 +68,19 @@ export default function StartupsPage() {
                   <td className="px-3.5 py-2.5 border-b border-border"><Pill color={getPillColor(s.stage, stageColor)}>{s.stage ?? "—"}</Pill></td>
                   <td className="px-3.5 py-2.5 border-b border-border font-mono text-primary">{s.score != null ? `${s.score}/100` : "—"}</td>
                   <td className="px-3.5 py-2.5 border-b border-border text-foreground">{s.country ?? "—"}</td>
-                  <td className="px-3.5 py-2.5 border-b border-border"><GhButton variant="ghost">→</GhButton></td>
+                  <td className="px-3.5 py-2.5 border-b border-border" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center gap-1 justify-end">
+                      <GhButton variant="ghost" onClick={() => setEditingStartup(s)} title="Modifier"><Pencil size={14} /></GhButton>
+                      <GhButton variant="ghost" onClick={() => navigate(`/app/entreprises/${s.id}`)}>→</GhButton>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </GhCard>
+      <EditStartupDialog open={!!editingStartup} onOpenChange={(v) => !v && setEditingStartup(null)} startup={editingStartup} />
     </motion.div>
   );
 }
