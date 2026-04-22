@@ -54,14 +54,19 @@ export default function CreateContrepartieDialog({ open, onOpenChange, defaultTy
         founderEmail = prof?.email ?? "";
         founderName = prof?.full_name ?? "";
       }
+      // Priorité aux champs client renseignés sur l'entreprise, fallback sur le fondateur
       setForm((f) => ({
         ...f,
         name: s.name ?? "",
         startup_id: s.id,
         city: s.city ?? f.city,
         country: s.country ?? f.country,
-        email: founderEmail || f.email,
-        contact_person: founderName || f.contact_person,
+        address: (s as any).address ?? f.address,
+        email: (s as any).email || founderEmail || f.email,
+        phone: (s as any).phone ?? f.phone,
+        contact_person: (s as any).contact_person || founderName || f.contact_person,
+        ninea: (s as any).ninea ?? f.ninea,
+        tax_id: (s as any).tax_id ?? f.tax_id,
         notes: s.description ?? f.notes,
       }));
     })();
