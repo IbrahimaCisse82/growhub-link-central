@@ -244,6 +244,7 @@ export default function CrmPage() {
           <TabsTrigger value="dashboard">Vue d'ensemble</TabsTrigger>
           <TabsTrigger value="analytics"><BarChart3 size={14} className="mr-1" /> Analytics</TabsTrigger>
           <TabsTrigger value="contreparties">Contreparties</TabsTrigger>
+          <TabsTrigger value="quotes">Devis</TabsTrigger>
           <TabsTrigger value="invoices">Factures</TabsTrigger>
           <TabsTrigger value="subscriptions">Abonnements</TabsTrigger>
         </TabsList>
@@ -431,6 +432,11 @@ export default function CrmPage() {
                               {i.status === "brouillon" && (
                                 <DropdownMenuItem onClick={() => updateStatus.mutate({ id: i.id, status: "envoyee" })}>
                                   <CheckCircle2 size={14} className="mr-2" /> Marquer envoyée
+                                </DropdownMenuItem>
+                              )}
+                              {i.direction === "emise" && !i.is_credit_note && (
+                                <DropdownMenuItem onClick={() => setCreditNoteFor(i.id)}>
+                                  <Receipt size={14} className="mr-2" /> Créer un avoir
                                 </DropdownMenuItem>
                               )}
                               <DropdownMenuItem className="text-red-600" onClick={() => confirm("Supprimer ?") && deleteInv.mutate(i.id)}>
