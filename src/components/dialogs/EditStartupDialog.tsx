@@ -36,6 +36,13 @@ export default function EditStartupDialog({ open, onOpenChange, startup }: Props
         website: form.website || null,
         team_size: form.team_size ? Number(form.team_size) : null,
         revenue_monthly: form.revenue_monthly ? Number(form.revenue_monthly) : null,
+        // Client / facturation fields
+        email: form.email || null,
+        phone: form.phone || null,
+        address: form.address || null,
+        contact_person: form.contact_person || null,
+        ninea: form.ninea || null,
+        tax_id: form.tax_id || null,
       };
       const { error } = await supabase.from("startups").update(payload).eq("id", startup.id);
       if (error) throw error;
@@ -54,9 +61,14 @@ export default function EditStartupDialog({ open, onOpenChange, startup }: Props
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card border-border">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-card border-border">
         <DialogHeader><DialogTitle className="font-display">Modifier l'entreprise</DialogTitle></DialogHeader>
-        <div className="grid grid-cols-2 gap-4 py-4">
+
+        {/* Section 1 : Identité */}
+        <div className="grid grid-cols-2 gap-4 py-2">
+          <div className="col-span-2">
+            <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider mb-2">Identité</div>
+          </div>
           <div className="col-span-2">
             <Label>Nom *</Label>
             <Input value={form.name || ""} onChange={(e) => setForm({ ...form, name: e.target.value })} />
@@ -80,14 +92,6 @@ export default function EditStartupDialog({ open, onOpenChange, startup }: Props
             </Select>
           </div>
           <div>
-            <Label>Ville</Label>
-            <Input value={form.city || ""} onChange={(e) => setForm({ ...form, city: e.target.value })} />
-          </div>
-          <div>
-            <Label>Pays</Label>
-            <Input value={form.country || ""} onChange={(e) => setForm({ ...form, country: e.target.value })} />
-          </div>
-          <div>
             <Label>Site web</Label>
             <Input value={form.website || ""} onChange={(e) => setForm({ ...form, website: e.target.value })} placeholder="https://" />
           </div>
@@ -104,7 +108,49 @@ export default function EditStartupDialog({ open, onOpenChange, startup }: Props
             <Textarea rows={3} value={form.description || ""} onChange={(e) => setForm({ ...form, description: e.target.value })} />
           </div>
         </div>
-        <DialogFooter>
+
+        {/* Section 2 : Contact & Facturation (champs client) */}
+        <div className="grid grid-cols-2 gap-4 py-2 border-t border-border pt-4 mt-2">
+          <div className="col-span-2">
+            <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider mb-2">
+              Contact & Facturation (utilisé pour la création de contrepartie client)
+            </div>
+          </div>
+          <div>
+            <Label>Personne de contact</Label>
+            <Input value={form.contact_person || ""} onChange={(e) => setForm({ ...form, contact_person: e.target.value })} placeholder="Nom du dirigeant / référent" />
+          </div>
+          <div>
+            <Label>Email</Label>
+            <Input type="email" value={form.email || ""} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="contact@entreprise.com" />
+          </div>
+          <div>
+            <Label>Téléphone</Label>
+            <Input value={form.phone || ""} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="+221 ..." />
+          </div>
+          <div>
+            <Label>Adresse</Label>
+            <Input value={form.address || ""} onChange={(e) => setForm({ ...form, address: e.target.value })} />
+          </div>
+          <div>
+            <Label>Ville</Label>
+            <Input value={form.city || ""} onChange={(e) => setForm({ ...form, city: e.target.value })} />
+          </div>
+          <div>
+            <Label>Pays</Label>
+            <Input value={form.country || ""} onChange={(e) => setForm({ ...form, country: e.target.value })} />
+          </div>
+          <div>
+            <Label>NINEA</Label>
+            <Input value={form.ninea || ""} onChange={(e) => setForm({ ...form, ninea: e.target.value })} />
+          </div>
+          <div>
+            <Label>N° fiscal</Label>
+            <Input value={form.tax_id || ""} onChange={(e) => setForm({ ...form, tax_id: e.target.value })} />
+          </div>
+        </div>
+
+        <DialogFooter className="mt-4">
           <Button variant="outline" onClick={() => onOpenChange(false)}>Annuler</Button>
           <Button onClick={() => update.mutate()} disabled={!form.name || update.isPending}>
             {update.isPending ? "Enregistrement…" : "Enregistrer"}
