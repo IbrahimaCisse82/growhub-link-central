@@ -12,6 +12,8 @@ import { exportInvoicePdf } from "@/lib/invoicePdfExport";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import RecordPaymentDialog from "./RecordPaymentDialog";
+import RemindersHistoryPanel from "@/components/crm/RemindersHistoryPanel";
+import SendReminderDialog from "./SendReminderDialog";
 
 const fmt = (n: number, cur = "XOF") =>
   new Intl.NumberFormat("fr-FR", { style: "currency", currency: cur, minimumFractionDigits: 0 }).format(n);
@@ -33,6 +35,7 @@ export default function InvoiceDetailDialog({ open, onOpenChange, invoiceId }: P
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [emailForm, setEmailForm] = useState({ to: "", message: "" });
   const [sending, setSending] = useState(false);
+  const [reminderOpen, setReminderOpen] = useState(false);
 
   if (!invoiceId) return null;
 
@@ -173,6 +176,21 @@ export default function InvoiceDetailDialog({ open, onOpenChange, invoiceId }: P
                 </div>
               )}
 
+              {/* Historique de relances */}
+              {inv.direction === "emise" && (
+                <div>
+                  <div className="text-xs text-muted-foreground uppercase mb-2 flex items-center justify-between">
+                    <span>Historique des relances</span>
+                    {remaining > 0 && (
+                      <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setReminderOpen(true)}>
+                        <Mail size={12} className="mr-1" /> Nouvelle relance
+                      </Button>
+                    )}
+                  </div>
+                  <RemindersHistoryPanel invoiceId={inv.id} />
+                </div>
+              )}
+
               {/* Actions */}
               <div className="flex flex-wrap gap-2 pt-2 border-t">
                 <Button size="sm" variant="outline" onClick={() => exportInvoicePdf(inv as any)}>
@@ -195,13 +213,29 @@ export default function InvoiceDetailDialog({ open, onOpenChange, invoiceId }: P
       </Dialog>
 
       {inv && (
-        <RecordPaymentDialog
-          open={paymentOpen}
-          onOpenChange={setPaymentOpen}
-          invoiceId={inv.id}
-          remaining={remaining}
-          currency={inv.currency}
-        />
+        <>
+          <RecordPaymentDialog
+            open={paymentOpen}
+            onOpenChange={setPaymentOpen}
+            invoiceId={inv.id}
+            remaining={remaining}
+            currency={inv.currency}
+          />
+          <SendReminderDialog
+            open={reminderOpen}
+            onOpenChange={setReminderOpen}
+            invoice={{
+              id: inv.id,
+              invoice_number: inv.invoice_number,
+              contrepartie: cp,
+              total: Number(inv.total),
+              amount_paid: Number(inv.amount_paid || 0),
+              currency: inv.currency,
+              due_date: inv.due_date,
+              reminder_count: (inv as any).reminder_count,
+            }}
+          />
+        </>
       )}
     </>
   );

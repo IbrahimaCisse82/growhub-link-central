@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   Building2, FileText, Repeat, TrendingUp, AlertCircle, Wallet, Plus, Search,
   Download, CheckCircle2, MoreHorizontal, Trash2, FileDown, CreditCard, BarChart3,
-  ArrowRightCircle, Receipt, Mail,
+  ArrowRightCircle, Receipt, Mail, BellRing, FileBarChart,
 } from "lucide-react";
 import {
   useContreparties, useInvoices, useSubscriptions, useCrmStats,
@@ -28,6 +28,8 @@ import EditContrepartieDialog from "@/components/dialogs/EditContrepartieDialog"
 import EditSubscriptionDialog from "@/components/dialogs/EditSubscriptionDialog";
 import InvoiceDetailDialog from "@/components/dialogs/InvoiceDetailDialog";
 import CrmAnalyticsTab from "@/components/crm/CrmAnalyticsTab";
+import RecouvrementTab from "@/components/crm/RecouvrementTab";
+import CrmReportsTab from "@/components/crm/CrmReportsTab";
 import { Edit2 } from "lucide-react";
 import { exportInvoicePdf } from "@/lib/invoicePdfExport";
 import { exportToCSV } from "@/lib/exportUtils";
@@ -272,13 +274,15 @@ export default function CrmPage() {
       </div>
 
       <Tabs value={tab} onValueChange={setTab}>
-        <TabsList>
+        <TabsList className="flex-wrap h-auto">
           <TabsTrigger value="dashboard">Vue d'ensemble</TabsTrigger>
           <TabsTrigger value="analytics"><BarChart3 size={14} className="mr-1" /> Analytics</TabsTrigger>
           <TabsTrigger value="contreparties">Contreparties</TabsTrigger>
           <TabsTrigger value="quotes">Devis</TabsTrigger>
           <TabsTrigger value="invoices">Factures</TabsTrigger>
+          <TabsTrigger value="recouvrement"><BellRing size={14} className="mr-1" /> Recouvrement</TabsTrigger>
           <TabsTrigger value="subscriptions">Abonnements</TabsTrigger>
+          <TabsTrigger value="reports"><FileBarChart size={14} className="mr-1" /> Rapports</TabsTrigger>
         </TabsList>
 
         {/* DASHBOARD */}
@@ -602,6 +606,16 @@ export default function CrmPage() {
               <Card className="p-8 text-center text-sm text-muted-foreground col-span-full">Aucun abonnement</Card>
             )}
           </div>
+        </TabsContent>
+
+        {/* RECOUVREMENT */}
+        <TabsContent value="recouvrement" className="mt-4">
+          <RecouvrementTab />
+        </TabsContent>
+
+        {/* REPORTS */}
+        <TabsContent value="reports" className="mt-4">
+          <CrmReportsTab />
         </TabsContent>
       </Tabs>
 
