@@ -141,6 +141,20 @@ export default function CrmPage() {
     });
   }, [invoices, search, dateFrom, dateTo, minAmount]);
 
+  const filteredQuotes = useMemo(() => {
+    return quotes?.filter((q: any) => {
+      if (quoteSearch) {
+        const t = quoteSearch.toLowerCase();
+        const m = q.quote_number.toLowerCase().includes(t) || (q.contrepartie as any)?.name?.toLowerCase().includes(t);
+        if (!m) return false;
+      }
+      if (quoteDateFrom && q.issue_date < quoteDateFrom) return false;
+      if (quoteDateTo && q.issue_date > quoteDateTo) return false;
+      if (quoteMinAmount && Number(q.total) < Number(quoteMinAmount)) return false;
+      return true;
+    });
+  }, [quotes, quoteSearch, quoteDateFrom, quoteDateTo, quoteMinAmount]);
+
   const downloadPdf = async (invId: string) => {
     const { data } = await import("@/integrations/supabase/client").then((m) =>
       m.supabase.from("crm_invoices").select("*, contrepartie:crm_contreparties(*), lines:crm_invoice_lines(*)").eq("id", invId).single()
@@ -365,7 +379,95 @@ export default function CrmPage() {
           </Card>
         </TabsContent>
 
-        {/* INVOICES */}
+        {/* QUOTES (DEVIS) */}
+        <TabsContent value="quotes" className="space-y-4 mt-4">
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <div className="flex items-center gap-2 flex-1 min-w-[280px] flex-wrap">
+              <div className="relative flex-1 max-w-xs min-w-[200px]">
+                <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <Input className="pl-8" placeholder="N° ou client..." value={quoteSearch} onChange={(e) => setQuoteSearch(e.target.value)} />
+              </div>
+              <Select value={quoteStatusFilter} onValueChange={(v) => setQuoteStatusFilter(v as any)}>
+                <SelectTrigger className="w-[150px]"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous statuts</SelectItem>
+                  <SelectItem value="brouillon">Brouillon</SelectItem>
+                  <SelectItem value="envoye">Envoyé</SelectItem>
+                  <SelectItem value="accepte">Accepté</SelectItem>
+                  <SelectItem value="refuse">Refusé</SelectItem>
+                  <SelectItem value="expire">Expiré</SelectItem>
+                  <SelectItem value="converti">Converti</SelectItem>
+                </SelectContent>
+              </Select>
+              <Input type="date" className="w-[150px]" value={quoteDateFrom} onChange={(e) => setQuoteDateFrom(e.target.value)} title="Date émission ≥" />
+              <Input type="date" className="w-[150px]" value={quoteDateTo} onChange={(e) => setQuoteDateTo(e.target.value)} title="Date émission ≤" />
+              <Input type="number" className="w-[130px]" placeholder="Montant min" value={quoteMinAmount} onChange={(e) => setQuoteMinAmount(e.target.value)} />
+              {(quoteDateFrom || quoteDateTo || quoteMinAmount || quoteSearch) && (
+                <Button variant="ghost" size="sm" onClick={() => { setQuoteDateFrom(""); setQuoteDateTo(""); setQuoteMinAmount(""); setQuoteSearch(""); }}>Réinitialiser</Button>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={() => setOpenQuote(true)}><Plus size={14} className="mr-1" /> Nouveau devis</Button>
+            </div>
+          </div>
+
+          <Card>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-secondary/50 text-xs uppercase text-muted-foreground">
+                  <tr>
+                    <th className="text-left p-3">N°</th>
+                    <th className="text-left p-3">Date</th>
+                    <th className="text-left p-3">Client</th>
+                    <th className="text-right p-3">Total</th>
+                    <th className="text-left p-3">Statut</th>
+                    <th className="text-left p-3">Validité</th>
+                    <th className="p-3 w-10"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredQuotes?.map((q: any) => (
+                    <tr key={q.id} className="border-t border-border hover:bg-secondary/30 cursor-pointer" onClick={() => setDetailQuoteId(q.id)}>
+                      <td className="p-3 font-mono text-xs">{q.quote_number}</td>
+                      <td className="p-3 text-xs">{new Date(q.issue_date).toLocaleDateString("fr-FR")}</td>
+                      <td className="p-3">{(q.contrepartie as any)?.name || "—"}</td>
+                      <td className="p-3 text-right font-mono">{fmt(Number(q.total), q.currency)}</td>
+                      <td className="p-3"><Badge className={quoteBadge[q.status as QuoteStatus]}>{quoteLabel[q.status as QuoteStatus]}</Badge></td>
+                      <td className="p-3 text-xs text-muted-foreground">{q.valid_until ? new Date(q.valid_until).toLocaleDateString("fr-FR") : "—"}</td>
+                      <td className="p-3" onClick={(e) => e.stopPropagation()}>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreHorizontal size={14} /></Button></DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem onClick={() => setDetailQuoteId(q.id)}>
+                              <FileText size={14} className="mr-2" /> Voir détail
+                            </DropdownMenuItem>
+                            {q.status === "brouillon" && (
+                              <DropdownMenuItem onClick={() => updateQuoteStatus.mutate({ id: q.id, status: "envoye" })}>
+                                <Mail size={14} className="mr-2" /> Marquer envoyé
+                              </DropdownMenuItem>
+                            )}
+                            {(q.status === "envoye" || q.status === "accepte" || q.status === "brouillon") && q.status !== "converti" && (
+                              <DropdownMenuItem onClick={() => convertQuote.mutate(q.id)}>
+                                <ArrowRightCircle size={14} className="mr-2" /> Convertir en facture
+                              </DropdownMenuItem>
+                            )}
+                            <DropdownMenuItem className="text-red-600" onClick={() => confirm("Supprimer ?") && deleteQuote.mutate(q.id)}>
+                              <Trash2 size={14} className="mr-2" /> Supprimer
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </td>
+                    </tr>
+                  ))}
+                  {!filteredQuotes?.length && (
+                    <tr><td colSpan={7} className="text-center p-8 text-sm text-muted-foreground">Aucun devis</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        </TabsContent>
+
         <TabsContent value="invoices" className="space-y-4 mt-4">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-center gap-2 flex-1 min-w-[280px] flex-wrap">
