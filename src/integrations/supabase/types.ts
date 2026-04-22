@@ -1051,6 +1051,7 @@ export type Database = {
           invoice_number: string
           is_credit_note: boolean | null
           issue_date: string
+          last_reminder_at: string | null
           last_reminder_sent_at: string | null
           notes: string | null
           paid_at: string | null
@@ -1058,6 +1059,7 @@ export type Database = {
           pdf_url: string | null
           project_id: string | null
           reference: string | null
+          reminder_count: number
           sent_at: string | null
           sent_to_email: string | null
           status: Database["public"]["Enums"]["crm_invoice_status"]
@@ -1083,6 +1085,7 @@ export type Database = {
           invoice_number: string
           is_credit_note?: boolean | null
           issue_date?: string
+          last_reminder_at?: string | null
           last_reminder_sent_at?: string | null
           notes?: string | null
           paid_at?: string | null
@@ -1090,6 +1093,7 @@ export type Database = {
           pdf_url?: string | null
           project_id?: string | null
           reference?: string | null
+          reminder_count?: number
           sent_at?: string | null
           sent_to_email?: string | null
           status?: Database["public"]["Enums"]["crm_invoice_status"]
@@ -1115,6 +1119,7 @@ export type Database = {
           invoice_number?: string
           is_credit_note?: boolean | null
           issue_date?: string
+          last_reminder_at?: string | null
           last_reminder_sent_at?: string | null
           notes?: string | null
           paid_at?: string | null
@@ -1122,6 +1127,7 @@ export type Database = {
           pdf_url?: string | null
           project_id?: string | null
           reference?: string | null
+          reminder_count?: number
           sent_at?: string | null
           sent_to_email?: string | null
           status?: Database["public"]["Enums"]["crm_invoice_status"]
@@ -2799,6 +2805,56 @@ export type Database = {
           token?: string
         }
         Relationships: []
+      }
+      invoice_reminders: {
+        Row: {
+          channel: string
+          created_at: string
+          id: string
+          invoice_id: string
+          message: string | null
+          metadata: Json | null
+          recipient_email: string | null
+          reminder_type: string
+          sent_at: string
+          sent_by: string | null
+          subject: string | null
+        }
+        Insert: {
+          channel?: string
+          created_at?: string
+          id?: string
+          invoice_id: string
+          message?: string | null
+          metadata?: Json | null
+          recipient_email?: string | null
+          reminder_type?: string
+          sent_at?: string
+          sent_by?: string | null
+          subject?: string | null
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          id?: string
+          invoice_id?: string
+          message?: string | null
+          metadata?: Json | null
+          recipient_email?: string | null
+          reminder_type?: string
+          sent_at?: string
+          sent_by?: string | null
+          subject?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_reminders_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "crm_invoices"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       logical_frameworks: {
         Row: {
