@@ -607,6 +607,16 @@ export default function CrmPage() {
             )}
           </div>
         </TabsContent>
+
+        {/* RECOUVREMENT */}
+        <TabsContent value="recouvrement" className="mt-4">
+          <RecouvrementTab />
+        </TabsContent>
+
+        {/* REPORTS */}
+        <TabsContent value="reports" className="mt-4">
+          <CrmReportsTab />
+        </TabsContent>
       </Tabs>
 
       <CreateContrepartieDialog open={openContrepartie} onOpenChange={setOpenContrepartie} />
