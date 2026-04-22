@@ -608,6 +608,9 @@ export default function CrmPage() {
       <CreateContrepartieDialog open={openContrepartie} onOpenChange={setOpenContrepartie} />
       <CreateInvoiceDialog open={openInvoice} onOpenChange={setOpenInvoice} />
       <CreateSubscriptionDialog open={openSub} onOpenChange={setOpenSub} />
+      <CreateQuoteDialog open={openQuote} onOpenChange={setOpenQuote} />
+      <QuoteDetailDialog open={!!detailQuoteId} onOpenChange={(v) => !v && setDetailQuoteId(null)} quoteId={detailQuoteId} />
+      <CreateCreditNoteDialog open={!!creditNoteFor} onOpenChange={(v) => !v && setCreditNoteFor(null)} sourceInvoiceId={creditNoteFor} />
       <EditContrepartieDialog open={!!editingParty} onOpenChange={(v) => !v && setEditingParty(null)} contrepartie={editingParty} />
       <EditSubscriptionDialog open={!!editingSub} onOpenChange={(v) => !v && setEditingSub(null)} subscription={editingSub} />
       <InvoiceDetailDialog open={!!detailInvoiceId} onOpenChange={(v) => !v && setDetailInvoiceId(null)} invoiceId={detailInvoiceId} />
