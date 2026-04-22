@@ -64,6 +64,24 @@ const statusLabel: Record<InvoiceStatus, string> = {
   annulee: "Annulée",
 };
 
+const quoteBadge: Record<QuoteStatus, string> = {
+  brouillon: "bg-gray-500/10 text-gray-600",
+  envoye: "bg-blue-500/10 text-blue-600",
+  accepte: "bg-emerald-500/10 text-emerald-600",
+  refuse: "bg-red-500/10 text-red-600",
+  expire: "bg-amber-500/10 text-amber-600",
+  converti: "bg-purple-500/10 text-purple-600",
+};
+
+const quoteLabel: Record<QuoteStatus, string> = {
+  brouillon: "Brouillon",
+  envoye: "Envoyé",
+  accepte: "Accepté",
+  refuse: "Refusé",
+  expire: "Expiré",
+  converti: "Converti",
+};
+
 export default function CrmPage() {
   const [tab, setTab] = useState("dashboard");
   const [partyFilter, setPartyFilter] = useState<PartyType | "all">("all");
