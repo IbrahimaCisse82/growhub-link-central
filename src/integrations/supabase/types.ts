@@ -4446,70 +4446,88 @@ export type Database = {
       }
       startups: {
         Row: {
+          address: string | null
           alumni_date: string | null
           alumni_notes: string | null
           city: string | null
           cohort_id: string | null
+          contact_person: string | null
           country: string | null
           created_at: string
           description: string | null
+          email: string | null
           founded_date: string | null
           founder_id: string | null
           id: string
           is_alumni: boolean | null
           logo_url: string | null
           name: string
+          ninea: string | null
+          phone: string | null
           pitch_deck_url: string | null
           revenue_monthly: number | null
           score: number | null
           sector: string | null
           stage: string | null
+          tax_id: string | null
           team_size: number | null
           updated_at: string
           website: string | null
         }
         Insert: {
+          address?: string | null
           alumni_date?: string | null
           alumni_notes?: string | null
           city?: string | null
           cohort_id?: string | null
+          contact_person?: string | null
           country?: string | null
           created_at?: string
           description?: string | null
+          email?: string | null
           founded_date?: string | null
           founder_id?: string | null
           id?: string
           is_alumni?: boolean | null
           logo_url?: string | null
           name: string
+          ninea?: string | null
+          phone?: string | null
           pitch_deck_url?: string | null
           revenue_monthly?: number | null
           score?: number | null
           sector?: string | null
           stage?: string | null
+          tax_id?: string | null
           team_size?: number | null
           updated_at?: string
           website?: string | null
         }
         Update: {
+          address?: string | null
           alumni_date?: string | null
           alumni_notes?: string | null
           city?: string | null
           cohort_id?: string | null
+          contact_person?: string | null
           country?: string | null
           created_at?: string
           description?: string | null
+          email?: string | null
           founded_date?: string | null
           founder_id?: string | null
           id?: string
           is_alumni?: boolean | null
           logo_url?: string | null
           name?: string
+          ninea?: string | null
+          phone?: string | null
           pitch_deck_url?: string | null
           revenue_monthly?: number | null
           score?: number | null
           sector?: string | null
           stage?: string | null
+          tax_id?: string | null
           team_size?: number | null
           updated_at?: string
           website?: string | null
