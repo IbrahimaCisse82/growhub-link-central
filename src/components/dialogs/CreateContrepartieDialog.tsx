@@ -48,7 +48,7 @@ export default function CreateContrepartieDialog({ open, onOpenChange, defaultTy
       if (s.founder_id) {
         const { data: prof } = await supabase
           .from("profiles")
-          .select("full_name, email, phone")
+          .select("full_name, email")
           .eq("user_id", s.founder_id)
           .maybeSingle();
         founderEmail = prof?.email ?? "";
