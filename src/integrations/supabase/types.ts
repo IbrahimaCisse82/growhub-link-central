@@ -1041,6 +1041,7 @@ export type Database = {
           contrepartie_id: string
           created_at: string
           created_by: string | null
+          credit_note_for: string | null
           currency: string
           direction: Database["public"]["Enums"]["crm_invoice_direction"]
           due_date: string | null
@@ -1048,6 +1049,7 @@ export type Database = {
           grant_id: string | null
           id: string
           invoice_number: string
+          is_credit_note: boolean | null
           issue_date: string
           last_reminder_sent_at: string | null
           notes: string | null
@@ -1071,6 +1073,7 @@ export type Database = {
           contrepartie_id: string
           created_at?: string
           created_by?: string | null
+          credit_note_for?: string | null
           currency?: string
           direction?: Database["public"]["Enums"]["crm_invoice_direction"]
           due_date?: string | null
@@ -1078,6 +1081,7 @@ export type Database = {
           grant_id?: string | null
           id?: string
           invoice_number: string
+          is_credit_note?: boolean | null
           issue_date?: string
           last_reminder_sent_at?: string | null
           notes?: string | null
@@ -1101,6 +1105,7 @@ export type Database = {
           contrepartie_id?: string
           created_at?: string
           created_by?: string | null
+          credit_note_for?: string | null
           currency?: string
           direction?: Database["public"]["Enums"]["crm_invoice_direction"]
           due_date?: string | null
@@ -1108,6 +1113,7 @@ export type Database = {
           grant_id?: string | null
           id?: string
           invoice_number?: string
+          is_credit_note?: boolean | null
           issue_date?: string
           last_reminder_sent_at?: string | null
           notes?: string | null
@@ -1132,6 +1138,13 @@ export type Database = {
             columns: ["contrepartie_id"]
             isOneToOne: false
             referencedRelation: "crm_contreparties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_invoices_credit_note_for_fkey"
+            columns: ["credit_note_for"]
+            isOneToOne: false
+            referencedRelation: "crm_invoices"
             referencedColumns: ["id"]
           },
           {
@@ -1200,6 +1213,157 @@ export type Database = {
             columns: ["invoice_id"]
             isOneToOne: false
             referencedRelation: "crm_invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_quote_lines: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          line_total: number | null
+          quantity: number
+          quote_id: string
+          sort_order: number | null
+          tax_rate: number | null
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          line_total?: number | null
+          quantity?: number
+          quote_id: string
+          sort_order?: number | null
+          tax_rate?: number | null
+          unit_price?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          line_total?: number | null
+          quantity?: number
+          quote_id?: string
+          sort_order?: number | null
+          tax_rate?: number | null
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_quote_lines_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "crm_quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_quotes: {
+        Row: {
+          accepted_at: string | null
+          contrepartie_id: string
+          converted_at: string | null
+          converted_invoice_id: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          grant_id: string | null
+          id: string
+          issue_date: string
+          notes: string | null
+          payment_terms: string | null
+          project_id: string | null
+          quote_number: string
+          reference: string | null
+          sent_at: string | null
+          status: Database["public"]["Enums"]["crm_quote_status"]
+          subtotal: number | null
+          tax_amount: number | null
+          tax_rate: number | null
+          total: number | null
+          updated_at: string
+          valid_until: string | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          contrepartie_id: string
+          converted_at?: string | null
+          converted_invoice_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          grant_id?: string | null
+          id?: string
+          issue_date?: string
+          notes?: string | null
+          payment_terms?: string | null
+          project_id?: string | null
+          quote_number: string
+          reference?: string | null
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["crm_quote_status"]
+          subtotal?: number | null
+          tax_amount?: number | null
+          tax_rate?: number | null
+          total?: number | null
+          updated_at?: string
+          valid_until?: string | null
+        }
+        Update: {
+          accepted_at?: string | null
+          contrepartie_id?: string
+          converted_at?: string | null
+          converted_invoice_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          grant_id?: string | null
+          id?: string
+          issue_date?: string
+          notes?: string | null
+          payment_terms?: string | null
+          project_id?: string | null
+          quote_number?: string
+          reference?: string | null
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["crm_quote_status"]
+          subtotal?: number | null
+          tax_amount?: number | null
+          tax_rate?: number | null
+          total?: number | null
+          updated_at?: string
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_quotes_contrepartie_id_fkey"
+            columns: ["contrepartie_id"]
+            isOneToOne: false
+            referencedRelation: "crm_contreparties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_quotes_converted_invoice_id_fkey"
+            columns: ["converted_invoice_id"]
+            isOneToOne: false
+            referencedRelation: "crm_invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_quotes_grant_id_fkey"
+            columns: ["grant_id"]
+            isOneToOne: false
+            referencedRelation: "grants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_quotes_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]
@@ -4909,6 +5073,13 @@ export type Database = {
         | "en_retard"
         | "annulee"
       crm_party_type: "client" | "bailleur" | "fournisseur" | "partenaire"
+      crm_quote_status:
+        | "brouillon"
+        | "envoye"
+        | "accepte"
+        | "refuse"
+        | "expire"
+        | "converti"
       crm_subscription_frequency:
         | "mensuel"
         | "trimestriel"
@@ -5089,6 +5260,14 @@ export const Constants = {
         "annulee",
       ],
       crm_party_type: ["client", "bailleur", "fournisseur", "partenaire"],
+      crm_quote_status: [
+        "brouillon",
+        "envoye",
+        "accepte",
+        "refuse",
+        "expire",
+        "converti",
+      ],
       crm_subscription_frequency: [
         "mensuel",
         "trimestriel",
