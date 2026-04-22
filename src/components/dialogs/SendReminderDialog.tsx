@@ -59,9 +59,9 @@ export default function SendReminderDialog({ open, onOpenChange, invoice }: Prop
     );
     setMessage(
       tpl.body
-        .replaceAll("{{number}}", invoice.invoice_number)
-        .replaceAll("{{amount}}", fmt(remaining, invoice.currency))
-        .replaceAll("{{due}}", invoice.due_date ? new Date(invoice.due_date).toLocaleDateString("fr-FR") : "—"),
+        .split("{{number}}").join(invoice.invoice_number)
+        .split("{{amount}}").join(fmt(remaining, invoice.currency))
+        .split("{{due}}").join(invoice.due_date ? new Date(invoice.due_date).toLocaleDateString("fr-FR") : "—"),
     );
     setRecipient(invoice.contrepartie?.email || invoice.contrepartie?.contact_email || "");
   }, [invoice, type]);
