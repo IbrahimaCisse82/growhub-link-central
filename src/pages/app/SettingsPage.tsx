@@ -11,6 +11,8 @@ import { toast } from "@/hooks/use-toast";
 import { useNotificationPrefs } from "@/hooks/useNotificationPrefs";
 import { SHORTCUT_HINTS } from "@/hooks/useKeyboardShortcuts";
 import { Keyboard } from "lucide-react";
+import OrgSettingsCard from "@/components/settings/OrgSettingsCard";
+import { useAuth as useAuthForOrg } from "@/hooks/useAuth";
 
 const notifTypes = [
   { key: "application", label: "Candidatures", description: "Mises à jour de statut des candidatures" },
@@ -135,6 +137,7 @@ export default function SettingsPage() {
       <SectionHeader title="Paramètres" subtitle="Gérez vos préférences de notification et paramètres" />
 
       <div className="max-w-2xl">
+        <OrgSettingsSection />
         <GhCard title="🔔 Préférences de notification">
           <div className="space-y-3">
             {notifTypes.map(n => (
