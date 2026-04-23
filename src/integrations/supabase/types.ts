@@ -3278,6 +3278,108 @@ export type Database = {
         }
         Relationships: []
       }
+      org_settings: {
+        Row: {
+          address: string | null
+          bank_details: string | null
+          brand_accent_hex: string | null
+          brand_primary_hex: string | null
+          city: string | null
+          company_name: string
+          country: string | null
+          created_at: string
+          default_currency: string | null
+          default_payment_terms: string | null
+          default_po_terms: string | null
+          default_quote_terms: string | null
+          default_tax_rate: number | null
+          email: string | null
+          id: string
+          is_active: boolean | null
+          legal_form: string | null
+          legal_mentions: string | null
+          logo_url: string | null
+          ninea: string | null
+          pdf_footer: string | null
+          phone: string | null
+          postal_box: string | null
+          rccm: string | null
+          signatory_city: string | null
+          signatory_name: string | null
+          signatory_role: string | null
+          stamp_url: string | null
+          tax_id: string | null
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          bank_details?: string | null
+          brand_accent_hex?: string | null
+          brand_primary_hex?: string | null
+          city?: string | null
+          company_name?: string
+          country?: string | null
+          created_at?: string
+          default_currency?: string | null
+          default_payment_terms?: string | null
+          default_po_terms?: string | null
+          default_quote_terms?: string | null
+          default_tax_rate?: number | null
+          email?: string | null
+          id?: string
+          is_active?: boolean | null
+          legal_form?: string | null
+          legal_mentions?: string | null
+          logo_url?: string | null
+          ninea?: string | null
+          pdf_footer?: string | null
+          phone?: string | null
+          postal_box?: string | null
+          rccm?: string | null
+          signatory_city?: string | null
+          signatory_name?: string | null
+          signatory_role?: string | null
+          stamp_url?: string | null
+          tax_id?: string | null
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          bank_details?: string | null
+          brand_accent_hex?: string | null
+          brand_primary_hex?: string | null
+          city?: string | null
+          company_name?: string
+          country?: string | null
+          created_at?: string
+          default_currency?: string | null
+          default_payment_terms?: string | null
+          default_po_terms?: string | null
+          default_quote_terms?: string | null
+          default_tax_rate?: number | null
+          email?: string | null
+          id?: string
+          is_active?: boolean | null
+          legal_form?: string | null
+          legal_mentions?: string | null
+          logo_url?: string | null
+          ninea?: string | null
+          pdf_footer?: string | null
+          phone?: string | null
+          postal_box?: string | null
+          rccm?: string | null
+          signatory_city?: string | null
+          signatory_name?: string | null
+          signatory_role?: string | null
+          stamp_url?: string | null
+          tax_id?: string | null
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
       partners: {
         Row: {
           contact_email: string | null
@@ -4283,6 +4385,166 @@ export type Database = {
           },
         ]
       }
+      purchase_order_lines: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          line_total: number | null
+          purchase_order_id: string
+          quantity: number
+          sort_order: number | null
+          tax_rate: number | null
+          unit: string | null
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          line_total?: number | null
+          purchase_order_id: string
+          quantity?: number
+          sort_order?: number | null
+          tax_rate?: number | null
+          unit?: string | null
+          unit_price?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          line_total?: number | null
+          purchase_order_id?: string
+          quantity?: number
+          sort_order?: number | null
+          tax_rate?: number | null
+          unit?: string | null
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchase_order_lines_purchase_order_id_fkey"
+            columns: ["purchase_order_id"]
+            isOneToOne: false
+            referencedRelation: "purchase_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      purchase_orders: {
+        Row: {
+          confirmed_at: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          delivery_address: string | null
+          delivery_contact: string | null
+          expected_delivery_date: string | null
+          grant_id: string | null
+          id: string
+          invoice_id: string | null
+          issue_date: string
+          notes: string | null
+          payment_terms: string | null
+          po_number: string
+          project_id: string | null
+          received_at: string | null
+          reference: string | null
+          sent_at: string | null
+          status: Database["public"]["Enums"]["purchase_order_status"]
+          subtotal: number | null
+          supplier_id: string
+          tax_amount: number | null
+          tax_rate: number | null
+          total: number | null
+          updated_at: string
+        }
+        Insert: {
+          confirmed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          delivery_address?: string | null
+          delivery_contact?: string | null
+          expected_delivery_date?: string | null
+          grant_id?: string | null
+          id?: string
+          invoice_id?: string | null
+          issue_date?: string
+          notes?: string | null
+          payment_terms?: string | null
+          po_number: string
+          project_id?: string | null
+          received_at?: string | null
+          reference?: string | null
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["purchase_order_status"]
+          subtotal?: number | null
+          supplier_id: string
+          tax_amount?: number | null
+          tax_rate?: number | null
+          total?: number | null
+          updated_at?: string
+        }
+        Update: {
+          confirmed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          delivery_address?: string | null
+          delivery_contact?: string | null
+          expected_delivery_date?: string | null
+          grant_id?: string | null
+          id?: string
+          invoice_id?: string | null
+          issue_date?: string
+          notes?: string | null
+          payment_terms?: string | null
+          po_number?: string
+          project_id?: string | null
+          received_at?: string | null
+          reference?: string | null
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["purchase_order_status"]
+          subtotal?: number | null
+          supplier_id?: string
+          tax_amount?: number | null
+          tax_rate?: number | null
+          total?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchase_orders_grant_id_fkey"
+            columns: ["grant_id"]
+            isOneToOne: false
+            referencedRelation: "grants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchase_orders_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "crm_invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchase_orders_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchase_orders_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "crm_contreparties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       resources: {
         Row: {
           category: string | null
@@ -5170,6 +5432,13 @@ export type Database = {
         | "other"
       grant_status: "draft" | "active" | "disbursing" | "closing" | "closed"
       project_status: "draft" | "active" | "paused" | "completed" | "cancelled"
+      purchase_order_status:
+        | "brouillon"
+        | "envoye"
+        | "confirme"
+        | "recu_partiel"
+        | "recu"
+        | "annule"
       risk_level: "low" | "medium" | "high" | "critical"
       session_status:
         | "planned"
@@ -5360,6 +5629,14 @@ export const Constants = {
       ],
       grant_status: ["draft", "active", "disbursing", "closing", "closed"],
       project_status: ["draft", "active", "paused", "completed", "cancelled"],
+      purchase_order_status: [
+        "brouillon",
+        "envoye",
+        "confirme",
+        "recu_partiel",
+        "recu",
+        "annule",
+      ],
       risk_level: ["low", "medium", "high", "critical"],
       session_status: [
         "planned",
