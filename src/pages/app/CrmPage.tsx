@@ -30,7 +30,9 @@ import InvoiceDetailDialog from "@/components/dialogs/InvoiceDetailDialog";
 import CrmAnalyticsTab from "@/components/crm/CrmAnalyticsTab";
 import RecouvrementTab from "@/components/crm/RecouvrementTab";
 import CrmReportsTab from "@/components/crm/CrmReportsTab";
-import { Edit2 } from "lucide-react";
+import CrmGlobalSearch from "@/components/crm/CrmGlobalSearch";
+import ContrepartieDetailPanel from "@/components/crm/ContrepartieDetailPanel";
+import { Edit2, Eye } from "lucide-react";
 import { exportInvoicePdf } from "@/lib/invoicePdfExport";
 import { exportToCSV } from "@/lib/exportUtils";
 import { exportToExcel } from "@/lib/excelExport";
@@ -110,6 +112,8 @@ export default function CrmPage() {
   const [editingParty, setEditingParty] = useState<any | null>(null);
   const [editingSub, setEditingSub] = useState<any | null>(null);
   const [detailInvoiceId, setDetailInvoiceId] = useState<string | null>(null);
+  const [globalSearchOpen, setGlobalSearchOpen] = useState(false);
+  const [detailPartyId, setDetailPartyId] = useState<string | null>(null);
 
   const { data: stats } = useCrmStats();
   const { data: parties } = useContreparties(partyFilter);
@@ -240,9 +244,15 @@ export default function CrmPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">CRM & Facturation</h1>
-        <p className="text-sm text-muted-foreground">Gestion des clients, bailleurs, fournisseurs, factures et abonnements</p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">CRM & Facturation</h1>
+          <p className="text-sm text-muted-foreground">Gestion des clients, bailleurs, fournisseurs, factures et abonnements</p>
+        </div>
+        <Button variant="outline" onClick={() => setGlobalSearchOpen(true)}>
+          <Search size={14} className="mr-2" /> Recherche globale
+          <kbd className="ml-2 px-1.5 py-0.5 bg-secondary rounded text-[10px]">⌘K</kbd>
+        </Button>
       </div>
 
       {/* KPIs */}
