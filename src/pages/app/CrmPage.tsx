@@ -650,6 +650,18 @@ export default function CrmPage() {
           currency={paymentInvoice.currency}
         />
       )}
+
+      {/* CRM Lot 7 — Recherche globale + détail 360° */}
+      <CrmGlobalSearch
+        open={globalSearchOpen}
+        onOpenChange={setGlobalSearchOpen}
+        onSelectContrepartie={(id) => setDetailPartyId(id)}
+      />
+      <ContrepartieDetailPanel
+        open={!!detailPartyId}
+        onOpenChange={(v) => !v && setDetailPartyId(null)}
+        contrepartieId={detailPartyId}
+      />
     </div>
   );
 }
