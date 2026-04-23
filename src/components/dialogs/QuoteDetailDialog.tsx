@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { FileDown, Mail, Loader2, Send, ArrowRightCircle, CheckCircle2, XCircle } from "lucide-react";
 import { useQuote, useUpdateQuoteStatus, useConvertQuoteToInvoice, useSendQuoteEmail, type QuoteStatus } from "@/hooks/useCrm";
-import { exportQuotePdf } from "@/lib/quotePdfExport";
+import { exportQuoteGrowhub } from "@/lib/pdfBridge";
 
 const fmt = (n: number, cur = "XOF") =>
   new Intl.NumberFormat("fr-FR", { style: "currency", currency: cur, minimumFractionDigits: 0 }).format(n);
@@ -143,7 +143,7 @@ export default function QuoteDetailDialog({ open, onOpenChange, quoteId }: Props
             )}
 
             <div className="flex flex-wrap gap-2 pt-2 border-t">
-              <Button size="sm" variant="outline" onClick={() => exportQuotePdf(q as any)}>
+              <Button size="sm" variant="outline" onClick={() => exportQuoteGrowhub(q as any)}>
                 <FileDown size={14} className="mr-1" /> Télécharger PDF
               </Button>
               <Button size="sm" variant="outline" onClick={() => setShowSend(!showSend)}>

@@ -33,7 +33,7 @@ import CrmReportsTab from "@/components/crm/CrmReportsTab";
 import CrmGlobalSearch from "@/components/crm/CrmGlobalSearch";
 import ContrepartieDetailPanel from "@/components/crm/ContrepartieDetailPanel";
 import { Edit2, Eye } from "lucide-react";
-import { exportInvoicePdf } from "@/lib/invoicePdfExport";
+import { exportInvoiceGrowhub } from "@/lib/pdfBridge";
 import { exportToCSV } from "@/lib/exportUtils";
 import { exportToExcel } from "@/lib/excelExport";
 import {
@@ -165,7 +165,7 @@ export default function CrmPage() {
     const { data } = await import("@/integrations/supabase/client").then((m) =>
       m.supabase.from("crm_invoices").select("*, contrepartie:crm_contreparties(*), lines:crm_invoice_lines(*)").eq("id", invId).single()
     );
-    if (data) exportInvoicePdf(data as any);
+    if (data) await exportInvoiceGrowhub(data as any);
   };
 
   const exportPartiesCsv = () => {
