@@ -41,7 +41,7 @@ export default function ContrepartieDetailPanel({ open, onOpenChange, contrepart
           .order("next_due_date"),
         supabase
           .from("invoice_reminders")
-          .select("id, sent_at, template, recipient_email, invoice_id")
+          .select("id, sent_at, reminder_type, recipient_email, invoice_id")
           .in(
             "invoice_id",
             (
@@ -102,8 +102,8 @@ export default function ContrepartieDetailPanel({ open, onOpenChange, contrepart
       events.push({
         at: r.sent_at,
         kind: "reminder",
-        label: `Relance envoyée (${r.template})`,
-        meta: r.recipient_email,
+        label: `Relance envoyée (${r.reminder_type})`,
+        meta: r.recipient_email ?? undefined,
         icon: BellRing,
         color: "text-amber-600",
       });
