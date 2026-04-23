@@ -373,6 +373,9 @@ export default function CrmPage() {
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreHorizontal size={14} /></Button></DropdownMenuTrigger>
                           <DropdownMenuContent>
+                            <DropdownMenuItem onClick={() => setDetailPartyId(p.id)}>
+                              <Eye size={14} className="mr-2" /> Voir détail 360°
+                            </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => setEditingParty(p)}>
                               <Edit2 size={14} className="mr-2" /> Modifier
                             </DropdownMenuItem>
