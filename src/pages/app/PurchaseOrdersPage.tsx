@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { usePurchaseOrders, useUpdatePurchaseOrderStatus, useDeletePurchaseOrder, usePurchaseOrder, PO_STATUS_LABELS, type POStatus } from "@/hooks/usePurchaseOrders";
+import { usePurchaseOrders, useUpdatePurchaseOrderStatus, useDeletePurchaseOrder, PO_STATUS_LABELS, type POStatus } from "@/hooks/usePurchaseOrders";
 import { useOrgSettings } from "@/hooks/useOrgSettings";
 import SectionHeader from "@/components/shared/SectionHeader";
 import GhCard from "@/components/shared/GhCard";
 import GhButton from "@/components/shared/GhButton";
 import EmptyState from "@/components/shared/EmptyState";
-import { Pill } from "@/components/shared/Pill";
+import Pill from "@/components/shared/Pill";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,14 +15,14 @@ import CreatePurchaseOrderDialog from "@/components/dialogs/CreatePurchaseOrderD
 import { exportGrowhubPdf } from "@/lib/growhubPdf";
 import { toast } from "sonner";
 
-const statusVariant = (s: POStatus): "neutral" | "warning" | "success" | "danger" | "primary" => {
+const statusColor = (s: POStatus): "gray" | "blue" | "amber" | "green" | "rose" | "purple" => {
   switch (s) {
-    case "brouillon": return "neutral";
-    case "envoye": return "primary";
-    case "confirme": return "warning";
-    case "recu_partiel": return "warning";
-    case "recu": return "success";
-    case "annule": return "danger";
+    case "brouillon": return "gray";
+    case "envoye": return "blue";
+    case "confirme": return "amber";
+    case "recu_partiel": return "amber";
+    case "recu": return "green";
+    case "annule": return "rose";
   }
 };
 
@@ -78,7 +78,7 @@ export default function PurchaseOrdersPage() {
       <SectionHeader
         title="Bons de commande"
         subtitle="Commandes émises auprès des fournisseurs"
-        action={<GhButton variant="primary" onClick={() => setCreateOpen(true)}><Plus size={14} className="mr-1" /> Nouveau BC</GhButton>}
+        actions={<GhButton variant="primary" onClick={() => setCreateOpen(true)}><Plus size={14} className="mr-1" /> Nouveau BC</GhButton>}
       />
 
       <Tabs value={filter} onValueChange={(v) => setFilter(v as any)} className="mb-4">
@@ -92,9 +92,9 @@ export default function PurchaseOrdersPage() {
         </TabsList>
       </Tabs>
 
-      <GhCard>
+      <GhCard title="Liste des bons de commande" noPadding>
         {isLoading ? <div className="text-[12px] text-muted-foreground p-4">Chargement…</div> :
-          !data?.length ? <EmptyState icon={FileText} title="Aucun bon de commande" description="Créez votre premier BC pour commencer." /> :
+          !data?.length ? <EmptyState icon="📦" title="Aucun bon de commande" description="Créez votre premier BC pour commencer." /> :
           <Table>
             <TableHeader>
               <TableRow>
@@ -115,7 +115,7 @@ export default function PurchaseOrdersPage() {
                   <TableCell className="text-[12px]">{new Date(po.issue_date).toLocaleDateString("fr-FR")}</TableCell>
                   <TableCell className="text-[12px]">{po.expected_delivery_date ? new Date(po.expected_delivery_date).toLocaleDateString("fr-FR") : "—"}</TableCell>
                   <TableCell className="text-right font-mono">{Number(po.total ?? 0).toLocaleString("fr-FR")} {po.currency}</TableCell>
-                  <TableCell><Pill variant={statusVariant(po.status)}>{PO_STATUS_LABELS[po.status]}</Pill></TableCell>
+                  <TableCell><Pill color={statusColor(po.status)}>{PO_STATUS_LABELS[po.status]}</Pill></TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild><button className="p-1 hover:bg-secondary rounded"><MoreHorizontal size={14}/></button></DropdownMenuTrigger>
