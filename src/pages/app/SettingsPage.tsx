@@ -305,3 +305,9 @@ function KeyboardShortcutsCard() {
     </GhCard>
   );
 }
+
+function OrgSettingsSection() {
+  const { isAdmin } = useAuthForOrg();
+  if (!isAdmin) return null;
+  return <div className="mb-4"><OrgSettingsCard /></div>;
+}
