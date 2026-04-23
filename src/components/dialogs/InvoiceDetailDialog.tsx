@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { FileDown, Mail, CreditCard, Loader2, Send } from "lucide-react";
 import { useInvoice } from "@/hooks/useCrm";
-import { exportInvoicePdf } from "@/lib/invoicePdfExport";
+import { exportInvoiceGrowhub } from "@/lib/pdfBridge";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import RecordPaymentDialog from "./RecordPaymentDialog";
@@ -193,7 +193,7 @@ export default function InvoiceDetailDialog({ open, onOpenChange, invoiceId }: P
 
               {/* Actions */}
               <div className="flex flex-wrap gap-2 pt-2 border-t">
-                <Button size="sm" variant="outline" onClick={() => exportInvoicePdf(inv as any)}>
+                <Button size="sm" variant="outline" onClick={() => exportInvoiceGrowhub(inv as any)}>
                   <FileDown size={14} className="mr-1" /> Télécharger PDF
                 </Button>
                 {inv.direction === "emise" && (

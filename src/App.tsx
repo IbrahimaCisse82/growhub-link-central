@@ -65,6 +65,7 @@ const EventDetailPage = lazy(() => import("@/pages/app/EventDetailPage"));
 const FunnelBuilderPage = lazy(() => import("@/pages/app/FunnelBuilderPage"));
 const HrPage = lazy(() => import("@/pages/app/HrPage"));
 const CrmPage = lazy(() => import("@/pages/app/CrmPage"));
+const PurchaseOrdersPage = lazy(() => import("@/pages/app/PurchaseOrdersPage"));
 const PublicApplicationPage = lazy(() => import("@/pages/public/PublicApplicationPage"));
 const UnsubscribePage = lazy(() => import("@/pages/public/UnsubscribePage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -154,6 +155,7 @@ const App = () => (
                 <Route path="parametres" element={<SettingsPage />} />
                 <Route path="rh" element={<HrPage />} />
                 <Route path="crm" element={<CrmPage />} />
+                <Route path="bons-de-commande" element={<PurchaseOrdersPage />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
