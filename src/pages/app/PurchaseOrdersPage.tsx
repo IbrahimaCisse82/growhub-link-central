@@ -13,8 +13,10 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FileText, Plus, MoreHorizontal, Download, Send, CheckCircle2, Trash2, PackageCheck, XCircle, Receipt, Search } from "lucide-react";
 import CreatePurchaseOrderDialog from "@/components/dialogs/CreatePurchaseOrderDialog";
+import PurchaseOrderPreview, { computePurchaseOrderPreview } from "@/components/purchase-orders/PurchaseOrderPreview";
 import { exportGrowhubPdf } from "@/lib/growhubPdf";
 import { toast } from "sonner";
 
@@ -33,6 +35,7 @@ export default function PurchaseOrdersPage() {
   const [filter, setFilter] = useState<POStatus | "all">("all");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const { data, isLoading } = usePurchaseOrders(filter);
   const { data: org } = useOrgSettings();
   const updateStatus = useUpdatePurchaseOrderStatus();
@@ -42,19 +45,20 @@ export default function PurchaseOrdersPage() {
   const [invoicePo, setInvoicePo] = useState<PurchaseOrder | null>(null);
   const [pdfPo, setPdfPo] = useState<PurchaseOrder | null>(null);
   const previewPo = invoicePo ?? pdfPo;
-  const pageSize = 10;
   const filteredOrders = useMemo(() => {
     const q = search.trim().toLowerCase();
     return (data ?? []).filter((po) => !q || po.po_number.toLowerCase().includes(q) || po.supplier?.name?.toLowerCase().includes(q) || po.reference?.toLowerCase().includes(q));
   }, [data, search]);
   const totalPages = Math.max(1, Math.ceil(filteredOrders.length / pageSize));
   const paginatedOrders = filteredOrders.slice((page - 1) * pageSize, page * pageSize);
-  const previewSubtotal = previewPo?.lines?.reduce((sum, line) => sum + Number(line.quantity ?? 0) * Number(line.unit_price ?? 0), 0) ?? 0;
-  const previewTax = previewPo?.lines?.reduce((sum, line) => sum + (Number(line.quantity ?? 0) * Number(line.unit_price ?? 0) * Number(line.tax_rate ?? 0)) / 100, 0) ?? Number(previewPo?.tax_amount ?? 0);
-  const previewTotal = previewSubtotal + previewTax;
-  const storedTotal = Number(previewPo?.total ?? 0);
-  const totalsMismatch = !!previewPo && Math.abs(previewTotal - storedTotal) > 1;
-  const canConvertPreview = !!invoicePo?.currency && !!invoicePo?.lines?.length && !totalsMismatch;
+  const previewSummary = computePurchaseOrderPreview(previewPo);
+  const canUsePreview = !!previewPo?.currency && !!previewPo?.lines?.length && !previewSummary.missingTaxRates && !previewSummary.totalsMismatch;
+  const aggregate = filteredOrders.reduce((acc, po) => {
+    acc.subtotal += Number(po.subtotal ?? 0);
+    acc.tax += Number(po.tax_amount ?? 0);
+    acc.total += Number(po.total ?? 0);
+    return acc;
+  }, { subtotal: 0, tax: 0, total: 0 });
 
   const confirmSupplierInvoice = async () => {
     if (!invoicePo) return;
