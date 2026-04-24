@@ -100,3 +100,48 @@ export function useHrPayrollHistory() {
 
   return { history, isLoading, saveSnapshot };
 }
+
+export function useHrPayrollSettings() {
+  const qc = useQueryClient();
+  const key = ["hr_payroll_settings"];
+  const { data: setting, isLoading } = useQuery({
+    queryKey: key,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("hr_payroll_settings").select("*").eq("is_active", true).order("effective_from", { ascending: false }).limit(1).maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+  const save = useMutation({
+    mutationFn: async (settings: Record<string, unknown>) => {
+      const payload = { name: "Paramètres paie Sénégal", effective_from: new Date().toISOString().slice(0, 10), settings, is_active: true };
+      const { error } = setting?.id
+        ? await supabase.from("hr_payroll_settings").update(payload as any).eq("id", setting.id)
+        : await supabase.from("hr_payroll_settings").insert(payload as any);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: key }),
+  });
+  return { setting, isLoading, save };
+}
+
+export function useHrPayrollVariables(mois: number, annee: number) {
+  const qc = useQueryClient();
+  const key = ["hr_payroll_variables", mois, annee];
+  const { data: variables = [], isLoading } = useQuery({
+    queryKey: key,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("hr_payroll_variables").select("*").eq("mois", mois).eq("annee", annee);
+      if (error) throw error;
+      return (data ?? []) as unknown as HrPayrollVariable[];
+    },
+  });
+  const saveVariable = useMutation({
+    mutationFn: async (variable: Partial<HrPayrollVariable> & { employee_id: string }) => {
+      const { error } = await supabase.from("hr_payroll_variables").upsert({ ...EMPTY_PAYROLL_VARIABLE, ...variable, mois, annee } as any, { onConflict: "employee_id,mois,annee" });
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: key }),
+  });
+  return { variables, isLoading, saveVariable };
+}
