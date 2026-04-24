@@ -63,7 +63,7 @@ const DEFAULT_CONVENTIONS = [
   },
 ];
 interface Entreprise {
-  nom: string; adresse: string; telephone: string; email: string; ninea: string; rccm: string;
+  nom: string; adresse: string; telephone: string; email: string; ninea: string; rccm: string; logo_url?: string | null; pdf_footer?: string | null; signatory_name?: string | null; signatory_role?: string | null;
 }
 
 const DEFAULT_ENTREPRISE: Entreprise = {
@@ -133,7 +133,7 @@ function genererBulletinHTML(emp: HrEmployee, p: PayrollResult, mois: number, an
 </style></head><body>
 <div class="page"><div class="content">
   <div class="header">
-    <div><div style="font-size:15px;font-weight:900;letter-spacing:1px;text-transform:uppercase">${ent.nom || "ENTREPRISE"}</div>
+    <div style="display:flex;align-items:center;gap:10px">${ent.logo_url ? `<img src="${ent.logo_url}" style="max-height:32px;max-width:96px;object-fit:contain;background:#fff;border-radius:3px;padding:2px"/>` : ""}<div><div style="font-size:15px;font-weight:900;letter-spacing:1px;text-transform:uppercase">${ent.nom || "ENTREPRISE"}</div>
     ${ent.ninea ? `<div style="font-size:9px;color:#a7f3d0;margin-top:2px">NINEA : ${ent.ninea}</div>` : ""}</div>
     <div style="text-align:right"><h2 style="font-size:15px;font-weight:900">BULLETIN DE PAIE</h2>
     <div style="font-size:11px;color:#a7f3d0;margin-top:3px">Période : <b>${periode}</b></div>
@@ -180,9 +180,9 @@ function genererBulletinHTML(emp: HrEmployee, p: PayrollResult, mois: number, an
     row("TOTAL CHARGES PATRONALES", p.chargesPat, { bold: true, color: "#92400e", bg: "#fffbeb" })
   )}
   <div class="masse-box"><span style="font-size:10px;font-weight:700;color:#5b21b6">MASSE SALARIALE TOTALE</span><span style="font-size:12px;font-weight:800;color:#5b21b6">${f(p.masse)} FCFA</span></div>
-  <div class="sigs">${["Employeur", "Service RH", "Employé(e)"].map(s => `<div class="sig"><div class="sig-name">${s}</div><div class="sig-line">Signature &amp; cachet</div></div>`).join("")}</div>
+  <div class="sigs">${[ent.signatory_name || "Employeur", ent.signatory_role || "Service RH", "Employé(e)"].map(s => `<div class="sig"><div class="sig-name">${s}</div><div class="sig-line">Signature &amp; cachet</div></div>`).join("")}</div>
 </div>
-<div class="footer"><div class="footer-coords">${footerItems}</div><div class="footer-doc">Document généré par Grow Hub Management System · ${periode} · Confidentiel</div></div>
+<div class="footer"><div class="footer-coords">${footerItems}</div><div class="footer-doc">${ent.pdf_footer || `Document généré par Grow Hub Management System · ${periode} · Confidentiel`}</div></div>
 </div></body></html>`;
 }
 
