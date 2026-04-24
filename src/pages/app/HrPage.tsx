@@ -653,6 +653,27 @@ function EntrepriseTab({ entreprise, onSave }: { entreprise: Entreprise; onSave:
 type ConvCategory = { id: string; code: string; libelle: string; statut: string; salaireMinima: number };
 type Convention = { id: string; nom: string; secteur: string; dateSignature: string; description: string; categories: ConvCategory[] };
 
+function applyPayrollVariable(emp: HrEmployee, variable?: HrPayrollVariable): HrEmployee {
+  if (!variable) return emp;
+  return {
+    ...emp,
+    hs_115: variable.hs_115,
+    hs_140: variable.hs_140,
+    hs_160: variable.hs_160,
+    hs_200: variable.hs_200,
+    heures_absence: variable.heures_absence,
+    heures_abs_maladie: variable.heures_abs_maladie,
+    taux_maladie: variable.taux_maladie,
+    nb_paniers: variable.nb_paniers,
+    avance_tabaski: variable.avance_tabaski,
+    avance_caisse: variable.avance_caisse,
+    avance_financiere: variable.avance_financiere,
+    ret_cooperative: variable.ret_cooperative,
+    frais_medicaux: variable.frais_medicaux,
+    ind_kilometrique: variable.ind_kilometrique + variable.primes_exceptionnelles,
+  };
+}
+
 function ConventionsTab({ conventions, setConventions }: { conventions: Convention[]; setConventions: (c: Convention[]) => void }) {
   const [selected, setSelected] = useState<string | null>(null);
   const selectedCC = conventions.find(c => c.id === selected);
