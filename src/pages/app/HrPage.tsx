@@ -1129,6 +1129,16 @@ export default function HrPage() {
           )}
         </TabsContent>
 
+        {/* ═══ VARIABLES ═══ */}
+        <TabsContent value="variables" className="space-y-4 mt-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <StatCard label="Période" value={`${MOIS[payrollMonth]} ${payrollYear}`} note="Variables mensuelles" color="blue" icon={<CalendarClock size={18} />} />
+            <StatCard label="Employés variables" value={String(variables.length)} note="Saisies enregistrées" color="green" icon={<Users size={18} />} />
+            <StatCard label="Net prévisionnel" value={`${fmtXOF(totaux.net)} F`} note="Après variables" color="purple" icon={<TrendingUp size={18} />} />
+          </div>
+          <VariablesTab employees={employees} variables={variables} onSave={(v) => saveVariable.mutateAsync(v)} />
+        </TabsContent>
+
         {/* ═══ EMPLOYÉS ═══ */}
         <TabsContent value="employes" className="space-y-4 mt-4">
           <div className="relative max-w-sm">
