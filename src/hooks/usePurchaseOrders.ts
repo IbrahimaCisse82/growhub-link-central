@@ -166,6 +166,7 @@ export const useCreateSupplierInvoiceFromPurchaseOrder = () => {
         .from("crm_invoices")
         .insert([{
           direction: "recue",
+          invoice_number: `FF-${new Date().getFullYear()}-${Date.now().toString().slice(-6)}`,
           contrepartie_id: (po as any).supplier_id,
           issue_date: new Date().toISOString().split("T")[0],
           due_date: (po as any).expected_delivery_date,
