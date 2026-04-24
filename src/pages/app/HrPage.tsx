@@ -896,18 +896,33 @@ function ConventionsTab({ conventions, setConventions }: { conventions: Conventi
 
 export default function HrPage() {
   const { t } = useTranslation();
+  const { isAdmin } = useAuth();
   const { employees, isLoading, upsert, remove } = useHrEmployees();
   const { history, saveSnapshot } = useHrPayrollHistory();
+  const payrollSettings = useHrPayrollSettings();
+  const payrollRuns = useHrPayrollRuns();
   const [showNew, setShowNew] = useState(false);
   const [showForm, setShowForm] = useState<Partial<HrEmployee> | null>(null);
   const [showBulletin, setShowBulletin] = useState<HrEmployee | null>(null);
   const [search, setSearch] = useState("");
   const [params, setParams] = useState<PayrollParams>(DEFAULT_PAYROLL_PARAMS);
+  const now = new Date();
+  const [payrollMonth, setPayrollMonth] = useState(now.getMonth());
+  const [payrollYear, setPayrollYear] = useState(now.getFullYear());
+  const { variables, saveVariable } = useHrPayrollVariables(payrollMonth, payrollYear);
   const [entreprise, setEntreprise] = useState<Entreprise>(DEFAULT_ENTREPRISE);
   const [conventions, setConventions] = useState(DEFAULT_CONVENTIONS);
   const [activeTab, setActiveTab] = useState("dashboard");
 
-  const allPaies = useMemo(() => employees.map(e => ({ ...e, paie: calculerPaie(e, params) })), [employees, params]);
+  useEffect(() => {
+    if (payrollSettings.setting?.settings) setParams(payrollSettings.setting.settings as unknown as PayrollParams);
+  }, [payrollSettings.setting]);
+
+  const variablesByEmployee = useMemo(() => new Map(variables.map(v => [v.employee_id, v])), [variables]);
+  const allPaies = useMemo(() => employees.map(e => {
+    const empWithVariables = applyPayrollVariable(e, variablesByEmployee.get(e.id!));
+    return { ...empWithVariables, paie: calculerPaie(empWithVariables, params, new Date(payrollYear, payrollMonth + 1, 0)) };
+  }), [employees, params, payrollMonth, payrollYear, variablesByEmployee]);
   const filtered = allPaies.filter(e =>
     `${e.prenom} ${e.nom} ${e.matricule} ${e.fonction}`.toLowerCase().includes(search.toLowerCase())
   );
