@@ -1040,6 +1040,7 @@ export default function HrPage() {
         <TabsList>
           <TabsTrigger value="dashboard" className="gap-1"><BarChart3 size={13} /> Tableau de bord</TabsTrigger>
           <TabsTrigger value="employes" className="gap-1"><Users size={13} /> Employés</TabsTrigger>
+          <TabsTrigger value="variables" className="gap-1"><CalendarClock size={13} /> Variables</TabsTrigger>
           <TabsTrigger value="parametres" className="gap-1"><Settings size={13} /> Paramètres</TabsTrigger>
           <TabsTrigger value="conventions" className="gap-1"><BookOpen size={13} /> Conventions</TabsTrigger>
           <TabsTrigger value="entreprise" className="gap-1"><Building2 size={13} /> Entreprise</TabsTrigger>
