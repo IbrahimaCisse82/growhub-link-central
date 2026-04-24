@@ -13,8 +13,10 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FileText, Plus, MoreHorizontal, Download, Send, CheckCircle2, Trash2, PackageCheck, XCircle, Receipt, Search } from "lucide-react";
 import CreatePurchaseOrderDialog from "@/components/dialogs/CreatePurchaseOrderDialog";
+import PurchaseOrderPreview, { computePurchaseOrderPreview } from "@/components/purchase-orders/PurchaseOrderPreview";
 import { exportGrowhubPdf } from "@/lib/growhubPdf";
 import { toast } from "sonner";
 
@@ -33,6 +35,7 @@ export default function PurchaseOrdersPage() {
   const [filter, setFilter] = useState<POStatus | "all">("all");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const { data, isLoading } = usePurchaseOrders(filter);
   const { data: org } = useOrgSettings();
   const updateStatus = useUpdatePurchaseOrderStatus();
@@ -42,23 +45,24 @@ export default function PurchaseOrdersPage() {
   const [invoicePo, setInvoicePo] = useState<PurchaseOrder | null>(null);
   const [pdfPo, setPdfPo] = useState<PurchaseOrder | null>(null);
   const previewPo = invoicePo ?? pdfPo;
-  const pageSize = 10;
   const filteredOrders = useMemo(() => {
     const q = search.trim().toLowerCase();
     return (data ?? []).filter((po) => !q || po.po_number.toLowerCase().includes(q) || po.supplier?.name?.toLowerCase().includes(q) || po.reference?.toLowerCase().includes(q));
   }, [data, search]);
   const totalPages = Math.max(1, Math.ceil(filteredOrders.length / pageSize));
   const paginatedOrders = filteredOrders.slice((page - 1) * pageSize, page * pageSize);
-  const previewSubtotal = previewPo?.lines?.reduce((sum, line) => sum + Number(line.quantity ?? 0) * Number(line.unit_price ?? 0), 0) ?? 0;
-  const previewTax = previewPo?.lines?.reduce((sum, line) => sum + (Number(line.quantity ?? 0) * Number(line.unit_price ?? 0) * Number(line.tax_rate ?? 0)) / 100, 0) ?? Number(previewPo?.tax_amount ?? 0);
-  const previewTotal = previewSubtotal + previewTax;
-  const storedTotal = Number(previewPo?.total ?? 0);
-  const totalsMismatch = !!previewPo && Math.abs(previewTotal - storedTotal) > 1;
-  const canConvertPreview = !!invoicePo?.currency && !!invoicePo?.lines?.length && !totalsMismatch;
+  const previewSummary = computePurchaseOrderPreview(previewPo);
+  const canUsePreview = !!previewPo?.currency && !!previewPo?.lines?.length && !previewSummary.missingTaxRates && !previewSummary.totalsMismatch;
+  const aggregate = filteredOrders.reduce((acc, po) => {
+    acc.subtotal += Number(po.subtotal ?? 0);
+    acc.tax += Number(po.tax_amount ?? 0);
+    acc.total += Number(po.total ?? 0);
+    return acc;
+  }, { subtotal: 0, tax: 0, total: 0 });
 
   const confirmSupplierInvoice = async () => {
     if (!invoicePo) return;
-    if (!canConvertPreview) {
+    if (!canUsePreview) {
       toast.error("Conversion impossible : vérifiez les lignes, la devise et les totaux du BC");
       return;
     }
@@ -135,7 +139,11 @@ export default function PurchaseOrdersPage() {
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input className="pl-9" value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder="Rechercher par N°, fournisseur, référence…" />
         </div>
-        <div className="text-[12px] text-muted-foreground">{filteredOrders.length} BC trouvé(s)</div>
+        <div className="grid grid-cols-3 gap-2 text-[12px] text-muted-foreground sm:text-right">
+          <div>HT <span className="font-mono text-foreground">{aggregate.subtotal.toLocaleString("fr-FR")}</span></div>
+          <div>TVA <span className="font-mono text-foreground">{aggregate.tax.toLocaleString("fr-FR")}</span></div>
+          <div>TTC <span className="font-mono text-foreground">{aggregate.total.toLocaleString("fr-FR")}</span></div>
+        </div>
       </div>
 
       <GhCard title="Liste des bons de commande" noPadding>
@@ -182,9 +190,17 @@ export default function PurchaseOrdersPage() {
               </TableBody>
             </Table>
             {!paginatedOrders.length && <div className="p-4 text-sm text-muted-foreground">Aucun BC ne correspond à la recherche.</div>}
-            <div className="flex items-center justify-between border-t border-border px-4 py-3 text-[12px] text-muted-foreground">
-              <span>Page {page} sur {totalPages}</span>
-              <div className="flex gap-2">
+            <div className="flex flex-col gap-3 border-t border-border px-4 py-3 text-[12px] text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+              <span>{filteredOrders.length} BC trouvé(s) • Page {page} sur {totalPages}</span>
+              <div className="flex items-center gap-2">
+                <Select value={String(pageSize)} onValueChange={(v) => { setPageSize(Number(v)); setPage(1); }}>
+                  <SelectTrigger className="h-8 w-24"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="10">10 / page</SelectItem>
+                    <SelectItem value="20">20 / page</SelectItem>
+                    <SelectItem value="50">50 / page</SelectItem>
+                  </SelectContent>
+                </Select>
                 <Button size="sm" variant="outline" disabled={page === 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>Précédent</Button>
                 <Button size="sm" variant="outline" disabled={page === totalPages} onClick={() => setPage((p) => Math.min(totalPages, p + 1))}>Suivant</Button>
               </div>
@@ -199,53 +215,12 @@ export default function PurchaseOrdersPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>{invoicePo ? "Créer la facture fournisseur ?" : "Exporter le BC en PDF ?"}</AlertDialogTitle>
             <AlertDialogDescription asChild>
-              <div className="space-y-4 text-sm">
-                <p>
-                  {invoicePo ? "Cette action va créer une facture fournisseur depuis le BC " : "Cette action va générer le PDF du BC "}<span className="font-mono font-semibold text-foreground">{previewPo?.po_number}</span>.
-                </p>
-                {(!previewPo?.currency || !previewPo?.lines?.length || totalsMismatch) && (
-                  <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-destructive">
-                    {!previewPo?.currency && <div>Devise manquante.</div>}
-                    {!previewPo?.lines?.length && <div>Aucune ligne détaillée disponible.</div>}
-                    {totalsMismatch && <div>Incohérence détectée : total lignes {previewTotal.toLocaleString("fr-FR")} {previewPo?.currency} vs total BC {storedTotal.toLocaleString("fr-FR")} {previewPo?.currency}.</div>}
-                  </div>
-                )}
-                <div className="rounded-md border border-border overflow-hidden">
-                  <div className="grid grid-cols-12 gap-2 bg-secondary/70 px-3 py-2 text-[11px] font-medium text-muted-foreground">
-                    <span className="col-span-5">Désignation</span>
-                    <span className="col-span-2 text-right">Qté</span>
-                    <span className="col-span-2 text-right">PU</span>
-                    <span className="col-span-1 text-right">TVA</span>
-                    <span className="col-span-2 text-right">Total</span>
-                  </div>
-                  <div className="max-h-52 overflow-y-auto divide-y divide-border">
-                    {previewPo?.lines?.length ? previewPo.lines.map((line, index) => {
-                      const ht = Number(line.quantity ?? 0) * Number(line.unit_price ?? 0);
-                      const tax = (ht * Number(line.tax_rate ?? 0)) / 100;
-                      return (
-                        <div key={line.id ?? index} className="grid grid-cols-12 gap-2 px-3 py-2 text-[12px]">
-                          <span className="col-span-5 text-foreground">{line.description}</span>
-                          <span className="col-span-2 text-right font-mono">{Number(line.quantity ?? 0).toLocaleString("fr-FR")}</span>
-                          <span className="col-span-2 text-right font-mono">{Number(line.unit_price ?? 0).toLocaleString("fr-FR")}</span>
-                          <span className="col-span-1 text-right font-mono">{Number(line.tax_rate ?? 0)}%</span>
-                          <span className="col-span-2 text-right font-mono text-foreground">{(ht + tax).toLocaleString("fr-FR")}</span>
-                        </div>
-                      );
-                    }) : <div className="px-3 py-3 text-muted-foreground">Aucune ligne détaillée disponible.</div>}
-                  </div>
-                </div>
-                <div className="ml-auto w-full max-w-xs space-y-1 rounded-md bg-secondary/50 p-3">
-                  <div className="flex justify-between"><span>Total HT</span><span className="font-mono text-foreground">{previewSubtotal.toLocaleString("fr-FR")} {previewPo?.currency}</span></div>
-                  <div className="flex justify-between"><span>TVA</span><span className="font-mono text-foreground">{previewTax.toLocaleString("fr-FR")} {previewPo?.currency}</span></div>
-                  <div className="flex justify-between border-t border-border pt-1 font-semibold"><span>Total TTC calculé</span><span className="font-mono text-primary">{previewTotal.toLocaleString("fr-FR")} {previewPo?.currency}</span></div>
-                  <div className="flex justify-between text-muted-foreground"><span>Total BC</span><span className="font-mono">{storedTotal.toLocaleString("fr-FR")} {previewPo?.currency}</span></div>
-                </div>
-              </div>
+              <PurchaseOrderPreview po={previewPo} mode={invoicePo ? "invoice" : "pdf"} />
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction onClick={invoicePo ? confirmSupplierInvoice : exportPreviewPdf} disabled={invoicePo ? createSupplierInvoice.isPending || !canConvertPreview : !previewPo?.lines?.length || !previewPo?.currency}>
+            <AlertDialogAction onClick={invoicePo ? confirmSupplierInvoice : exportPreviewPdf} disabled={invoicePo ? createSupplierInvoice.isPending || !canUsePreview : !canUsePreview}>
               {invoicePo ? "Créer la facture" : "Exporter PDF"}
             </AlertDialogAction>
           </AlertDialogFooter>
