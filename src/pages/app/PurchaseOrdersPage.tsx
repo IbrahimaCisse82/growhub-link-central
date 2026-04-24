@@ -215,53 +215,12 @@ export default function PurchaseOrdersPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>{invoicePo ? "Créer la facture fournisseur ?" : "Exporter le BC en PDF ?"}</AlertDialogTitle>
             <AlertDialogDescription asChild>
-              <div className="space-y-4 text-sm">
-                <p>
-                  {invoicePo ? "Cette action va créer une facture fournisseur depuis le BC " : "Cette action va générer le PDF du BC "}<span className="font-mono font-semibold text-foreground">{previewPo?.po_number}</span>.
-                </p>
-                {(!previewPo?.currency || !previewPo?.lines?.length || totalsMismatch) && (
-                  <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-destructive">
-                    {!previewPo?.currency && <div>Devise manquante.</div>}
-                    {!previewPo?.lines?.length && <div>Aucune ligne détaillée disponible.</div>}
-                    {totalsMismatch && <div>Incohérence détectée : total lignes {previewTotal.toLocaleString("fr-FR")} {previewPo?.currency} vs total BC {storedTotal.toLocaleString("fr-FR")} {previewPo?.currency}.</div>}
-                  </div>
-                )}
-                <div className="rounded-md border border-border overflow-hidden">
-                  <div className="grid grid-cols-12 gap-2 bg-secondary/70 px-3 py-2 text-[11px] font-medium text-muted-foreground">
-                    <span className="col-span-5">Désignation</span>
-                    <span className="col-span-2 text-right">Qté</span>
-                    <span className="col-span-2 text-right">PU</span>
-                    <span className="col-span-1 text-right">TVA</span>
-                    <span className="col-span-2 text-right">Total</span>
-                  </div>
-                  <div className="max-h-52 overflow-y-auto divide-y divide-border">
-                    {previewPo?.lines?.length ? previewPo.lines.map((line, index) => {
-                      const ht = Number(line.quantity ?? 0) * Number(line.unit_price ?? 0);
-                      const tax = (ht * Number(line.tax_rate ?? 0)) / 100;
-                      return (
-                        <div key={line.id ?? index} className="grid grid-cols-12 gap-2 px-3 py-2 text-[12px]">
-                          <span className="col-span-5 text-foreground">{line.description}</span>
-                          <span className="col-span-2 text-right font-mono">{Number(line.quantity ?? 0).toLocaleString("fr-FR")}</span>
-                          <span className="col-span-2 text-right font-mono">{Number(line.unit_price ?? 0).toLocaleString("fr-FR")}</span>
-                          <span className="col-span-1 text-right font-mono">{Number(line.tax_rate ?? 0)}%</span>
-                          <span className="col-span-2 text-right font-mono text-foreground">{(ht + tax).toLocaleString("fr-FR")}</span>
-                        </div>
-                      );
-                    }) : <div className="px-3 py-3 text-muted-foreground">Aucune ligne détaillée disponible.</div>}
-                  </div>
-                </div>
-                <div className="ml-auto w-full max-w-xs space-y-1 rounded-md bg-secondary/50 p-3">
-                  <div className="flex justify-between"><span>Total HT</span><span className="font-mono text-foreground">{previewSubtotal.toLocaleString("fr-FR")} {previewPo?.currency}</span></div>
-                  <div className="flex justify-between"><span>TVA</span><span className="font-mono text-foreground">{previewTax.toLocaleString("fr-FR")} {previewPo?.currency}</span></div>
-                  <div className="flex justify-between border-t border-border pt-1 font-semibold"><span>Total TTC calculé</span><span className="font-mono text-primary">{previewTotal.toLocaleString("fr-FR")} {previewPo?.currency}</span></div>
-                  <div className="flex justify-between text-muted-foreground"><span>Total BC</span><span className="font-mono">{storedTotal.toLocaleString("fr-FR")} {previewPo?.currency}</span></div>
-                </div>
-              </div>
+              <PurchaseOrderPreview po={previewPo} mode={invoicePo ? "invoice" : "pdf"} />
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction onClick={invoicePo ? confirmSupplierInvoice : exportPreviewPdf} disabled={invoicePo ? createSupplierInvoice.isPending || !canConvertPreview : !previewPo?.lines?.length || !previewPo?.currency}>
+            <AlertDialogAction onClick={invoicePo ? confirmSupplierInvoice : exportPreviewPdf} disabled={invoicePo ? createSupplierInvoice.isPending || !canUsePreview : !canUsePreview}>
               {invoicePo ? "Créer la facture" : "Exporter PDF"}
             </AlertDialogAction>
           </AlertDialogFooter>
