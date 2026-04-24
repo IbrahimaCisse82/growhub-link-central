@@ -58,8 +58,18 @@ export default function PurchaseOrdersPage() {
 
   const confirmSupplierInvoice = async () => {
     if (!invoicePo) return;
+    if (!canConvertPreview) {
+      toast.error("Conversion impossible : vérifiez les lignes, la devise et les totaux du BC");
+      return;
+    }
     await createSupplierInvoice.mutateAsync(invoicePo.id);
     setInvoicePo(null);
+  };
+
+  const exportPreviewPdf = async () => {
+    if (!pdfPo) return;
+    await downloadPdf(pdfPo.id);
+    setPdfPo(null);
   };
 
   const downloadPdf = async (poId: string) => {
@@ -109,7 +119,7 @@ export default function PurchaseOrdersPage() {
         actions={<GhButton variant="primary" onClick={() => setCreateOpen(true)}><Plus size={14} className="mr-1" /> Nouveau BC</GhButton>}
       />
 
-      <Tabs value={filter} onValueChange={(v) => setFilter(v as any)} className="mb-4">
+      <Tabs value={filter} onValueChange={(v) => { setFilter(v as any); setPage(1); }} className="mb-4">
         <TabsList>
           <TabsTrigger value="all">Tous</TabsTrigger>
           <TabsTrigger value="brouillon">Brouillons</TabsTrigger>
@@ -119,6 +129,14 @@ export default function PurchaseOrdersPage() {
           <TabsTrigger value="annule">Annulés</TabsTrigger>
         </TabsList>
       </Tabs>
+
+      <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative w-full sm:max-w-sm">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <Input className="pl-9" value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder="Rechercher par N°, fournisseur, référence…" />
+        </div>
+        <div className="text-[12px] text-muted-foreground">{filteredOrders.length} BC trouvé(s)</div>
+      </div>
 
       <GhCard title="Liste des bons de commande" noPadding>
         {isLoading ? <div className="text-[12px] text-muted-foreground p-4">Chargement…</div> :
@@ -136,7 +154,7 @@ export default function PurchaseOrdersPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.map((po) => (
+              {paginatedOrders.map((po) => (
                 <TableRow key={po.id}>
                   <TableCell className="font-mono text-[12px]">{po.po_number}</TableCell>
                   <TableCell>{po.supplier?.name ?? "—"}</TableCell>
@@ -148,7 +166,7 @@ export default function PurchaseOrdersPage() {
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild><button className="p-1 hover:bg-secondary rounded"><MoreHorizontal size={14}/></button></DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => downloadPdf(po.id)}><Download size={13} className="mr-2"/> Télécharger PDF</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setPdfPo(po)}><Download size={13} className="mr-2"/> Télécharger PDF</DropdownMenuItem>
                         {po.status === "brouillon" && <DropdownMenuItem onClick={() => updateStatus.mutate({ id: po.id, status: "envoye" })}><Send size={13} className="mr-2"/> Marquer envoyé</DropdownMenuItem>}
                         {po.status === "envoye" && <DropdownMenuItem onClick={() => updateStatus.mutate({ id: po.id, status: "confirme" })}><CheckCircle2 size={13} className="mr-2"/> Confirmé par fournisseur</DropdownMenuItem>}
                         {(po.status === "confirme" || po.status === "recu_partiel") && <DropdownMenuItem onClick={() => updateStatus.mutate({ id: po.id, status: "recu" })}><PackageCheck size={13} className="mr-2"/> Marquer reçu</DropdownMenuItem>}
