@@ -918,11 +918,18 @@ function ConventionsTab({ conventions, setConventions }: { conventions: Conventi
 
 export default function HrPage() {
   const { t } = useTranslation();
-  const { isAdmin } = useAuth();
-  const { employees, isLoading, upsert, remove } = useHrEmployees();
+  const { isAdmin, roles, user } = useAuth();
+  const canManageHr = roles.includes("super_admin") || roles.includes("coordinator");
+  const { data: orgSettings } = useOrgSettings();
+  const { data: assignableUsers = [] } = useAssignableUsers();
+  const adminEmployees = useHrEmployees();
+  const ownEmployees = useMyHrEmployees(!canManageHr);
+  const employees = canManageHr ? adminEmployees.employees : ownEmployees.employees.filter(e => e.user_id === user?.id);
+  const isLoading = canManageHr ? adminEmployees.isLoading : ownEmployees.isLoading;
+  const { upsert, remove } = adminEmployees;
   const { history, saveSnapshot } = useHrPayrollHistory();
-  const payrollSettings = useHrPayrollSettings();
-  const payrollRuns = useHrPayrollRuns();
+  const payrollSettings = useHrPayrollSettings(canManageHr);
+  const payrollRuns = useHrPayrollRuns(canManageHr);
   const [showNew, setShowNew] = useState(false);
   const [showForm, setShowForm] = useState<Partial<HrEmployee> | null>(null);
   const [showBulletin, setShowBulletin] = useState<HrEmployee | null>(null);
@@ -931,7 +938,7 @@ export default function HrPage() {
   const now = new Date();
   const [payrollMonth, setPayrollMonth] = useState(now.getMonth());
   const [payrollYear, setPayrollYear] = useState(now.getFullYear());
-  const { variables, saveVariable } = useHrPayrollVariables(payrollMonth, payrollYear);
+  const { variables, saveVariable } = useHrPayrollVariables(payrollMonth, payrollYear, canManageHr);
   const [entreprise, setEntreprise] = useState<Entreprise>(DEFAULT_ENTREPRISE);
   const [conventions, setConventions] = useState(DEFAULT_CONVENTIONS);
   const [activeTab, setActiveTab] = useState("dashboard");
