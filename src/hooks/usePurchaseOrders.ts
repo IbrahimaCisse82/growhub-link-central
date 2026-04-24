@@ -164,7 +164,7 @@ export const useCreateSupplierInvoiceFromPurchaseOrder = () => {
 
       const { data: invoice, error: invoiceError } = await supabase
         .from("crm_invoices")
-        .insert({
+        .insert([{
           direction: "recue",
           contrepartie_id: (po as any).supplier_id,
           issue_date: new Date().toISOString().split("T")[0],
@@ -178,7 +178,7 @@ export const useCreateSupplierInvoiceFromPurchaseOrder = () => {
           reference: (po as any).po_number,
           payment_terms: (po as any).payment_terms,
           notes: `Facture fournisseur générée depuis le bon de commande ${(po as any).po_number}`,
-        })
+        }])
         .select()
         .single();
       if (invoiceError) throw invoiceError;
