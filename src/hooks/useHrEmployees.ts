@@ -12,6 +12,7 @@ export function useHrEmployees() {
       const { data, error } = await supabase
         .from("hr_employees")
         .select("*")
+        .is("archived_at", null)
         .order("nom", { ascending: true });
       if (error) throw error;
       return (data ?? []) as unknown as HrEmployee[];
@@ -33,7 +34,7 @@ export function useHrEmployees() {
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("hr_employees").delete().eq("id", id);
+      const { error } = await supabase.from("hr_employees").update({ is_active: false, archived_at: new Date().toISOString() } as any).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: key }),
