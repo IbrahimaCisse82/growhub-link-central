@@ -159,8 +159,9 @@ export function useHrPayrollRuns() {
   });
   const upsertRun = useMutation({
     mutationFn: async (run: Record<string, unknown>) => {
-      const { error } = await supabase.from("hr_payroll_runs").upsert(run as any, { onConflict: "mois,annee" });
+      const { data, error } = await supabase.from("hr_payroll_runs").upsert(run as any, { onConflict: "mois,annee" }).select().single();
       if (error) throw error;
+      return data;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: key }),
   });
