@@ -2573,9 +2573,46 @@ export type Database = {
           },
         ]
       }
+      hr_collective_agreements: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          sector: string | null
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          sector?: string | null
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          sector?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       hr_employees: {
         Row: {
           adresse: string | null
+          archived_at: string | null
           avance_caisse: number | null
           avance_financiere: number | null
           avance_tabaski: number | null
@@ -2583,6 +2620,7 @@ export type Database = {
           contrat: string | null
           convention: string | null
           created_at: string
+          created_by: string | null
           date_entree: string | null
           date_naissance: string | null
           email: string | null
@@ -2614,9 +2652,11 @@ export type Database = {
           taux_maladie: number | null
           telephone: string | null
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           adresse?: string | null
+          archived_at?: string | null
           avance_caisse?: number | null
           avance_financiere?: number | null
           avance_tabaski?: number | null
@@ -2624,6 +2664,7 @@ export type Database = {
           contrat?: string | null
           convention?: string | null
           created_at?: string
+          created_by?: string | null
           date_entree?: string | null
           date_naissance?: string | null
           email?: string | null
@@ -2655,9 +2696,11 @@ export type Database = {
           taux_maladie?: number | null
           telephone?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           adresse?: string | null
+          archived_at?: string | null
           avance_caisse?: number | null
           avance_financiere?: number | null
           avance_tabaski?: number | null
@@ -2665,6 +2708,7 @@ export type Database = {
           contrat?: string | null
           convention?: string | null
           created_at?: string
+          created_by?: string | null
           date_entree?: string | null
           date_naissance?: string | null
           email?: string | null
@@ -2696,6 +2740,7 @@ export type Database = {
           taux_maladie?: number | null
           telephone?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -2737,6 +2782,319 @@ export type Database = {
           total_net?: number | null
         }
         Relationships: []
+      }
+      hr_payroll_runs: {
+        Row: {
+          annee: number
+          calculated_at: string | null
+          closed_at: string | null
+          closed_by: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          mois: number
+          nb_employes: number
+          settings_snapshot: Json
+          status: Database["public"]["Enums"]["hr_payroll_run_status"]
+          total_brut: number
+          total_charges: number
+          total_masse: number
+          total_net: number
+          updated_at: string
+          validated_at: string | null
+          validated_by: string | null
+        }
+        Insert: {
+          annee: number
+          calculated_at?: string | null
+          closed_at?: string | null
+          closed_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          mois: number
+          nb_employes?: number
+          settings_snapshot?: Json
+          status?: Database["public"]["Enums"]["hr_payroll_run_status"]
+          total_brut?: number
+          total_charges?: number
+          total_masse?: number
+          total_net?: number
+          updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
+        }
+        Update: {
+          annee?: number
+          calculated_at?: string | null
+          closed_at?: string | null
+          closed_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          mois?: number
+          nb_employes?: number
+          settings_snapshot?: Json
+          status?: Database["public"]["Enums"]["hr_payroll_run_status"]
+          total_brut?: number
+          total_charges?: number
+          total_masse?: number
+          total_net?: number
+          updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
+        }
+        Relationships: []
+      }
+      hr_payroll_settings: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          effective_from: string
+          effective_to: string | null
+          id: string
+          is_active: boolean
+          name: string
+          settings: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          effective_from?: string
+          effective_to?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          settings?: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          effective_from?: string
+          effective_to?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          settings?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      hr_payroll_variables: {
+        Row: {
+          annee: number
+          avance_caisse: number
+          avance_financiere: number
+          avance_tabaski: number
+          created_at: string
+          created_by: string | null
+          employee_id: string
+          frais_medicaux: number
+          heures_abs_maladie: number
+          heures_absence: number
+          hs_115: number
+          hs_140: number
+          hs_160: number
+          hs_200: number
+          id: string
+          ind_kilometrique: number
+          mois: number
+          nb_paniers: number
+          notes: string | null
+          primes_exceptionnelles: number
+          ret_cooperative: number
+          taux_maladie: number
+          updated_at: string
+          validated_at: string | null
+          validated_by: string | null
+        }
+        Insert: {
+          annee: number
+          avance_caisse?: number
+          avance_financiere?: number
+          avance_tabaski?: number
+          created_at?: string
+          created_by?: string | null
+          employee_id: string
+          frais_medicaux?: number
+          heures_abs_maladie?: number
+          heures_absence?: number
+          hs_115?: number
+          hs_140?: number
+          hs_160?: number
+          hs_200?: number
+          id?: string
+          ind_kilometrique?: number
+          mois: number
+          nb_paniers?: number
+          notes?: string | null
+          primes_exceptionnelles?: number
+          ret_cooperative?: number
+          taux_maladie?: number
+          updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
+        }
+        Update: {
+          annee?: number
+          avance_caisse?: number
+          avance_financiere?: number
+          avance_tabaski?: number
+          created_at?: string
+          created_by?: string | null
+          employee_id?: string
+          frais_medicaux?: number
+          heures_abs_maladie?: number
+          heures_absence?: number
+          hs_115?: number
+          hs_140?: number
+          hs_160?: number
+          hs_200?: number
+          id?: string
+          ind_kilometrique?: number
+          mois?: number
+          nb_paniers?: number
+          notes?: string | null
+          primes_exceptionnelles?: number
+          ret_cooperative?: number
+          taux_maladie?: number
+          updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hr_payroll_variables_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "hr_employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hr_payslips: {
+        Row: {
+          annee: number
+          calculation_snapshot: Json
+          created_at: string
+          created_by: string | null
+          employee_id: string
+          employee_snapshot: Json
+          employer_charges: number
+          gross_total: number
+          id: string
+          issued_at: string
+          mois: number
+          net_total: number
+          payroll_run_id: string
+          pdf_url: string | null
+          reference: string
+          updated_at: string
+          variables_snapshot: Json
+        }
+        Insert: {
+          annee: number
+          calculation_snapshot?: Json
+          created_at?: string
+          created_by?: string | null
+          employee_id: string
+          employee_snapshot?: Json
+          employer_charges?: number
+          gross_total?: number
+          id?: string
+          issued_at?: string
+          mois: number
+          net_total?: number
+          payroll_run_id: string
+          pdf_url?: string | null
+          reference: string
+          updated_at?: string
+          variables_snapshot?: Json
+        }
+        Update: {
+          annee?: number
+          calculation_snapshot?: Json
+          created_at?: string
+          created_by?: string | null
+          employee_id?: string
+          employee_snapshot?: Json
+          employer_charges?: number
+          gross_total?: number
+          id?: string
+          issued_at?: string
+          mois?: number
+          net_total?: number
+          payroll_run_id?: string
+          pdf_url?: string | null
+          reference?: string
+          updated_at?: string
+          variables_snapshot?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hr_payslips_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "hr_employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hr_payslips_payroll_run_id_fkey"
+            columns: ["payroll_run_id"]
+            isOneToOne: false
+            referencedRelation: "hr_payroll_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hr_salary_categories: {
+        Row: {
+          agreement_id: string | null
+          code: string
+          created_at: string
+          created_by: string | null
+          currency: string
+          id: string
+          is_active: boolean
+          label: string
+          minimum_salary: number
+          updated_at: string
+        }
+        Insert: {
+          agreement_id?: string | null
+          code: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          id?: string
+          is_active?: boolean
+          label: string
+          minimum_salary?: number
+          updated_at?: string
+        }
+        Update: {
+          agreement_id?: string | null
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          id?: string
+          is_active?: boolean
+          label?: string
+          minimum_salary?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hr_salary_categories_agreement_id_fkey"
+            columns: ["agreement_id"]
+            isOneToOne: false
+            referencedRelation: "hr_collective_agreements"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       invitation_reminders: {
         Row: {
@@ -5431,6 +5789,12 @@ export type Database = {
         | "webinar"
         | "other"
       grant_status: "draft" | "active" | "disbursing" | "closing" | "closed"
+      hr_payroll_run_status:
+        | "draft"
+        | "calculated"
+        | "validated"
+        | "closed"
+        | "cancelled"
       project_status: "draft" | "active" | "paused" | "completed" | "cancelled"
       purchase_order_status:
         | "brouillon"
@@ -5628,6 +5992,13 @@ export const Constants = {
         "other",
       ],
       grant_status: ["draft", "active", "disbursing", "closing", "closed"],
+      hr_payroll_run_status: [
+        "draft",
+        "calculated",
+        "validated",
+        "closed",
+        "cancelled",
+      ],
       project_status: ["draft", "active", "paused", "completed", "cancelled"],
       purchase_order_status: [
         "brouillon",
