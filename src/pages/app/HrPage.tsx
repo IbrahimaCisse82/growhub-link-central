@@ -967,26 +967,52 @@ export default function HrPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Supprimer cet employé ?")) return;
+    if (!confirm("Archiver cet employé ? Les données RH restent conservées pour l'historique de paie.")) return;
     await remove.mutateAsync(id);
-    toast.success("Employé supprimé");
+    toast.success("Employé archivé");
   };
 
   const handleCloseMonth = async () => {
-    const now = new Date();
+    if (!isAdmin) { toast.error("Accès RH non autorisé"); return; }
+    const run = await payrollRuns.upsertRun.mutateAsync({
+      mois: payrollMonth,
+      annee: payrollYear,
+      status: "calculated",
+      settings_snapshot: params as any,
+      total_brut: totaux.brut,
+      total_net: totaux.net,
+      total_charges: totaux.charges,
+      total_masse: totaux.masse,
+      nb_employes: employees.length,
+      calculated_at: new Date().toISOString(),
+    }) as any;
+    await payrollRuns.savePayslips.mutateAsync(allPaies.map(emp => ({
+      payroll_run_id: run.id,
+      employee_id: emp.id,
+      mois: payrollMonth,
+      annee: payrollYear,
+      reference: `BP-${payrollYear}-${String(payrollMonth + 1).padStart(2, "0")}-${emp.matricule}`,
+      employee_snapshot: emp,
+      variables_snapshot: variablesByEmployee.get(emp.id!) ?? {},
+      calculation_snapshot: emp.paie,
+      gross_total: emp.paie.brut,
+      net_total: emp.paie.net,
+      employer_charges: emp.paie.chargesPat,
+    })));
     await saveSnapshot.mutateAsync({
-      mois: now.getMonth(),
-      annee: now.getFullYear(),
+      mois: payrollMonth,
+      annee: payrollYear,
       total_brut: totaux.brut,
       total_net: totaux.net,
       total_charges: totaux.charges,
       total_masse: totaux.masse,
       nb_employes: employees.length,
     });
-    toast.success(`${MOIS[now.getMonth()]} ${now.getFullYear()} clôturé`);
+    toast.success(`${MOIS[payrollMonth]} ${payrollYear} calculé avec bulletins figés`);
   };
 
   if (isLoading) return <div className="flex items-center justify-center h-40"><div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>;
+  if (!isAdmin) return <div className="max-w-xl mx-auto mt-12"><GhCard title="Accès RH restreint"><div className="flex gap-3 text-sm text-muted-foreground"><ShieldCheck className="w-5 h-5 text-primary shrink-0" />Les données RH et salariales sont réservées aux administrateurs et coordinateurs autorisés.</div></GhCard></div>;
 
   return (
     <div className="space-y-5">
