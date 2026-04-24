@@ -1202,7 +1202,7 @@ export default function HrPage() {
 
         {/* ═══ PARAMÈTRES ═══ */}
         <TabsContent value="parametres" className="mt-4">
-          <ParametresTab params={params} onSave={setParams} />
+          <ParametresTab params={params} onSave={(p) => { setParams(p); payrollSettings.save.mutate(p as any); }} />
         </TabsContent>
 
         {/* ═══ CONVENTIONS ═══ */}
