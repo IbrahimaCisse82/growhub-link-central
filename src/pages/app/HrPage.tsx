@@ -674,6 +674,47 @@ function applyPayrollVariable(emp: HrEmployee, variable?: HrPayrollVariable): Hr
   };
 }
 
+function VariablesTab({ employees, variables, onSave }: { employees: HrEmployee[]; variables: HrPayrollVariable[]; onSave: (v: Partial<HrPayrollVariable> & { employee_id: string }) => void }) {
+  const [editing, setEditing] = useState<string | null>(null);
+  const [form, setForm] = useState<Record<string, number | string>>({});
+  const open = (emp: HrEmployee) => {
+    const variable = variables.find(v => v.employee_id === emp.id);
+    setEditing(emp.id!);
+    setForm({ ...EMPTY_PAYROLL_VARIABLE, ...(variable ?? {}) });
+  };
+  const set = (k: string, v: string) => setForm(prev => ({ ...prev, [k]: k === "notes" ? v : Number(v || 0) }));
+  const fields = [
+    ["HS 115%", "hs_115"], ["HS 140%", "hs_140"], ["Absences", "heures_absence"], ["Paniers", "nb_paniers"],
+    ["Avance caisse", "avance_caisse"], ["Avance financière", "avance_financiere"], ["Ret. coopérative", "ret_cooperative"], ["Prime exceptionnelle", "primes_exceptionnelles"],
+  ];
+
+  return (
+    <GhCard title="Variables mensuelles de paie">
+      <div className="space-y-2">
+        {employees.map(emp => {
+          const variable = variables.find(v => v.employee_id === emp.id);
+          const hasValues = variable && fields.some(([, k]) => Number((variable as any)[k] ?? 0) > 0);
+          return (
+            <div key={emp.id} className="rounded-lg border border-border p-3">
+              <div className="flex items-center justify-between gap-3">
+                <div><div className="font-semibold text-sm">{emp.prenom} {emp.nom}</div><div className="text-xs text-muted-foreground">{emp.matricule} · {emp.fonction || "—"}</div></div>
+                <div className="flex items-center gap-2"><span className="text-xs text-muted-foreground">{hasValues ? "Variables saisies" : "Aucune variable"}</span><GhButton size="sm" variant="secondary" onClick={() => open(emp)}><Pencil className="w-3 h-3 mr-1" />Saisir</GhButton></div>
+              </div>
+              {editing === emp.id && (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3 pt-3 border-t border-border">
+                  {fields.map(([label, key]) => <div key={key}><Label className="text-[11px]">{label}</Label><Input type="number" value={String(form[key] ?? 0)} onChange={e => set(key, e.target.value)} /></div>)}
+                  <div className="md:col-span-4"><Label className="text-[11px]">Notes</Label><Input value={String(form.notes ?? "")} onChange={e => set("notes", e.target.value)} /></div>
+                  <div className="md:col-span-4 flex justify-end gap-2"><GhButton size="sm" variant="ghost" onClick={() => setEditing(null)}>Annuler</GhButton><GhButton size="sm" onClick={() => { onSave({ ...(form as any), employee_id: emp.id! }); setEditing(null); toast.success("Variables enregistrées"); }}>Enregistrer</GhButton></div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </GhCard>
+  );
+}
+
 function ConventionsTab({ conventions, setConventions }: { conventions: Convention[]; setConventions: (c: Convention[]) => void }) {
   const [selected, setSelected] = useState<string | null>(null);
   const selectedCC = conventions.find(c => c.id === selected);
