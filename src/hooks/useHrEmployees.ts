@@ -145,3 +145,31 @@ export function useHrPayrollVariables(mois: number, annee: number) {
   });
   return { variables, isLoading, saveVariable };
 }
+
+export function useHrPayrollRuns() {
+  const qc = useQueryClient();
+  const key = ["hr_payroll_runs"];
+  const { data: runs = [], isLoading } = useQuery({
+    queryKey: key,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("hr_payroll_runs").select("*, hr_payslips(*)").order("annee", { ascending: false }).order("mois", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+  const upsertRun = useMutation({
+    mutationFn: async (run: Record<string, unknown>) => {
+      const { error } = await supabase.from("hr_payroll_runs").upsert(run as any, { onConflict: "mois,annee" });
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: key }),
+  });
+  const savePayslips = useMutation({
+    mutationFn: async (rows: Record<string, unknown>[]) => {
+      const { error } = await supabase.from("hr_payslips").upsert(rows as any, { onConflict: "payroll_run_id,employee_id" });
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: key }),
+  });
+  return { runs, isLoading, upsertRun, savePayslips };
+}
