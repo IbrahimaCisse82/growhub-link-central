@@ -164,6 +164,9 @@ export const useCreateSupplierInvoiceFromPurchaseOrder = () => {
       if (error) throw error;
       if (!(po as any).currency) throw new Error("Devise manquante sur le bon de commande");
       if (!((po as any).lines ?? []).length) throw new Error("Impossible de convertir un BC sans lignes");
+      if (((po as any).lines ?? []).some((line: any) => line.tax_rate === null || line.tax_rate === undefined)) {
+        throw new Error("Chaque ligne du BC doit avoir un taux de TVA");
+      }
 
       const { data: invoice, error: invoiceError } = await supabase
         .from("crm_invoices")
