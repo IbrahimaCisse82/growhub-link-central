@@ -62,7 +62,7 @@ export default function PurchaseOrdersPage() {
 
   const confirmSupplierInvoice = async () => {
     if (!invoicePo) return;
-    if (!canConvertPreview) {
+    if (!canUsePreview) {
       toast.error("Conversion impossible : vérifiez les lignes, la devise et les totaux du BC");
       return;
     }
@@ -139,7 +139,11 @@ export default function PurchaseOrdersPage() {
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input className="pl-9" value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder="Rechercher par N°, fournisseur, référence…" />
         </div>
-        <div className="text-[12px] text-muted-foreground">{filteredOrders.length} BC trouvé(s)</div>
+        <div className="grid grid-cols-3 gap-2 text-[12px] text-muted-foreground sm:text-right">
+          <div>HT <span className="font-mono text-foreground">{aggregate.subtotal.toLocaleString("fr-FR")}</span></div>
+          <div>TVA <span className="font-mono text-foreground">{aggregate.tax.toLocaleString("fr-FR")}</span></div>
+          <div>TTC <span className="font-mono text-foreground">{aggregate.total.toLocaleString("fr-FR")}</span></div>
+        </div>
       </div>
 
       <GhCard title="Liste des bons de commande" noPadding>
@@ -186,9 +190,17 @@ export default function PurchaseOrdersPage() {
               </TableBody>
             </Table>
             {!paginatedOrders.length && <div className="p-4 text-sm text-muted-foreground">Aucun BC ne correspond à la recherche.</div>}
-            <div className="flex items-center justify-between border-t border-border px-4 py-3 text-[12px] text-muted-foreground">
-              <span>Page {page} sur {totalPages}</span>
-              <div className="flex gap-2">
+            <div className="flex flex-col gap-3 border-t border-border px-4 py-3 text-[12px] text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+              <span>{filteredOrders.length} BC trouvé(s) • Page {page} sur {totalPages}</span>
+              <div className="flex items-center gap-2">
+                <Select value={String(pageSize)} onValueChange={(v) => { setPageSize(Number(v)); setPage(1); }}>
+                  <SelectTrigger className="h-8 w-24"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="10">10 / page</SelectItem>
+                    <SelectItem value="20">20 / page</SelectItem>
+                    <SelectItem value="50">50 / page</SelectItem>
+                  </SelectContent>
+                </Select>
                 <Button size="sm" variant="outline" disabled={page === 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>Précédent</Button>
                 <Button size="sm" variant="outline" disabled={page === totalPages} onClick={() => setPage((p) => Math.min(totalPages, p + 1))}>Suivant</Button>
               </div>
