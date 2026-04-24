@@ -114,11 +114,12 @@ export function useHrPayrollHistory() {
   return { history, isLoading, saveSnapshot };
 }
 
-export function useHrPayrollSettings() {
+export function useHrPayrollSettings(enabled = true) {
   const qc = useQueryClient();
   const key = ["hr_payroll_settings"];
   const { data: setting, isLoading } = useQuery({
     queryKey: key,
+    enabled,
     queryFn: async () => {
       const { data, error } = await supabase.from("hr_payroll_settings").select("*").eq("is_active", true).order("effective_from", { ascending: false }).limit(1).maybeSingle();
       if (error) throw error;
@@ -138,11 +139,12 @@ export function useHrPayrollSettings() {
   return { setting, isLoading, save };
 }
 
-export function useHrPayrollVariables(mois: number, annee: number) {
+export function useHrPayrollVariables(mois: number, annee: number, enabled = true) {
   const qc = useQueryClient();
   const key = ["hr_payroll_variables", mois, annee];
   const { data: variables = [], isLoading } = useQuery({
     queryKey: key,
+    enabled,
     queryFn: async () => {
       const { data, error } = await supabase.from("hr_payroll_variables").select("*").eq("mois", mois).eq("annee", annee);
       if (error) throw error;
@@ -159,11 +161,12 @@ export function useHrPayrollVariables(mois: number, annee: number) {
   return { variables, isLoading, saveVariable };
 }
 
-export function useHrPayrollRuns() {
+export function useHrPayrollRuns(enabled = true) {
   const qc = useQueryClient();
   const key = ["hr_payroll_runs"];
   const { data: runs = [], isLoading } = useQuery({
     queryKey: key,
+    enabled,
     queryFn: async () => {
       const { data, error } = await supabase.from("hr_payroll_runs").select("*, hr_payslips(*)").order("annee", { ascending: false }).order("mois", { ascending: false });
       if (error) throw error;
