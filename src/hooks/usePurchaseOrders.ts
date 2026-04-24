@@ -151,6 +151,68 @@ export const useDeletePurchaseOrder = () => {
   });
 };
 
+export const useCreateSupplierInvoiceFromPurchaseOrder = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (poId: string) => {
+      const { data: po, error } = await supabase
+        .from("purchase_orders")
+        .select("*, lines:purchase_order_lines(*)")
+        .eq("id", poId)
+        .single();
+      if (error) throw error;
+
+      const { data: invoice, error: invoiceError } = await supabase
+        .from("crm_invoices")
+        .insert({
+          direction: "recue",
+          contrepartie_id: (po as any).supplier_id,
+          issue_date: new Date().toISOString().split("T")[0],
+          due_date: (po as any).expected_delivery_date,
+          currency: (po as any).currency ?? "XOF",
+          tax_rate: (po as any).tax_rate ?? 18,
+          subtotal: (po as any).subtotal ?? 0,
+          tax_amount: (po as any).tax_amount ?? 0,
+          total: (po as any).total ?? 0,
+          status: "brouillon",
+          reference: (po as any).po_number,
+          payment_terms: (po as any).payment_terms,
+          notes: `Facture fournisseur générée depuis le bon de commande ${(po as any).po_number}`,
+        })
+        .select()
+        .single();
+      if (invoiceError) throw invoiceError;
+
+      const lines = ((po as any).lines ?? []).map((line: any, index: number) => ({
+        invoice_id: invoice.id,
+        description: line.description,
+        quantity: line.quantity,
+        unit_price: line.unit_price,
+        tax_rate: line.tax_rate,
+        line_total: line.line_total,
+        sort_order: index,
+      }));
+      if (lines.length) {
+        const { error: linesError } = await supabase.from("crm_invoice_lines").insert(lines);
+        if (linesError) throw linesError;
+      }
+
+      const { error: updateError } = await supabase
+        .from("purchase_orders")
+        .update({ invoice_id: invoice.id, status: "recu", received_at: new Date().toISOString() })
+        .eq("id", poId);
+      if (updateError) throw updateError;
+      return invoice;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["purchase_orders"] });
+      qc.invalidateQueries({ queryKey: ["crm-invoices"] });
+      toast.success("Facture fournisseur créée et BC marqué reçu");
+    },
+    onError: (e: any) => toast.error(e.message ?? "Erreur de création de facture fournisseur"),
+  });
+};
+
 export const PO_STATUS_LABELS: Record<POStatus, string> = {
   brouillon: "Brouillon",
   envoye: "Envoyé",
