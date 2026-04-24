@@ -73,6 +73,19 @@ export function useHrEmployees() {
   return { employees, isLoading, upsert, remove };
 }
 
+export function useMyHrEmployees(enabled = true) {
+  const { data: employees = [], isLoading } = useQuery({
+    queryKey: ["my_hr_employees"],
+    enabled,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("hr_employees").select("*").is("archived_at", null).order("nom", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as unknown as HrEmployee[];
+    },
+  });
+  return { employees, isLoading };
+}
+
 export function useHrPayrollHistory() {
   const qc = useQueryClient();
   const key = ["hr_payroll_history"];
@@ -172,5 +185,15 @@ export function useHrPayrollRuns() {
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: key }),
   });
-  return { runs, isLoading, upsertRun, savePayslips };
+  const updateRunStatus = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: "draft" | "calculated" | "validated" | "closed" | "cancelled" }) => {
+      const patch: Record<string, unknown> = { status };
+      if (status === "closed") patch.closed_at = new Date().toISOString();
+      if (status === "validated") patch.validated_at = new Date().toISOString();
+      const { error } = await supabase.from("hr_payroll_runs").update(patch as any).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: key }),
+  });
+  return { runs, isLoading, upsertRun, savePayslips, updateRunStatus };
 }
