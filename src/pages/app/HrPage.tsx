@@ -1,11 +1,12 @@
-import { useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import SectionHeader from "@/components/shared/SectionHeader";
 import GhButton from "@/components/shared/GhButton";
 import GhCard from "@/components/shared/GhCard";
 import StatCard from "@/components/shared/StatCard";
-import { useHrEmployees, useHrPayrollHistory } from "@/hooks/useHrEmployees";
+import { EMPTY_PAYROLL_VARIABLE, useHrEmployees, useHrPayrollHistory, useHrPayrollRuns, useHrPayrollSettings, useHrPayrollVariables, type HrPayrollVariable } from "@/hooks/useHrEmployees";
+import { useAuth } from "@/hooks/useAuth";
 import { calculerPaie, fmtXOF, DEFAULT_PAYROLL_PARAMS, MOIS, type HrEmployee, type PayrollParams, type PayrollResult } from "@/lib/payroll";
-import { Plus, FileText, Users, DollarSign, TrendingUp, Trash2, Pencil, Eye, Download, Search, Settings, Building2, BookOpen, BarChart3, Printer } from "lucide-react";
+import { Plus, FileText, Users, DollarSign, TrendingUp, Trash2, Pencil, Eye, Download, Search, Settings, Building2, BookOpen, BarChart3, Printer, ShieldCheck, CalendarClock } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -652,6 +653,68 @@ function EntrepriseTab({ entreprise, onSave }: { entreprise: Entreprise; onSave:
 type ConvCategory = { id: string; code: string; libelle: string; statut: string; salaireMinima: number };
 type Convention = { id: string; nom: string; secteur: string; dateSignature: string; description: string; categories: ConvCategory[] };
 
+function applyPayrollVariable(emp: HrEmployee, variable?: HrPayrollVariable): HrEmployee {
+  if (!variable) return emp;
+  return {
+    ...emp,
+    hs_115: variable.hs_115,
+    hs_140: variable.hs_140,
+    hs_160: variable.hs_160,
+    hs_200: variable.hs_200,
+    heures_absence: variable.heures_absence,
+    heures_abs_maladie: variable.heures_abs_maladie,
+    taux_maladie: variable.taux_maladie,
+    nb_paniers: variable.nb_paniers,
+    avance_tabaski: variable.avance_tabaski,
+    avance_caisse: variable.avance_caisse,
+    avance_financiere: variable.avance_financiere,
+    ret_cooperative: variable.ret_cooperative,
+    frais_medicaux: variable.frais_medicaux,
+    ind_kilometrique: variable.ind_kilometrique + variable.primes_exceptionnelles,
+  };
+}
+
+function VariablesTab({ employees, variables, onSave }: { employees: HrEmployee[]; variables: HrPayrollVariable[]; onSave: (v: Partial<HrPayrollVariable> & { employee_id: string }) => void }) {
+  const [editing, setEditing] = useState<string | null>(null);
+  const [form, setForm] = useState<Record<string, number | string>>({});
+  const open = (emp: HrEmployee) => {
+    const variable = variables.find(v => v.employee_id === emp.id);
+    setEditing(emp.id!);
+    setForm({ ...EMPTY_PAYROLL_VARIABLE, ...(variable ?? {}) });
+  };
+  const set = (k: string, v: string) => setForm(prev => ({ ...prev, [k]: k === "notes" ? v : Number(v || 0) }));
+  const fields = [
+    ["HS 115%", "hs_115"], ["HS 140%", "hs_140"], ["Absences", "heures_absence"], ["Paniers", "nb_paniers"],
+    ["Avance caisse", "avance_caisse"], ["Avance financière", "avance_financiere"], ["Ret. coopérative", "ret_cooperative"], ["Prime exceptionnelle", "primes_exceptionnelles"],
+  ];
+
+  return (
+    <GhCard title="Variables mensuelles de paie">
+      <div className="space-y-2">
+        {employees.map(emp => {
+          const variable = variables.find(v => v.employee_id === emp.id);
+          const hasValues = variable && fields.some(([, k]) => Number((variable as any)[k] ?? 0) > 0);
+          return (
+            <div key={emp.id} className="rounded-lg border border-border p-3">
+              <div className="flex items-center justify-between gap-3">
+                <div><div className="font-semibold text-sm">{emp.prenom} {emp.nom}</div><div className="text-xs text-muted-foreground">{emp.matricule} · {emp.fonction || "—"}</div></div>
+                <div className="flex items-center gap-2"><span className="text-xs text-muted-foreground">{hasValues ? "Variables saisies" : "Aucune variable"}</span><GhButton size="sm" variant="secondary" onClick={() => open(emp)}><Pencil className="w-3 h-3 mr-1" />Saisir</GhButton></div>
+              </div>
+              {editing === emp.id && (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3 pt-3 border-t border-border">
+                  {fields.map(([label, key]) => <div key={key}><Label className="text-[11px]">{label}</Label><Input type="number" value={String(form[key] ?? 0)} onChange={e => set(key, e.target.value)} /></div>)}
+                  <div className="md:col-span-4"><Label className="text-[11px]">Notes</Label><Input value={String(form.notes ?? "")} onChange={e => set("notes", e.target.value)} /></div>
+                  <div className="md:col-span-4 flex justify-end gap-2"><GhButton size="sm" variant="ghost" onClick={() => setEditing(null)}>Annuler</GhButton><GhButton size="sm" onClick={() => { onSave({ ...(form as any), employee_id: emp.id! }); setEditing(null); toast.success("Variables enregistrées"); }}>Enregistrer</GhButton></div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </GhCard>
+  );
+}
+
 function ConventionsTab({ conventions, setConventions }: { conventions: Convention[]; setConventions: (c: Convention[]) => void }) {
   const [selected, setSelected] = useState<string | null>(null);
   const selectedCC = conventions.find(c => c.id === selected);
@@ -833,18 +896,33 @@ function ConventionsTab({ conventions, setConventions }: { conventions: Conventi
 
 export default function HrPage() {
   const { t } = useTranslation();
+  const { isAdmin } = useAuth();
   const { employees, isLoading, upsert, remove } = useHrEmployees();
   const { history, saveSnapshot } = useHrPayrollHistory();
+  const payrollSettings = useHrPayrollSettings();
+  const payrollRuns = useHrPayrollRuns();
   const [showNew, setShowNew] = useState(false);
   const [showForm, setShowForm] = useState<Partial<HrEmployee> | null>(null);
   const [showBulletin, setShowBulletin] = useState<HrEmployee | null>(null);
   const [search, setSearch] = useState("");
   const [params, setParams] = useState<PayrollParams>(DEFAULT_PAYROLL_PARAMS);
+  const now = new Date();
+  const [payrollMonth, setPayrollMonth] = useState(now.getMonth());
+  const [payrollYear, setPayrollYear] = useState(now.getFullYear());
+  const { variables, saveVariable } = useHrPayrollVariables(payrollMonth, payrollYear);
   const [entreprise, setEntreprise] = useState<Entreprise>(DEFAULT_ENTREPRISE);
   const [conventions, setConventions] = useState(DEFAULT_CONVENTIONS);
   const [activeTab, setActiveTab] = useState("dashboard");
 
-  const allPaies = useMemo(() => employees.map(e => ({ ...e, paie: calculerPaie(e, params) })), [employees, params]);
+  useEffect(() => {
+    if (payrollSettings.setting?.settings) setParams(payrollSettings.setting.settings as unknown as PayrollParams);
+  }, [payrollSettings.setting]);
+
+  const variablesByEmployee = useMemo(() => new Map(variables.map(v => [v.employee_id, v])), [variables]);
+  const allPaies = useMemo(() => employees.map(e => {
+    const empWithVariables = applyPayrollVariable(e, variablesByEmployee.get(e.id!));
+    return { ...empWithVariables, paie: calculerPaie(empWithVariables, params, new Date(payrollYear, payrollMonth + 1, 0)) };
+  }), [employees, params, payrollMonth, payrollYear, variablesByEmployee]);
   const filtered = allPaies.filter(e =>
     `${e.prenom} ${e.nom} ${e.matricule} ${e.fonction}`.toLowerCase().includes(search.toLowerCase())
   );
@@ -889,26 +967,52 @@ export default function HrPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Supprimer cet employé ?")) return;
+    if (!confirm("Archiver cet employé ? Les données RH restent conservées pour l'historique de paie.")) return;
     await remove.mutateAsync(id);
-    toast.success("Employé supprimé");
+    toast.success("Employé archivé");
   };
 
   const handleCloseMonth = async () => {
-    const now = new Date();
+    if (!isAdmin) { toast.error("Accès RH non autorisé"); return; }
+    const run = await payrollRuns.upsertRun.mutateAsync({
+      mois: payrollMonth,
+      annee: payrollYear,
+      status: "calculated",
+      settings_snapshot: params as any,
+      total_brut: totaux.brut,
+      total_net: totaux.net,
+      total_charges: totaux.charges,
+      total_masse: totaux.masse,
+      nb_employes: employees.length,
+      calculated_at: new Date().toISOString(),
+    }) as any;
+    await payrollRuns.savePayslips.mutateAsync(allPaies.map(emp => ({
+      payroll_run_id: run.id,
+      employee_id: emp.id,
+      mois: payrollMonth,
+      annee: payrollYear,
+      reference: `BP-${payrollYear}-${String(payrollMonth + 1).padStart(2, "0")}-${emp.matricule}`,
+      employee_snapshot: emp,
+      variables_snapshot: variablesByEmployee.get(emp.id!) ?? {},
+      calculation_snapshot: emp.paie,
+      gross_total: emp.paie.brut,
+      net_total: emp.paie.net,
+      employer_charges: emp.paie.chargesPat,
+    })));
     await saveSnapshot.mutateAsync({
-      mois: now.getMonth(),
-      annee: now.getFullYear(),
+      mois: payrollMonth,
+      annee: payrollYear,
       total_brut: totaux.brut,
       total_net: totaux.net,
       total_charges: totaux.charges,
       total_masse: totaux.masse,
       nb_employes: employees.length,
     });
-    toast.success(`${MOIS[now.getMonth()]} ${now.getFullYear()} clôturé`);
+    toast.success(`${MOIS[payrollMonth]} ${payrollYear} calculé avec bulletins figés`);
   };
 
   if (isLoading) return <div className="flex items-center justify-center h-40"><div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>;
+  if (!isAdmin) return <div className="max-w-xl mx-auto mt-12"><GhCard title="Accès RH restreint"><div className="flex gap-3 text-sm text-muted-foreground"><ShieldCheck className="w-5 h-5 text-primary shrink-0" />Les données RH et salariales sont réservées aux administrateurs et coordinateurs autorisés.</div></GhCard></div>;
 
   return (
     <div className="space-y-5">
@@ -917,6 +1021,11 @@ export default function HrPage() {
         subtitle="Module complet de paie conforme au droit sénégalais — Barème fiscal, cotisations sociales et bulletins"
         actions={
           <div className="flex gap-2">
+            <Select value={String(payrollMonth)} onValueChange={v => setPayrollMonth(Number(v))}>
+              <SelectTrigger className="w-[132px] h-9"><SelectValue /></SelectTrigger>
+              <SelectContent>{MOIS.map((m, i) => <SelectItem key={m} value={String(i)}>{m}</SelectItem>)}</SelectContent>
+            </Select>
+            <Input className="w-24 h-9" type="number" value={payrollYear} onChange={e => setPayrollYear(Number(e.target.value))} />
             <GhButton size="sm" variant="secondary" onClick={handleCloseMonth}>
               <Download size={14} className="mr-1" /> Clôturer le mois
             </GhButton>
@@ -931,6 +1040,7 @@ export default function HrPage() {
         <TabsList>
           <TabsTrigger value="dashboard" className="gap-1"><BarChart3 size={13} /> Tableau de bord</TabsTrigger>
           <TabsTrigger value="employes" className="gap-1"><Users size={13} /> Employés</TabsTrigger>
+          <TabsTrigger value="variables" className="gap-1"><CalendarClock size={13} /> Variables</TabsTrigger>
           <TabsTrigger value="parametres" className="gap-1"><Settings size={13} /> Paramètres</TabsTrigger>
           <TabsTrigger value="conventions" className="gap-1"><BookOpen size={13} /> Conventions</TabsTrigger>
           <TabsTrigger value="entreprise" className="gap-1"><Building2 size={13} /> Entreprise</TabsTrigger>
@@ -1019,6 +1129,16 @@ export default function HrPage() {
           )}
         </TabsContent>
 
+        {/* ═══ VARIABLES ═══ */}
+        <TabsContent value="variables" className="space-y-4 mt-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <StatCard label="Période" value={`${MOIS[payrollMonth]} ${payrollYear}`} note="Variables mensuelles" color="blue" icon={<CalendarClock size={18} />} />
+            <StatCard label="Employés variables" value={String(variables.length)} note="Saisies enregistrées" color="green" icon={<Users size={18} />} />
+            <StatCard label="Net prévisionnel" value={`${fmtXOF(totaux.net)} F`} note="Après variables" color="purple" icon={<TrendingUp size={18} />} />
+          </div>
+          <VariablesTab employees={employees} variables={variables} onSave={(v) => saveVariable.mutateAsync(v)} />
+        </TabsContent>
+
         {/* ═══ EMPLOYÉS ═══ */}
         <TabsContent value="employes" className="space-y-4 mt-4">
           <div className="relative max-w-sm">
@@ -1082,7 +1202,7 @@ export default function HrPage() {
 
         {/* ═══ PARAMÈTRES ═══ */}
         <TabsContent value="parametres" className="mt-4">
-          <ParametresTab params={params} onSave={setParams} />
+          <ParametresTab params={params} onSave={(p) => { setParams(p); payrollSettings.save.mutate(p as any); }} />
         </TabsContent>
 
         {/* ═══ CONVENTIONS ═══ */}

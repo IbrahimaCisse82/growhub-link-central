@@ -4,6 +4,8 @@
 
 export interface HrEmployee {
   id?: string;
+  user_id?: string | null;
+  archived_at?: string | null;
   matricule: string;
   prenom: string;
   nom: string;
