@@ -1088,12 +1088,15 @@ export default function HrPage() {
               <SelectContent>{MOIS.map((m, i) => <SelectItem key={m} value={String(i)}>{m}</SelectItem>)}</SelectContent>
             </Select>
             <Input className="w-24 h-9" type="number" value={payrollYear} onChange={e => setPayrollYear(Number(e.target.value))} />
-            <GhButton size="sm" variant="secondary" onClick={handleCloseMonth}>
-              <Download size={14} className="mr-1" /> Clôturer le mois
-            </GhButton>
-            <GhButton size="sm" onClick={() => setShowNew(true)}>
+            {canManageHr && <GhButton size="sm" variant="secondary" onClick={handleCalculatePayroll} disabled={isPeriodClosed}>
+              <Calculator size={14} className="mr-1" /> Calculer la paie
+            </GhButton>}
+            {canManageHr && <GhButton size="sm" variant="secondary" onClick={handleCloseMonth} disabled={isPeriodClosed}>
+              {isPeriodClosed ? <Lock size={14} className="mr-1" /> : <Download size={14} className="mr-1" />} Clôturer le mois
+            </GhButton>}
+            {canManageHr && <GhButton size="sm" onClick={() => setShowNew(true)} disabled={isPeriodClosed}>
               <Plus size={14} className="mr-1" /> Nouvel employé
-            </GhButton>
+            </GhButton>}
           </div>
         }
       />
@@ -1198,7 +1201,7 @@ export default function HrPage() {
             <StatCard label="Employés variables" value={String(variables.length)} note="Saisies enregistrées" color="green" icon={<Users size={18} />} />
             <StatCard label="Net prévisionnel" value={`${fmtXOF(totaux.net)} F`} note="Après variables" color="purple" icon={<TrendingUp size={18} />} />
           </div>
-          <VariablesTab employees={employees} variables={variables} onSave={(v) => saveVariable.mutateAsync(v)} />
+          <VariablesTab employees={employees} variables={variables} onSave={(v) => isPeriodClosed ? toast.error("Cette période est clôturée") : saveVariable.mutateAsync(v)} />
         </TabsContent>
 
         {/* ═══ EMPLOYÉS ═══ */}
@@ -1279,9 +1282,9 @@ export default function HrPage() {
       </Tabs>
 
       {/* Dialogs */}
-      {showNew && <EmployeeFormDialog emp={{ ...EMPTY_EMP }} onSave={handleSave} onClose={() => setShowNew(false)} existingMats={employees.map(e => e.matricule)} conventions={conventions} />}
-      {showForm && <EmployeeFormDialog emp={showForm} onSave={handleSave} onClose={() => setShowForm(null)} existingMats={employees.filter(e => e.id !== showForm.id).map(e => e.matricule)} conventions={conventions} />}
-      {showBulletin && <BulletinModal emp={showBulletin} params={params} entreprise={entreprise} onClose={() => setShowBulletin(null)} />}
+      {showNew && <EmployeeFormDialog emp={{ ...EMPTY_EMP }} onSave={handleSave} onClose={() => setShowNew(false)} existingMats={employees.map(e => e.matricule)} conventions={conventions} users={assignableUsers} locked={isPeriodClosed} />}
+      {showForm && <EmployeeFormDialog emp={showForm} onSave={handleSave} onClose={() => setShowForm(null)} existingMats={employees.filter(e => e.id !== showForm.id).map(e => e.matricule)} conventions={conventions} users={assignableUsers} locked={isPeriodClosed} />}
+      {showBulletin && <BulletinModal emp={showBulletin} params={params} entreprise={entreprise} orgSettings={orgSettings} defaultMois={payrollMonth} defaultAnnee={payrollYear} onClose={() => setShowBulletin(null)} />}
     </div>
   );
 }
