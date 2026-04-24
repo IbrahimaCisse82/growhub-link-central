@@ -141,45 +141,55 @@ export default function PurchaseOrdersPage() {
       <GhCard title="Liste des bons de commande" noPadding>
         {isLoading ? <div className="text-[12px] text-muted-foreground p-4">Chargement…</div> :
           !data?.length ? <EmptyState icon="📦" title="Aucun bon de commande" description="Créez votre premier BC pour commencer." /> :
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>N°</TableHead>
-                <TableHead>Fournisseur</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Livraison prévue</TableHead>
-                <TableHead className="text-right">Total TTC</TableHead>
-                <TableHead>Statut</TableHead>
-                <TableHead className="w-12"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paginatedOrders.map((po) => (
-                <TableRow key={po.id}>
-                  <TableCell className="font-mono text-[12px]">{po.po_number}</TableCell>
-                  <TableCell>{po.supplier?.name ?? "—"}</TableCell>
-                  <TableCell className="text-[12px]">{new Date(po.issue_date).toLocaleDateString("fr-FR")}</TableCell>
-                  <TableCell className="text-[12px]">{po.expected_delivery_date ? new Date(po.expected_delivery_date).toLocaleDateString("fr-FR") : "—"}</TableCell>
-                  <TableCell className="text-right font-mono">{Number(po.total ?? 0).toLocaleString("fr-FR")} {po.currency}</TableCell>
-                  <TableCell><Pill color={statusColor(po.status)}>{PO_STATUS_LABELS[po.status]}</Pill></TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild><button className="p-1 hover:bg-secondary rounded"><MoreHorizontal size={14}/></button></DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => setPdfPo(po)}><Download size={13} className="mr-2"/> Télécharger PDF</DropdownMenuItem>
-                        {po.status === "brouillon" && <DropdownMenuItem onClick={() => updateStatus.mutate({ id: po.id, status: "envoye" })}><Send size={13} className="mr-2"/> Marquer envoyé</DropdownMenuItem>}
-                        {po.status === "envoye" && <DropdownMenuItem onClick={() => updateStatus.mutate({ id: po.id, status: "confirme" })}><CheckCircle2 size={13} className="mr-2"/> Confirmé par fournisseur</DropdownMenuItem>}
-                        {(po.status === "confirme" || po.status === "recu_partiel") && <DropdownMenuItem onClick={() => updateStatus.mutate({ id: po.id, status: "recu" })}><PackageCheck size={13} className="mr-2"/> Marquer reçu</DropdownMenuItem>}
-                        {!po.invoice_id && ["envoye", "confirme", "recu_partiel", "recu"].includes(po.status) && <DropdownMenuItem onClick={() => setInvoicePo(po)}><Receipt size={13} className="mr-2"/> Créer facture fournisseur</DropdownMenuItem>}
-                        {po.status !== "annule" && po.status !== "recu" && <DropdownMenuItem onClick={() => updateStatus.mutate({ id: po.id, status: "annule" })}><XCircle size={13} className="mr-2"/> Annuler</DropdownMenuItem>}
-                        <DropdownMenuItem className="text-destructive" onClick={() => { if (confirm("Supprimer ce BC ?")) del.mutate(po.id); }}><Trash2 size={13} className="mr-2"/> Supprimer</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+          <>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>N°</TableHead>
+                  <TableHead>Fournisseur</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Livraison prévue</TableHead>
+                  <TableHead className="text-right">Total TTC</TableHead>
+                  <TableHead>Statut</TableHead>
+                  <TableHead className="w-12"></TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {paginatedOrders.map((po) => (
+                  <TableRow key={po.id}>
+                    <TableCell className="font-mono text-[12px]">{po.po_number}</TableCell>
+                    <TableCell>{po.supplier?.name ?? "—"}</TableCell>
+                    <TableCell className="text-[12px]">{new Date(po.issue_date).toLocaleDateString("fr-FR")}</TableCell>
+                    <TableCell className="text-[12px]">{po.expected_delivery_date ? new Date(po.expected_delivery_date).toLocaleDateString("fr-FR") : "—"}</TableCell>
+                    <TableCell className="text-right font-mono">{Number(po.total ?? 0).toLocaleString("fr-FR")} {po.currency}</TableCell>
+                    <TableCell><Pill color={statusColor(po.status)}>{PO_STATUS_LABELS[po.status]}</Pill></TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild><button className="p-1 hover:bg-secondary rounded"><MoreHorizontal size={14}/></button></DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => setPdfPo(po)}><Download size={13} className="mr-2"/> Télécharger PDF</DropdownMenuItem>
+                          {po.status === "brouillon" && <DropdownMenuItem onClick={() => updateStatus.mutate({ id: po.id, status: "envoye" })}><Send size={13} className="mr-2"/> Marquer envoyé</DropdownMenuItem>}
+                          {po.status === "envoye" && <DropdownMenuItem onClick={() => updateStatus.mutate({ id: po.id, status: "confirme" })}><CheckCircle2 size={13} className="mr-2"/> Confirmé par fournisseur</DropdownMenuItem>}
+                          {(po.status === "confirme" || po.status === "recu_partiel") && <DropdownMenuItem onClick={() => updateStatus.mutate({ id: po.id, status: "recu" })}><PackageCheck size={13} className="mr-2"/> Marquer reçu</DropdownMenuItem>}
+                          {!po.invoice_id && ["envoye", "confirme", "recu_partiel", "recu"].includes(po.status) && <DropdownMenuItem onClick={() => setInvoicePo(po)}><Receipt size={13} className="mr-2"/> Créer facture fournisseur</DropdownMenuItem>}
+                          {po.status !== "annule" && po.status !== "recu" && <DropdownMenuItem onClick={() => updateStatus.mutate({ id: po.id, status: "annule" })}><XCircle size={13} className="mr-2"/> Annuler</DropdownMenuItem>}
+                          <DropdownMenuItem className="text-destructive" onClick={() => { if (confirm("Supprimer ce BC ?")) del.mutate(po.id); }}><Trash2 size={13} className="mr-2"/> Supprimer</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+            {!paginatedOrders.length && <div className="p-4 text-sm text-muted-foreground">Aucun BC ne correspond à la recherche.</div>}
+            <div className="flex items-center justify-between border-t border-border px-4 py-3 text-[12px] text-muted-foreground">
+              <span>Page {page} sur {totalPages}</span>
+              <div className="flex gap-2">
+                <Button size="sm" variant="outline" disabled={page === 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>Précédent</Button>
+                <Button size="sm" variant="outline" disabled={page === totalPages} onClick={() => setPage((p) => Math.min(totalPages, p + 1))}>Suivant</Button>
+              </div>
+            </div>
+          </>
         }
       </GhCard>
 
