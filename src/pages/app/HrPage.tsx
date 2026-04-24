@@ -1007,6 +1007,7 @@ export default function HrPage() {
   }, [allPaies]);
 
   const handleSave = async (emp: Partial<HrEmployee>) => {
+    if (isPeriodClosed) { toast.error("Cette période est clôturée : modification impossible"); return; }
     await upsert.mutateAsync(emp);
     setShowForm(null);
     setShowNew(false);
@@ -1014,6 +1015,7 @@ export default function HrPage() {
   };
 
   const handleDelete = async (id: string) => {
+    if (isPeriodClosed) { toast.error("Cette période est clôturée : modification impossible"); return; }
     if (!confirm("Archiver cet employé ? Les données RH restent conservées pour l'historique de paie.")) return;
     await remove.mutateAsync(id);
     toast.success("Employé archivé");
