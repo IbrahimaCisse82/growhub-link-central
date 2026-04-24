@@ -339,9 +339,9 @@ function BulletinModal({ emp, params, entreprise, orgSettings, defaultMois, defa
 // Employee Form Dialog
 // ═══════════════════════════════════════════════════════════════════════════
 
-function EmployeeFormDialog({ emp, onSave, onClose, existingMats, conventions }: {
+function EmployeeFormDialog({ emp, onSave, onClose, existingMats, conventions, users, locked }: {
   emp: Partial<HrEmployee> | null; onSave: (e: Partial<HrEmployee>) => void; onClose: () => void; existingMats: string[];
-  conventions: Convention[];
+  conventions: Convention[]; users: { user_id: string; full_name: string; email: string | null }[]; locked?: boolean;
 }) {
   const [form, setForm] = useState<Partial<HrEmployee>>(emp || { ...EMPTY_EMP });
   const isEdit = !!emp?.id;
@@ -372,6 +372,7 @@ function EmployeeFormDialog({ emp, onSave, onClose, existingMats, conventions }:
       toast.error("Le salaire de base doit être supérieur à 0");
       return;
     }
+    if (locked) { toast.error("Cette période est clôturée : modification impossible"); return; }
     onSave(form);
   };
 
