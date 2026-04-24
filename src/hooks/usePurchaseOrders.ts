@@ -162,6 +162,8 @@ export const useCreateSupplierInvoiceFromPurchaseOrder = () => {
         .eq("id", poId)
         .single();
       if (error) throw error;
+      if (!(po as any).currency) throw new Error("Devise manquante sur le bon de commande");
+      if (!((po as any).lines ?? []).length) throw new Error("Impossible de convertir un BC sans lignes");
 
       const { data: invoice, error: invoiceError } = await supabase
         .from("crm_invoices")
