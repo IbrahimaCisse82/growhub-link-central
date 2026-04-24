@@ -31,6 +31,7 @@ export interface PurchaseOrder {
   created_at: string;
   updated_at: string;
   supplier?: { name: string; email: string | null; phone: string | null; address: string | null; ninea: string | null } | null;
+  lines?: POLine[];
 }
 
 export interface POLine {
@@ -50,7 +51,7 @@ export const usePurchaseOrders = (status?: POStatus | "all") => {
     queryFn: async () => {
       let q = supabase
         .from("purchase_orders")
-        .select("*, supplier:crm_contreparties!supplier_id(name,email,phone,address,ninea)")
+        .select("*, supplier:crm_contreparties!supplier_id(name,email,phone,address,ninea), lines:purchase_order_lines(*)")
         .order("created_at", { ascending: false });
       if (status && status !== "all") q = q.eq("status", status);
       const { data, error } = await q;

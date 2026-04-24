@@ -36,6 +36,9 @@ export default function PurchaseOrdersPage() {
   const del = useDeletePurchaseOrder();
   const [createOpen, setCreateOpen] = useState(false);
   const [invoicePo, setInvoicePo] = useState<PurchaseOrder | null>(null);
+  const invoicePoSubtotal = invoicePo?.lines?.reduce((sum, line) => sum + Number(line.quantity ?? 0) * Number(line.unit_price ?? 0), 0) ?? 0;
+  const invoicePoTax = invoicePo?.lines?.reduce((sum, line) => sum + (Number(line.quantity ?? 0) * Number(line.unit_price ?? 0) * Number(line.tax_rate ?? 0)) / 100, 0) ?? Number(invoicePo?.tax_amount ?? 0);
+  const invoicePoTotal = Number(invoicePo?.total ?? invoicePoSubtotal + invoicePoTax);
 
   const confirmSupplierInvoice = async () => {
     if (!invoicePo) return;
@@ -148,11 +151,44 @@ export default function PurchaseOrdersPage() {
 
       <CreatePurchaseOrderDialog open={createOpen} onOpenChange={setCreateOpen} />
       <AlertDialog open={!!invoicePo} onOpenChange={(open) => !open && setInvoicePo(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-2xl">
           <AlertDialogHeader>
             <AlertDialogTitle>Créer la facture fournisseur ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Cette action va créer une facture fournisseur depuis le BC {invoicePo?.po_number} pour un total de {Number(invoicePo?.total ?? 0).toLocaleString("fr-FR")} {invoicePo?.currency}.
+            <AlertDialogDescription asChild>
+              <div className="space-y-4 text-sm">
+                <p>
+                  Cette action va créer une facture fournisseur depuis le BC <span className="font-mono font-semibold text-foreground">{invoicePo?.po_number}</span>.
+                </p>
+                <div className="rounded-md border border-border overflow-hidden">
+                  <div className="grid grid-cols-12 gap-2 bg-secondary/70 px-3 py-2 text-[11px] font-medium text-muted-foreground">
+                    <span className="col-span-5">Désignation</span>
+                    <span className="col-span-2 text-right">Qté</span>
+                    <span className="col-span-2 text-right">PU</span>
+                    <span className="col-span-1 text-right">TVA</span>
+                    <span className="col-span-2 text-right">Total</span>
+                  </div>
+                  <div className="max-h-52 overflow-y-auto divide-y divide-border">
+                    {invoicePo?.lines?.length ? invoicePo.lines.map((line, index) => {
+                      const ht = Number(line.quantity ?? 0) * Number(line.unit_price ?? 0);
+                      const tax = (ht * Number(line.tax_rate ?? 0)) / 100;
+                      return (
+                        <div key={line.id ?? index} className="grid grid-cols-12 gap-2 px-3 py-2 text-[12px]">
+                          <span className="col-span-5 text-foreground">{line.description}</span>
+                          <span className="col-span-2 text-right font-mono">{Number(line.quantity ?? 0).toLocaleString("fr-FR")}</span>
+                          <span className="col-span-2 text-right font-mono">{Number(line.unit_price ?? 0).toLocaleString("fr-FR")}</span>
+                          <span className="col-span-1 text-right font-mono">{Number(line.tax_rate ?? 0)}%</span>
+                          <span className="col-span-2 text-right font-mono text-foreground">{(ht + tax).toLocaleString("fr-FR")}</span>
+                        </div>
+                      );
+                    }) : <div className="px-3 py-3 text-muted-foreground">Aucune ligne détaillée disponible.</div>}
+                  </div>
+                </div>
+                <div className="ml-auto w-full max-w-xs space-y-1 rounded-md bg-secondary/50 p-3">
+                  <div className="flex justify-between"><span>Total HT</span><span className="font-mono text-foreground">{invoicePoSubtotal.toLocaleString("fr-FR")} {invoicePo?.currency}</span></div>
+                  <div className="flex justify-between"><span>TVA</span><span className="font-mono text-foreground">{invoicePoTax.toLocaleString("fr-FR")} {invoicePo?.currency}</span></div>
+                  <div className="flex justify-between border-t border-border pt-1 font-semibold"><span>Total TTC</span><span className="font-mono text-primary">{invoicePoTotal.toLocaleString("fr-FR")} {invoicePo?.currency}</span></div>
+                </div>
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
