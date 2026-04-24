@@ -134,7 +134,7 @@ function genererBulletinHTML(emp: HrEmployee, p: PayrollResult, mois: number, an
 <div class="page"><div class="content">
   <div class="header">
     <div style="display:flex;align-items:center;gap:10px">${ent.logo_url ? `<img src="${ent.logo_url}" style="max-height:32px;max-width:96px;object-fit:contain;background:#fff;border-radius:3px;padding:2px"/>` : ""}<div><div style="font-size:15px;font-weight:900;letter-spacing:1px;text-transform:uppercase">${ent.nom || "ENTREPRISE"}</div>
-    ${ent.ninea ? `<div style="font-size:9px;color:#a7f3d0;margin-top:2px">NINEA : ${ent.ninea}</div>` : ""}</div>
+    ${ent.ninea ? `<div style="font-size:9px;color:#a7f3d0;margin-top:2px">NINEA : ${ent.ninea}</div>` : ""}</div></div>
     <div style="text-align:right"><h2 style="font-size:15px;font-weight:900">BULLETIN DE PAIE</h2>
     <div style="font-size:11px;color:#a7f3d0;margin-top:3px">Période : <b>${periode}</b></div>
     <div style="font-size:9px;color:#6ee7b7;margin-top:2px">Émis le : ${date_emission}</div></div>
