@@ -947,7 +947,25 @@ export default function HrPage() {
     if (payrollSettings.setting?.settings) setParams(payrollSettings.setting.settings as unknown as PayrollParams);
   }, [payrollSettings.setting]);
 
+  useEffect(() => {
+    if (!orgSettings) return;
+    setEntreprise({
+      nom: orgSettings.company_name || DEFAULT_ENTREPRISE.nom,
+      adresse: orgSettings.address || DEFAULT_ENTREPRISE.adresse,
+      telephone: orgSettings.phone || DEFAULT_ENTREPRISE.telephone,
+      email: orgSettings.email || DEFAULT_ENTREPRISE.email,
+      ninea: orgSettings.ninea || "",
+      rccm: orgSettings.rccm || "",
+      logo_url: orgSettings.logo_url,
+      pdf_footer: orgSettings.pdf_footer,
+      signatory_name: orgSettings.signatory_name,
+      signatory_role: orgSettings.signatory_role,
+    });
+  }, [orgSettings]);
+
   const variablesByEmployee = useMemo(() => new Map(variables.map(v => [v.employee_id, v])), [variables]);
+  const currentRun = useMemo(() => payrollRuns.runs.find((r: any) => r.mois === payrollMonth && r.annee === payrollYear), [payrollRuns.runs, payrollMonth, payrollYear]) as any;
+  const isPeriodClosed = currentRun?.status === "closed";
   const allPaies = useMemo(() => employees.map(e => {
     const empWithVariables = applyPayrollVariable(e, variablesByEmployee.get(e.id!));
     return { ...empWithVariables, paie: calculerPaie(empWithVariables, params, new Date(payrollYear, payrollMonth + 1, 0)) };
