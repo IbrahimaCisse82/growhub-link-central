@@ -1022,11 +1022,12 @@ export default function HrPage() {
   };
 
   const handleCloseMonth = async () => {
-    if (!isAdmin) { toast.error("Accès RH non autorisé"); return; }
+    if (!canManageHr) { toast.error("Accès RH non autorisé"); return; }
+    if (isPeriodClosed) { toast.error("Cette période est déjà clôturée"); return; }
     const run = await payrollRuns.upsertRun.mutateAsync({
       mois: payrollMonth,
       annee: payrollYear,
-      status: "calculated",
+      status: "closed",
       settings_snapshot: params as any,
       total_brut: totaux.brut,
       total_net: totaux.net,
@@ -1034,6 +1035,7 @@ export default function HrPage() {
       total_masse: totaux.masse,
       nb_employes: employees.length,
       calculated_at: new Date().toISOString(),
+      closed_at: new Date().toISOString(),
     }) as any;
     await payrollRuns.savePayslips.mutateAsync(allPaies.map(emp => ({
       payroll_run_id: run.id,
@@ -1057,11 +1059,22 @@ export default function HrPage() {
       total_masse: totaux.masse,
       nb_employes: employees.length,
     });
-    toast.success(`${MOIS[payrollMonth]} ${payrollYear} calculé avec bulletins figés`);
+    toast.success(`${MOIS[payrollMonth]} ${payrollYear} clôturé avec bulletins figés`);
+  };
+
+  const handleCalculatePayroll = async () => {
+    if (!canManageHr) { toast.error("Accès RH non autorisé"); return; }
+    if (isPeriodClosed) { toast.error("Cette période est clôturée"); return; }
+    await payrollRuns.upsertRun.mutateAsync({
+      mois: payrollMonth, annee: payrollYear, status: "draft", settings_snapshot: params as any,
+      total_brut: totaux.brut, total_net: totaux.net, total_charges: totaux.charges, total_masse: totaux.masse,
+      nb_employes: employees.length, calculated_at: new Date().toISOString(),
+    });
+    toast.success(`Paie brouillon calculée pour ${MOIS[payrollMonth]} ${payrollYear}`);
   };
 
   if (isLoading) return <div className="flex items-center justify-center h-40"><div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>;
-  if (!isAdmin) return <div className="max-w-xl mx-auto mt-12"><GhCard title="Accès RH restreint"><div className="flex gap-3 text-sm text-muted-foreground"><ShieldCheck className="w-5 h-5 text-primary shrink-0" />Les données RH et salariales sont réservées aux administrateurs et coordinateurs autorisés.</div></GhCard></div>;
+  if (!canManageHr && employees.length === 0) return <div className="max-w-xl mx-auto mt-12"><GhCard title="Accès RH restreint"><div className="flex gap-3 text-sm text-muted-foreground"><ShieldCheck className="w-5 h-5 text-primary shrink-0" />Les données RH sensibles sont réservées aux administrateurs et coordinateurs. Aucun profil employé n’est lié à votre compte.</div></GhCard></div>;
 
   return (
     <div className="space-y-5">
