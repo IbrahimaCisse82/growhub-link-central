@@ -1021,6 +1021,11 @@ export default function HrPage() {
         subtitle="Module complet de paie conforme au droit sénégalais — Barème fiscal, cotisations sociales et bulletins"
         actions={
           <div className="flex gap-2">
+            <Select value={String(payrollMonth)} onValueChange={v => setPayrollMonth(Number(v))}>
+              <SelectTrigger className="w-[132px] h-9"><SelectValue /></SelectTrigger>
+              <SelectContent>{MOIS.map((m, i) => <SelectItem key={m} value={String(i)}>{m}</SelectItem>)}</SelectContent>
+            </Select>
+            <Input className="w-24 h-9" type="number" value={payrollYear} onChange={e => setPayrollYear(Number(e.target.value))} />
             <GhButton size="sm" variant="secondary" onClick={handleCloseMonth}>
               <Download size={14} className="mr-1" /> Clôturer le mois
             </GhButton>
