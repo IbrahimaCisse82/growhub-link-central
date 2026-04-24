@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { useCreateSupplierInvoiceFromPurchaseOrder, usePurchaseOrders, useUpdatePurchaseOrderStatus, useDeletePurchaseOrder, PO_STATUS_LABELS, type POStatus } from "@/hooks/usePurchaseOrders";
+import { useCreateSupplierInvoiceFromPurchaseOrder, usePurchaseOrders, useUpdatePurchaseOrderStatus, useDeletePurchaseOrder, PO_STATUS_LABELS, type POStatus, type PurchaseOrder } from "@/hooks/usePurchaseOrders";
 import { useOrgSettings } from "@/hooks/useOrgSettings";
 import SectionHeader from "@/components/shared/SectionHeader";
 import GhCard from "@/components/shared/GhCard";
@@ -10,6 +10,7 @@ import Pill from "@/components/shared/Pill";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { FileText, Plus, MoreHorizontal, Download, Send, CheckCircle2, Trash2, PackageCheck, XCircle, Receipt } from "lucide-react";
 import CreatePurchaseOrderDialog from "@/components/dialogs/CreatePurchaseOrderDialog";
 import { exportGrowhubPdf } from "@/lib/growhubPdf";
@@ -34,6 +35,13 @@ export default function PurchaseOrdersPage() {
   const createSupplierInvoice = useCreateSupplierInvoiceFromPurchaseOrder();
   const del = useDeletePurchaseOrder();
   const [createOpen, setCreateOpen] = useState(false);
+  const [invoicePo, setInvoicePo] = useState<PurchaseOrder | null>(null);
+
+  const confirmSupplierInvoice = async () => {
+    if (!invoicePo) return;
+    await createSupplierInvoice.mutateAsync(invoicePo.id);
+    setInvoicePo(null);
+  };
 
   const downloadPdf = async (poId: string) => {
     const { data: po, error } = await import("@/integrations/supabase/client").then(m =>
@@ -125,7 +133,7 @@ export default function PurchaseOrdersPage() {
                         {po.status === "brouillon" && <DropdownMenuItem onClick={() => updateStatus.mutate({ id: po.id, status: "envoye" })}><Send size={13} className="mr-2"/> Marquer envoyé</DropdownMenuItem>}
                         {po.status === "envoye" && <DropdownMenuItem onClick={() => updateStatus.mutate({ id: po.id, status: "confirme" })}><CheckCircle2 size={13} className="mr-2"/> Confirmé par fournisseur</DropdownMenuItem>}
                         {(po.status === "confirme" || po.status === "recu_partiel") && <DropdownMenuItem onClick={() => updateStatus.mutate({ id: po.id, status: "recu" })}><PackageCheck size={13} className="mr-2"/> Marquer reçu</DropdownMenuItem>}
-                        {!po.invoice_id && ["envoye", "confirme", "recu_partiel", "recu"].includes(po.status) && <DropdownMenuItem onClick={() => createSupplierInvoice.mutate(po.id)}><Receipt size={13} className="mr-2"/> Créer facture fournisseur</DropdownMenuItem>}
+                        {!po.invoice_id && ["envoye", "confirme", "recu_partiel", "recu"].includes(po.status) && <DropdownMenuItem onClick={() => setInvoicePo(po)}><Receipt size={13} className="mr-2"/> Créer facture fournisseur</DropdownMenuItem>}
                         {po.status !== "annule" && po.status !== "recu" && <DropdownMenuItem onClick={() => updateStatus.mutate({ id: po.id, status: "annule" })}><XCircle size={13} className="mr-2"/> Annuler</DropdownMenuItem>}
                         <DropdownMenuItem className="text-destructive" onClick={() => { if (confirm("Supprimer ce BC ?")) del.mutate(po.id); }}><Trash2 size={13} className="mr-2"/> Supprimer</DropdownMenuItem>
                       </DropdownMenuContent>
@@ -139,6 +147,22 @@ export default function PurchaseOrdersPage() {
       </GhCard>
 
       <CreatePurchaseOrderDialog open={createOpen} onOpenChange={setCreateOpen} />
+      <AlertDialog open={!!invoicePo} onOpenChange={(open) => !open && setInvoicePo(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Créer la facture fournisseur ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Cette action va créer une facture fournisseur depuis le BC {invoicePo?.po_number} pour un total de {Number(invoicePo?.total ?? 0).toLocaleString("fr-FR")} {invoicePo?.currency}.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmSupplierInvoice} disabled={createSupplierInvoice.isPending}>
+              Confirmer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </motion.div>
   );
 }
