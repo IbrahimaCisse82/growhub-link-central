@@ -3,10 +3,13 @@ import SectionHeader from "@/components/shared/SectionHeader";
 import GhButton from "@/components/shared/GhButton";
 import GhCard from "@/components/shared/GhCard";
 import StatCard from "@/components/shared/StatCard";
-import { EMPTY_PAYROLL_VARIABLE, useHrEmployees, useHrPayrollHistory, useHrPayrollRuns, useHrPayrollSettings, useHrPayrollVariables, type HrPayrollVariable } from "@/hooks/useHrEmployees";
+import { EMPTY_PAYROLL_VARIABLE, useHrEmployees, useHrPayrollHistory, useHrPayrollRuns, useHrPayrollSettings, useHrPayrollVariables, useMyHrEmployees, type HrPayrollVariable } from "@/hooks/useHrEmployees";
 import { useAuth } from "@/hooks/useAuth";
+import { useAssignableUsers } from "@/hooks/useAssignableUsers";
+import { useOrgSettings } from "@/hooks/useOrgSettings";
 import { calculerPaie, fmtXOF, DEFAULT_PAYROLL_PARAMS, MOIS, type HrEmployee, type PayrollParams, type PayrollResult } from "@/lib/payroll";
-import { Plus, FileText, Users, DollarSign, TrendingUp, Trash2, Pencil, Eye, Download, Search, Settings, Building2, BookOpen, BarChart3, Printer, ShieldCheck, CalendarClock } from "lucide-react";
+import { exportPayrollPayslipPdf } from "@/lib/payrollPdfExport";
+import { Plus, FileText, Users, DollarSign, TrendingUp, Trash2, Pencil, Eye, Download, Search, Settings, Building2, BookOpen, BarChart3, Printer, ShieldCheck, CalendarClock, Lock, Calculator } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -60,7 +63,7 @@ const DEFAULT_CONVENTIONS = [
   },
 ];
 interface Entreprise {
-  nom: string; adresse: string; telephone: string; email: string; ninea: string; rccm: string;
+  nom: string; adresse: string; telephone: string; email: string; ninea: string; rccm: string; logo_url?: string | null; pdf_footer?: string | null; signatory_name?: string | null; signatory_role?: string | null;
 }
 
 const DEFAULT_ENTREPRISE: Entreprise = {
@@ -130,8 +133,8 @@ function genererBulletinHTML(emp: HrEmployee, p: PayrollResult, mois: number, an
 </style></head><body>
 <div class="page"><div class="content">
   <div class="header">
-    <div><div style="font-size:15px;font-weight:900;letter-spacing:1px;text-transform:uppercase">${ent.nom || "ENTREPRISE"}</div>
-    ${ent.ninea ? `<div style="font-size:9px;color:#a7f3d0;margin-top:2px">NINEA : ${ent.ninea}</div>` : ""}</div>
+    <div style="display:flex;align-items:center;gap:10px">${ent.logo_url ? `<img src="${ent.logo_url}" style="max-height:32px;max-width:96px;object-fit:contain;background:#fff;border-radius:3px;padding:2px"/>` : ""}<div><div style="font-size:15px;font-weight:900;letter-spacing:1px;text-transform:uppercase">${ent.nom || "ENTREPRISE"}</div>
+    ${ent.ninea ? `<div style="font-size:9px;color:#a7f3d0;margin-top:2px">NINEA : ${ent.ninea}</div>` : ""}</div></div>
     <div style="text-align:right"><h2 style="font-size:15px;font-weight:900">BULLETIN DE PAIE</h2>
     <div style="font-size:11px;color:#a7f3d0;margin-top:3px">Période : <b>${periode}</b></div>
     <div style="font-size:9px;color:#6ee7b7;margin-top:2px">Émis le : ${date_emission}</div></div>
@@ -177,9 +180,9 @@ function genererBulletinHTML(emp: HrEmployee, p: PayrollResult, mois: number, an
     row("TOTAL CHARGES PATRONALES", p.chargesPat, { bold: true, color: "#92400e", bg: "#fffbeb" })
   )}
   <div class="masse-box"><span style="font-size:10px;font-weight:700;color:#5b21b6">MASSE SALARIALE TOTALE</span><span style="font-size:12px;font-weight:800;color:#5b21b6">${f(p.masse)} FCFA</span></div>
-  <div class="sigs">${["Employeur", "Service RH", "Employé(e)"].map(s => `<div class="sig"><div class="sig-name">${s}</div><div class="sig-line">Signature &amp; cachet</div></div>`).join("")}</div>
+  <div class="sigs">${[ent.signatory_name || "Employeur", ent.signatory_role || "Service RH", "Employé(e)"].map(s => `<div class="sig"><div class="sig-name">${s}</div><div class="sig-line">Signature &amp; cachet</div></div>`).join("")}</div>
 </div>
-<div class="footer"><div class="footer-coords">${footerItems}</div><div class="footer-doc">Document généré par Grow Hub Management System · ${periode} · Confidentiel</div></div>
+<div class="footer"><div class="footer-coords">${footerItems}</div><div class="footer-doc">${ent.pdf_footer || `Document généré par Grow Hub Management System · ${periode} · Confidentiel`}</div></div>
 </div></body></html>`;
 }
 
@@ -187,10 +190,10 @@ function genererBulletinHTML(emp: HrEmployee, p: PayrollResult, mois: number, an
 // Bulletin Modal with period selector + PDF
 // ═══════════════════════════════════════════════════════════════════════════
 
-function BulletinModal({ emp, params, entreprise, onClose }: { emp: HrEmployee; params: PayrollParams; entreprise: Entreprise; onClose: () => void }) {
+function BulletinModal({ emp, params, entreprise, orgSettings, defaultMois, defaultAnnee, onClose }: { emp: HrEmployee; params: PayrollParams; entreprise: Entreprise; orgSettings: any; defaultMois: number; defaultAnnee: number; onClose: () => void }) {
   const now = new Date();
-  const [mois, setMois] = useState(now.getMonth());
-  const [annee, setAnnee] = useState(now.getFullYear());
+  const [mois, setMois] = useState(defaultMois);
+  const [annee, setAnnee] = useState(defaultAnnee);
   const refDate = new Date(annee, mois + 1, 0);
   const paie = calculerPaie(emp, params, refDate);
   const periodeLabel = `${MOIS[mois]} ${annee}`;
@@ -202,6 +205,11 @@ function BulletinModal({ emp, params, entreprise, onClose }: { emp: HrEmployee; 
     if (!win) { toast.error("Veuillez autoriser les popups"); return; }
     win.document.write(html);
     win.document.close();
+  };
+
+  const downloadPDF = async () => {
+    await exportPayrollPayslipPdf(emp, paie, mois, annee, orgSettings ?? null);
+    toast.success("Bulletin PDF généré");
   };
 
   const Row = ({ l, v, c, bold, neg }: { l: string; v: number; c?: string; bold?: boolean; neg?: boolean }) => (
@@ -234,8 +242,11 @@ function BulletinModal({ emp, params, entreprise, onClose }: { emp: HrEmployee; 
             <SelectContent>{years.map(y => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}</SelectContent>
           </Select>
           <div className="flex-1" />
-          <GhButton size="sm" variant="accent" onClick={openPDF}>
-            <Printer size={13} className="mr-1" /> Générer PDF
+          <GhButton size="sm" variant="secondary" onClick={openPDF}>
+            <Eye size={13} className="mr-1" /> Aperçu
+          </GhButton>
+          <GhButton size="sm" variant="accent" onClick={downloadPDF}>
+            <Printer size={13} className="mr-1" /> Télécharger PDF
           </GhButton>
         </div>
 
@@ -317,7 +328,7 @@ function BulletinModal({ emp, params, entreprise, onClose }: { emp: HrEmployee; 
         </div>
 
         <div className="text-center text-[10px] text-muted-foreground p-2 bg-primary/5 rounded-lg">
-          💡 Cliquez sur <strong>« Générer PDF »</strong> — un nouvel onglet s'ouvre. Utilisez <strong>Ctrl+P</strong> puis "Enregistrer en PDF".
+          L’aperçu reprend le logo, le footer et le signataire des paramètres d’organisation avant téléchargement.
         </div>
       </DialogContent>
     </Dialog>
@@ -328,9 +339,9 @@ function BulletinModal({ emp, params, entreprise, onClose }: { emp: HrEmployee; 
 // Employee Form Dialog
 // ═══════════════════════════════════════════════════════════════════════════
 
-function EmployeeFormDialog({ emp, onSave, onClose, existingMats, conventions }: {
+function EmployeeFormDialog({ emp, onSave, onClose, existingMats, conventions, users, locked }: {
   emp: Partial<HrEmployee> | null; onSave: (e: Partial<HrEmployee>) => void; onClose: () => void; existingMats: string[];
-  conventions: Convention[];
+  conventions: Convention[]; users: { user_id: string; full_name: string; email: string | null }[]; locked?: boolean;
 }) {
   const [form, setForm] = useState<Partial<HrEmployee>>(emp || { ...EMPTY_EMP });
   const isEdit = !!emp?.id;
@@ -361,6 +372,7 @@ function EmployeeFormDialog({ emp, onSave, onClose, existingMats, conventions }:
       toast.error("Le salaire de base doit être supérieur à 0");
       return;
     }
+    if (locked) { toast.error("Cette période est clôturée : modification impossible"); return; }
     onSave(form);
   };
 
@@ -397,6 +409,16 @@ function EmployeeFormDialog({ emp, onSave, onClose, existingMats, conventions }:
             <div className="grid grid-cols-2 gap-3">
               <div><Label className="text-[11px]">Téléphone</Label><Input value={form.telephone || ""} onChange={e => set("telephone", e.target.value)} /></div>
               <div><Label className="text-[11px]">Email</Label><Input value={form.email || ""} onChange={e => set("email", e.target.value)} /></div>
+            </div>
+            <div>
+              <Label className="text-[11px]">Compte utilisateur lié</Label>
+              <Select value={form.user_id || "none"} onValueChange={v => set("user_id", v === "none" ? null : v)} disabled={locked}>
+                <SelectTrigger><SelectValue placeholder="Aucun compte lié" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Aucun compte lié</SelectItem>
+                  {users.map(u => <SelectItem key={u.user_id} value={u.user_id}>{u.full_name || u.email} · {u.email}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
             <div className="grid grid-cols-3 gap-3">
               <div>
@@ -496,7 +518,7 @@ function EmployeeFormDialog({ emp, onSave, onClose, existingMats, conventions }:
         </Tabs>
         <div className="flex justify-end gap-2 mt-4">
           <GhButton variant="ghost" size="sm" onClick={onClose}>Annuler</GhButton>
-          <GhButton size="sm" onClick={handleSubmit}>{isEdit ? "Modifier" : "Créer"}</GhButton>
+          <GhButton size="sm" onClick={handleSubmit} disabled={locked}>{locked ? "Période clôturée" : isEdit ? "Modifier" : "Créer"}</GhButton>
         </div>
       </DialogContent>
     </Dialog>
@@ -896,11 +918,18 @@ function ConventionsTab({ conventions, setConventions }: { conventions: Conventi
 
 export default function HrPage() {
   const { t } = useTranslation();
-  const { isAdmin } = useAuth();
-  const { employees, isLoading, upsert, remove } = useHrEmployees();
+  const { isAdmin, roles, user } = useAuth();
+  const canManageHr = roles.includes("super_admin") || roles.includes("coordinator");
+  const { data: orgSettings } = useOrgSettings();
+  const { data: assignableUsers = [] } = useAssignableUsers();
+  const adminEmployees = useHrEmployees();
+  const ownEmployees = useMyHrEmployees(!canManageHr);
+  const employees = canManageHr ? adminEmployees.employees : ownEmployees.employees.filter(e => e.user_id === user?.id);
+  const isLoading = canManageHr ? adminEmployees.isLoading : ownEmployees.isLoading;
+  const { upsert, remove } = adminEmployees;
   const { history, saveSnapshot } = useHrPayrollHistory();
-  const payrollSettings = useHrPayrollSettings();
-  const payrollRuns = useHrPayrollRuns();
+  const payrollSettings = useHrPayrollSettings(canManageHr);
+  const payrollRuns = useHrPayrollRuns(canManageHr);
   const [showNew, setShowNew] = useState(false);
   const [showForm, setShowForm] = useState<Partial<HrEmployee> | null>(null);
   const [showBulletin, setShowBulletin] = useState<HrEmployee | null>(null);
@@ -909,7 +938,7 @@ export default function HrPage() {
   const now = new Date();
   const [payrollMonth, setPayrollMonth] = useState(now.getMonth());
   const [payrollYear, setPayrollYear] = useState(now.getFullYear());
-  const { variables, saveVariable } = useHrPayrollVariables(payrollMonth, payrollYear);
+  const { variables, saveVariable } = useHrPayrollVariables(payrollMonth, payrollYear, canManageHr);
   const [entreprise, setEntreprise] = useState<Entreprise>(DEFAULT_ENTREPRISE);
   const [conventions, setConventions] = useState(DEFAULT_CONVENTIONS);
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -918,7 +947,25 @@ export default function HrPage() {
     if (payrollSettings.setting?.settings) setParams(payrollSettings.setting.settings as unknown as PayrollParams);
   }, [payrollSettings.setting]);
 
+  useEffect(() => {
+    if (!orgSettings) return;
+    setEntreprise({
+      nom: orgSettings.company_name || DEFAULT_ENTREPRISE.nom,
+      adresse: orgSettings.address || DEFAULT_ENTREPRISE.adresse,
+      telephone: orgSettings.phone || DEFAULT_ENTREPRISE.telephone,
+      email: orgSettings.email || DEFAULT_ENTREPRISE.email,
+      ninea: orgSettings.ninea || "",
+      rccm: orgSettings.rccm || "",
+      logo_url: orgSettings.logo_url,
+      pdf_footer: orgSettings.pdf_footer,
+      signatory_name: orgSettings.signatory_name,
+      signatory_role: orgSettings.signatory_role,
+    });
+  }, [orgSettings]);
+
   const variablesByEmployee = useMemo(() => new Map(variables.map(v => [v.employee_id, v])), [variables]);
+  const currentRun = useMemo(() => payrollRuns.runs.find((r: any) => r.mois === payrollMonth && r.annee === payrollYear), [payrollRuns.runs, payrollMonth, payrollYear]) as any;
+  const isPeriodClosed = currentRun?.status === "closed";
   const allPaies = useMemo(() => employees.map(e => {
     const empWithVariables = applyPayrollVariable(e, variablesByEmployee.get(e.id!));
     return { ...empWithVariables, paie: calculerPaie(empWithVariables, params, new Date(payrollYear, payrollMonth + 1, 0)) };
@@ -960,6 +1007,7 @@ export default function HrPage() {
   }, [allPaies]);
 
   const handleSave = async (emp: Partial<HrEmployee>) => {
+    if (isPeriodClosed) { toast.error("Cette période est clôturée : modification impossible"); return; }
     await upsert.mutateAsync(emp);
     setShowForm(null);
     setShowNew(false);
@@ -967,17 +1015,19 @@ export default function HrPage() {
   };
 
   const handleDelete = async (id: string) => {
+    if (isPeriodClosed) { toast.error("Cette période est clôturée : modification impossible"); return; }
     if (!confirm("Archiver cet employé ? Les données RH restent conservées pour l'historique de paie.")) return;
     await remove.mutateAsync(id);
     toast.success("Employé archivé");
   };
 
   const handleCloseMonth = async () => {
-    if (!isAdmin) { toast.error("Accès RH non autorisé"); return; }
+    if (!canManageHr) { toast.error("Accès RH non autorisé"); return; }
+    if (isPeriodClosed) { toast.error("Cette période est déjà clôturée"); return; }
     const run = await payrollRuns.upsertRun.mutateAsync({
       mois: payrollMonth,
       annee: payrollYear,
-      status: "calculated",
+      status: "closed",
       settings_snapshot: params as any,
       total_brut: totaux.brut,
       total_net: totaux.net,
@@ -985,6 +1035,7 @@ export default function HrPage() {
       total_masse: totaux.masse,
       nb_employes: employees.length,
       calculated_at: new Date().toISOString(),
+      closed_at: new Date().toISOString(),
     }) as any;
     await payrollRuns.savePayslips.mutateAsync(allPaies.map(emp => ({
       payroll_run_id: run.id,
@@ -1008,11 +1059,22 @@ export default function HrPage() {
       total_masse: totaux.masse,
       nb_employes: employees.length,
     });
-    toast.success(`${MOIS[payrollMonth]} ${payrollYear} calculé avec bulletins figés`);
+    toast.success(`${MOIS[payrollMonth]} ${payrollYear} clôturé avec bulletins figés`);
+  };
+
+  const handleCalculatePayroll = async () => {
+    if (!canManageHr) { toast.error("Accès RH non autorisé"); return; }
+    if (isPeriodClosed) { toast.error("Cette période est clôturée"); return; }
+    await payrollRuns.upsertRun.mutateAsync({
+      mois: payrollMonth, annee: payrollYear, status: "draft", settings_snapshot: params as any,
+      total_brut: totaux.brut, total_net: totaux.net, total_charges: totaux.charges, total_masse: totaux.masse,
+      nb_employes: employees.length, calculated_at: new Date().toISOString(),
+    });
+    toast.success(`Paie brouillon calculée pour ${MOIS[payrollMonth]} ${payrollYear}`);
   };
 
   if (isLoading) return <div className="flex items-center justify-center h-40"><div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>;
-  if (!isAdmin) return <div className="max-w-xl mx-auto mt-12"><GhCard title="Accès RH restreint"><div className="flex gap-3 text-sm text-muted-foreground"><ShieldCheck className="w-5 h-5 text-primary shrink-0" />Les données RH et salariales sont réservées aux administrateurs et coordinateurs autorisés.</div></GhCard></div>;
+  if (!canManageHr && employees.length === 0) return <div className="max-w-xl mx-auto mt-12"><GhCard title="Accès RH restreint"><div className="flex gap-3 text-sm text-muted-foreground"><ShieldCheck className="w-5 h-5 text-primary shrink-0" />Les données RH sensibles sont réservées aux administrateurs et coordinateurs. Aucun profil employé n’est lié à votre compte.</div></GhCard></div>;
 
   return (
     <div className="space-y-5">
@@ -1026,12 +1088,15 @@ export default function HrPage() {
               <SelectContent>{MOIS.map((m, i) => <SelectItem key={m} value={String(i)}>{m}</SelectItem>)}</SelectContent>
             </Select>
             <Input className="w-24 h-9" type="number" value={payrollYear} onChange={e => setPayrollYear(Number(e.target.value))} />
-            <GhButton size="sm" variant="secondary" onClick={handleCloseMonth}>
-              <Download size={14} className="mr-1" /> Clôturer le mois
-            </GhButton>
-            <GhButton size="sm" onClick={() => setShowNew(true)}>
+            {canManageHr && <GhButton size="sm" variant="secondary" onClick={handleCalculatePayroll} disabled={isPeriodClosed}>
+              <Calculator size={14} className="mr-1" /> Calculer la paie
+            </GhButton>}
+            {canManageHr && <GhButton size="sm" variant="secondary" onClick={handleCloseMonth} disabled={isPeriodClosed}>
+              {isPeriodClosed ? <Lock size={14} className="mr-1" /> : <Download size={14} className="mr-1" />} Clôturer le mois
+            </GhButton>}
+            {canManageHr && <GhButton size="sm" onClick={() => setShowNew(true)} disabled={isPeriodClosed}>
               <Plus size={14} className="mr-1" /> Nouvel employé
-            </GhButton>
+            </GhButton>}
           </div>
         }
       />
@@ -1136,7 +1201,7 @@ export default function HrPage() {
             <StatCard label="Employés variables" value={String(variables.length)} note="Saisies enregistrées" color="green" icon={<Users size={18} />} />
             <StatCard label="Net prévisionnel" value={`${fmtXOF(totaux.net)} F`} note="Après variables" color="purple" icon={<TrendingUp size={18} />} />
           </div>
-          <VariablesTab employees={employees} variables={variables} onSave={(v) => saveVariable.mutateAsync(v)} />
+          <VariablesTab employees={employees} variables={variables} onSave={(v) => isPeriodClosed ? toast.error("Cette période est clôturée") : saveVariable.mutateAsync(v)} />
         </TabsContent>
 
         {/* ═══ EMPLOYÉS ═══ */}
@@ -1217,9 +1282,9 @@ export default function HrPage() {
       </Tabs>
 
       {/* Dialogs */}
-      {showNew && <EmployeeFormDialog emp={{ ...EMPTY_EMP }} onSave={handleSave} onClose={() => setShowNew(false)} existingMats={employees.map(e => e.matricule)} conventions={conventions} />}
-      {showForm && <EmployeeFormDialog emp={showForm} onSave={handleSave} onClose={() => setShowForm(null)} existingMats={employees.filter(e => e.id !== showForm.id).map(e => e.matricule)} conventions={conventions} />}
-      {showBulletin && <BulletinModal emp={showBulletin} params={params} entreprise={entreprise} onClose={() => setShowBulletin(null)} />}
+      {showNew && <EmployeeFormDialog emp={{ ...EMPTY_EMP }} onSave={handleSave} onClose={() => setShowNew(false)} existingMats={employees.map(e => e.matricule)} conventions={conventions} users={assignableUsers} locked={isPeriodClosed} />}
+      {showForm && <EmployeeFormDialog emp={showForm} onSave={handleSave} onClose={() => setShowForm(null)} existingMats={employees.filter(e => e.id !== showForm.id).map(e => e.matricule)} conventions={conventions} users={assignableUsers} locked={isPeriodClosed} />}
+      {showBulletin && <BulletinModal emp={showBulletin} params={params} entreprise={entreprise} orgSettings={orgSettings} defaultMois={payrollMonth} defaultAnnee={payrollYear} onClose={() => setShowBulletin(null)} />}
     </div>
   );
 }
