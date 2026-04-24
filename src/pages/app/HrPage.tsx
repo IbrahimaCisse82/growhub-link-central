@@ -410,6 +410,16 @@ function EmployeeFormDialog({ emp, onSave, onClose, existingMats, conventions, u
               <div><Label className="text-[11px]">Téléphone</Label><Input value={form.telephone || ""} onChange={e => set("telephone", e.target.value)} /></div>
               <div><Label className="text-[11px]">Email</Label><Input value={form.email || ""} onChange={e => set("email", e.target.value)} /></div>
             </div>
+            <div>
+              <Label className="text-[11px]">Compte utilisateur lié</Label>
+              <Select value={form.user_id || "none"} onValueChange={v => set("user_id", v === "none" ? null : v)} disabled={locked}>
+                <SelectTrigger><SelectValue placeholder="Aucun compte lié" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Aucun compte lié</SelectItem>
+                  {users.map(u => <SelectItem key={u.user_id} value={u.user_id}>{u.full_name || u.email} · {u.email}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
             <div className="grid grid-cols-3 gap-3">
               <div>
                 <Label className="text-[11px]">Situation familiale</Label>
@@ -508,7 +518,7 @@ function EmployeeFormDialog({ emp, onSave, onClose, existingMats, conventions, u
         </Tabs>
         <div className="flex justify-end gap-2 mt-4">
           <GhButton variant="ghost" size="sm" onClick={onClose}>Annuler</GhButton>
-          <GhButton size="sm" onClick={handleSubmit}>{isEdit ? "Modifier" : "Créer"}</GhButton>
+          <GhButton size="sm" onClick={handleSubmit} disabled={locked}>{locked ? "Période clôturée" : isEdit ? "Modifier" : "Créer"}</GhButton>
         </div>
       </DialogContent>
     </Dialog>
