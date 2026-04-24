@@ -190,10 +190,10 @@ function genererBulletinHTML(emp: HrEmployee, p: PayrollResult, mois: number, an
 // Bulletin Modal with period selector + PDF
 // ═══════════════════════════════════════════════════════════════════════════
 
-function BulletinModal({ emp, params, entreprise, onClose }: { emp: HrEmployee; params: PayrollParams; entreprise: Entreprise; onClose: () => void }) {
+function BulletinModal({ emp, params, entreprise, orgSettings, defaultMois, defaultAnnee, onClose }: { emp: HrEmployee; params: PayrollParams; entreprise: Entreprise; orgSettings: any; defaultMois: number; defaultAnnee: number; onClose: () => void }) {
   const now = new Date();
-  const [mois, setMois] = useState(now.getMonth());
-  const [annee, setAnnee] = useState(now.getFullYear());
+  const [mois, setMois] = useState(defaultMois);
+  const [annee, setAnnee] = useState(defaultAnnee);
   const refDate = new Date(annee, mois + 1, 0);
   const paie = calculerPaie(emp, params, refDate);
   const periodeLabel = `${MOIS[mois]} ${annee}`;
@@ -205,6 +205,11 @@ function BulletinModal({ emp, params, entreprise, onClose }: { emp: HrEmployee; 
     if (!win) { toast.error("Veuillez autoriser les popups"); return; }
     win.document.write(html);
     win.document.close();
+  };
+
+  const downloadPDF = async () => {
+    await exportPayrollPayslipPdf(emp, paie, mois, annee, orgSettings ?? null);
+    toast.success("Bulletin PDF généré");
   };
 
   const Row = ({ l, v, c, bold, neg }: { l: string; v: number; c?: string; bold?: boolean; neg?: boolean }) => (
@@ -237,8 +242,11 @@ function BulletinModal({ emp, params, entreprise, onClose }: { emp: HrEmployee; 
             <SelectContent>{years.map(y => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}</SelectContent>
           </Select>
           <div className="flex-1" />
-          <GhButton size="sm" variant="accent" onClick={openPDF}>
-            <Printer size={13} className="mr-1" /> Générer PDF
+          <GhButton size="sm" variant="secondary" onClick={openPDF}>
+            <Eye size={13} className="mr-1" /> Aperçu
+          </GhButton>
+          <GhButton size="sm" variant="accent" onClick={downloadPDF}>
+            <Printer size={13} className="mr-1" /> Télécharger PDF
           </GhButton>
         </div>
 
@@ -320,7 +328,7 @@ function BulletinModal({ emp, params, entreprise, onClose }: { emp: HrEmployee; 
         </div>
 
         <div className="text-center text-[10px] text-muted-foreground p-2 bg-primary/5 rounded-lg">
-          💡 Cliquez sur <strong>« Générer PDF »</strong> — un nouvel onglet s'ouvre. Utilisez <strong>Ctrl+P</strong> puis "Enregistrer en PDF".
+          L’aperçu reprend le logo, le footer et le signataire des paramètres d’organisation avant téléchargement.
         </div>
       </DialogContent>
     </Dialog>
