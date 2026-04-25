@@ -1171,8 +1171,9 @@ export default function HrPage() {
             {canManageHr && <GhButton size="sm" variant="secondary" onClick={handleCalculatePayroll} disabled={isPeriodClosed}>
               <Calculator size={14} className="mr-1" /> Calculer la paie
             </GhButton>}
-            {canManageHr && <GhButton size="sm" variant="secondary" onClick={() => setBulkConfirm(true)} disabled={allPaies.length === 0 || !!bulkProgress}>
-              <FileDown size={14} className="mr-1" /> Bulletins PDF du mois
+            {canManageHr && <GhButton size="sm" variant="secondary" onClick={() => setBulkConfirm(true)} disabled={exportTargets.length === 0 || !!bulkProgress}>
+              <FileDown size={14} className="mr-1" />
+              {selectedIds.size > 0 ? `Bulletins PDF (${selectedIds.size} sél.)` : "Bulletins PDF du mois"}
             </GhButton>}
             {canManageHr && <GhButton size="sm" variant="secondary" onClick={handleCloseMonth} disabled={isPeriodClosed}>
               {isPeriodClosed ? <Lock size={14} className="mr-1" /> : <Download size={14} className="mr-1" />} Clôturer le mois
