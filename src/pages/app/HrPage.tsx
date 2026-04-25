@@ -1453,7 +1453,7 @@ export default function HrPage() {
 
         {/* ═══ CONVENTIONS ═══ */}
         <TabsContent value="conventions" className="mt-4">
-          <ConventionsTab conventions={conventions} setConventions={setConventions} />
+          <HrAgreementsPanel />
         </TabsContent>
 
         {/* ═══ ENTREPRISE ═══ */}
@@ -1476,6 +1476,20 @@ export default function HrPage() {
             restrictedEmployeeId={!canManageHr && employees[0]?.id ? employees[0].id : null}
           />
         </TabsContent>
+
+        {/* ═══ MES BULLETINS (self-service) ═══ */}
+        {!canManageHr && employees[0]?.id && (
+          <TabsContent value="mes-bulletins" className="mt-4">
+            <HrSelfServicePanel employeeId={employees[0].id} />
+          </TabsContent>
+        )}
+
+        {/* ═══ AUDIT TRAIL RH ═══ */}
+        {canManageHr && (
+          <TabsContent value="audit" className="mt-4">
+            <HrAuditPanel />
+          </TabsContent>
+        )}
       </Tabs>
 
       {/* Dialogs */}
