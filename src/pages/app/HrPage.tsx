@@ -9,6 +9,7 @@ import { useAssignableUsers } from "@/hooks/useAssignableUsers";
 import { useOrgSettings } from "@/hooks/useOrgSettings";
 import { calculerPaie, fmtXOF, DEFAULT_PAYROLL_PARAMS, MOIS, type HrEmployee, type PayrollParams, type PayrollResult } from "@/lib/payroll";
 import { exportPayrollPayslipPdf } from "@/lib/payrollPdfExport";
+import { exportLivreDePaieXlsx, exportBankCsv, exportRegistrePersonnelXlsx } from "@/lib/hrExports";
 import { Plus, FileText, Users, DollarSign, TrendingUp, Trash2, Pencil, Eye, Download, Search, Settings, Building2, BookOpen, BarChart3, Printer, ShieldCheck, CalendarClock, Lock, Calculator, FileDown, AlertTriangle, CheckCircle2, History, CalendarDays, FileSignature } from "lucide-react";
 import HrLeavesPanel from "@/components/hr/HrLeavesPanel";
 import HrContractsPanel from "@/components/hr/HrContractsPanel";
