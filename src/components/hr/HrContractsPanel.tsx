@@ -1,9 +1,23 @@
 import { useMemo, useState } from "react";
 import { useHrEmployees } from "@/hooks/useHrEmployees";
 import { useHrContracts, useHrContractAlerts, type HrContract, type HrContractType } from "@/hooks/useHrLeaves";
-import GhCard from "@/components/shared/GhCard";
 import GhButton from "@/components/shared/GhButton";
-import StatCard from "@/components/shared/StatCard";
+
+function MiniStat({ label, value, icon, accent }: { label: string; value: number | string; icon: React.ReactNode; accent?: "emerald" | "amber" }) {
+  const cls = accent === "emerald" ? "text-emerald-600" : accent === "amber" ? "text-amber-600" : "text-primary";
+  return (
+    <div className="bg-card border border-border rounded-lg p-3">
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-xs text-muted-foreground">{label}</span>
+        <span className={cls}>{icon}</span>
+      </div>
+      <div className="text-xl font-bold text-foreground">{value}</div>
+    </div>
+  );
+}
+function Panel({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return <div className={`bg-card border border-border rounded-lg ${className}`}>{children}</div>;
+}
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
