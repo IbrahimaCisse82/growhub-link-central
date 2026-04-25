@@ -1374,6 +1374,15 @@ export default function HrPage() {
               <tbody>
                 {filtered.map(emp => (
                   <tr key={emp.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
+                    {canManageHr && (
+                      <td className="py-2.5 px-3">
+                        <Checkbox
+                          checked={!!emp.id && selectedIds.has(emp.id)}
+                          onCheckedChange={() => emp.id && toggleSelected(emp.id)}
+                          aria-label={`Sélectionner ${emp.prenom} ${emp.nom}`}
+                        />
+                      </td>
+                    )}
                     <td className="py-2.5 px-3 font-mono">{emp.matricule}</td>
                     <td className="py-2.5 px-3 font-medium">{emp.prenom} {emp.nom}</td>
                     <td className="py-2.5 px-3">{emp.fonction}</td>
