@@ -1401,7 +1401,7 @@ export default function HrPage() {
                   </tr>
                 ))}
                 {filtered.length === 0 && (
-                  <tr><td colSpan={9} className="py-8 text-center text-muted-foreground">Aucun employé trouvé</td></tr>
+                  <tr><td colSpan={canManageHr ? 10 : 9} className="py-8 text-center text-muted-foreground">Aucun employé trouvé</td></tr>
                 )}
               </tbody>
               {filtered.length > 0 && (
