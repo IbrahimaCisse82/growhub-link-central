@@ -1444,12 +1444,12 @@ export default function HrPage() {
       <AlertDialog open={bulkConfirm} onOpenChange={setBulkConfirm}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2"><FileDown size={16} /> Générer tous les bulletins du mois ?</AlertDialogTitle>
+            <AlertDialogTitle className="flex items-center gap-2"><FileDown size={16} /> {selectedIds.size > 0 ? `Générer les ${exportTargets.length} bulletins sélectionnés ?` : "Générer tous les bulletins du mois ?"}</AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="space-y-2 text-xs">
                 <div>Période : <b>{MOIS[payrollMonth]} {payrollYear}</b></div>
-                <div>Employés concernés : <b>{allPaies.length}</b></div>
-                <div>Total brut : <b>{fmtXOF(totaux.brut)} F</b> · Total net : <b>{fmtXOF(totaux.net)} F</b></div>
+                <div>Portée : <b>{selectedIds.size > 0 ? `${exportTargets.length} employé(s) sélectionné(s)` : `tous les employés (${exportTargets.length})`}</b></div>
+                <div>Total brut : <b>{fmtXOF(exportTotals.brut)} F</b> · Total net : <b>{fmtXOF(exportTotals.net)} F</b></div>
                 <div className="flex items-start gap-2 p-2 bg-muted/40 rounded text-muted-foreground">
                   <AlertTriangle size={14} className="shrink-0 mt-0.5 text-amber-600" />
                   <span>Chaque bulletin sera vérifié (recalcul brut/net) avant téléchargement. En cas d’incohérence, le bulletin est ignoré.</span>
