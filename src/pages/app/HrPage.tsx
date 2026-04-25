@@ -1307,9 +1307,15 @@ export default function HrPage() {
 
         {/* ═══ EMPLOYÉS ═══ */}
         <TabsContent value="employes" className="space-y-4 mt-4">
-          <div className="relative max-w-sm">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Rechercher un employé..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 text-sm" />
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="relative max-w-sm flex-1">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Input placeholder="Rechercher un employé..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 text-sm" />
+            </div>
+            <Badge variant="outline" className="text-[10px] gap-1">
+              <ShieldCheck size={11} />
+              {canManageHr ? "Vue complète RH" : "Vue restreinte — votre fiche uniquement"}
+            </Badge>
           </div>
 
           <GhCard title={`Liste des employés (${filtered.length})`} className="overflow-x-auto">
