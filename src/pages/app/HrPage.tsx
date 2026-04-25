@@ -9,8 +9,11 @@ import { useAssignableUsers } from "@/hooks/useAssignableUsers";
 import { useOrgSettings } from "@/hooks/useOrgSettings";
 import { calculerPaie, fmtXOF, DEFAULT_PAYROLL_PARAMS, MOIS, type HrEmployee, type PayrollParams, type PayrollResult } from "@/lib/payroll";
 import { exportPayrollPayslipPdf } from "@/lib/payrollPdfExport";
-import { Plus, FileText, Users, DollarSign, TrendingUp, Trash2, Pencil, Eye, Download, Search, Settings, Building2, BookOpen, BarChart3, Printer, ShieldCheck, CalendarClock, Lock, Calculator } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Plus, FileText, Users, DollarSign, TrendingUp, Trash2, Pencil, Eye, Download, Search, Settings, Building2, BookOpen, BarChart3, Printer, ShieldCheck, CalendarClock, Lock, Calculator, FileDown, AlertTriangle, CheckCircle2, History } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -208,8 +211,20 @@ function BulletinModal({ emp, params, entreprise, orgSettings, defaultMois, defa
   };
 
   const downloadPDF = async () => {
+    // Coherence check: recompute paie just before generation and compare to displayed values
+    const verif = calculerPaie(emp, params, refDate);
+    const tol = 1; // tolerance FCFA
+    const diffs: string[] = [];
+    if (Math.abs(verif.brut - paie.brut) > tol) diffs.push(`Brut: ${fmtXOF(paie.brut)} ≠ ${fmtXOF(verif.brut)}`);
+    if (Math.abs(verif.net - paie.net) > tol) diffs.push(`Net: ${fmtXOF(paie.net)} ≠ ${fmtXOF(verif.net)}`);
+    if (Math.abs(verif.totalRet - paie.totalRet) > tol) diffs.push(`Retenues: ${fmtXOF(paie.totalRet)} ≠ ${fmtXOF(verif.totalRet)}`);
+    if (Math.abs(verif.chargesPat - paie.chargesPat) > tol) diffs.push(`Charges: ${fmtXOF(paie.chargesPat)} ≠ ${fmtXOF(verif.chargesPat)}`);
+    if (diffs.length > 0) {
+      toast.error(`Incohérence aperçu/PDF — ${diffs.join(" · ")}`);
+      return;
+    }
     await exportPayrollPayslipPdf(emp, paie, mois, annee, orgSettings ?? null);
-    toast.success("Bulletin PDF généré");
+    toast.success("Bulletin PDF généré (montants vérifiés)");
   };
 
   const Row = ({ l, v, c, bold, neg }: { l: string; v: number; c?: string; bold?: boolean; neg?: boolean }) => (
@@ -1073,7 +1088,50 @@ export default function HrPage() {
     toast.success(`Paie brouillon calculée pour ${MOIS[payrollMonth]} ${payrollYear}`);
   };
 
-  if (isLoading) return <div className="flex items-center justify-center h-40"><div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>;
+  // Bulk PDF export — confirmation + progress
+  const [bulkConfirm, setBulkConfirm] = useState(false);
+  const [bulkProgress, setBulkProgress] = useState<{ current: number; total: number; running: boolean } | null>(null);
+  const handleBulkExport = async () => {
+    setBulkConfirm(false);
+    if (allPaies.length === 0) { toast.error("Aucun employé à exporter"); return; }
+    setBulkProgress({ current: 0, total: allPaies.length, running: true });
+    let ok = 0, fail = 0;
+    for (let i = 0; i < allPaies.length; i++) {
+      const e = allPaies[i];
+      try {
+        // Coherence verif before each export
+        const verif = calculerPaie(e, params, new Date(payrollYear, payrollMonth + 1, 0));
+        if (Math.abs(verif.net - e.paie.net) > 1 || Math.abs(verif.brut - e.paie.brut) > 1) {
+          fail++;
+        } else {
+          await exportPayrollPayslipPdf(e, e.paie, payrollMonth, payrollYear, orgSettings ?? null);
+          ok++;
+        }
+      } catch { fail++; }
+      setBulkProgress({ current: i + 1, total: allPaies.length, running: i + 1 < allPaies.length });
+    }
+    setBulkProgress(null);
+    if (fail > 0) toast.warning(`${ok} bulletin(s) exporté(s) · ${fail} en échec/incohérence`);
+    else toast.success(`${ok} bulletin(s) PDF générés pour ${MOIS[payrollMonth]} ${payrollYear}`);
+  };
+
+  // History filter
+  const [historyYear, setHistoryYear] = useState<number | "all">(payrollYear);
+  const [historyMonth, setHistoryMonth] = useState<number | "all">("all");
+  const [historyStatus, setHistoryStatus] = useState<"all" | "draft" | "calculated" | "validated" | "closed">("all");
+  const filteredRuns = useMemo(() => {
+    return (payrollRuns.runs as any[]).filter(r =>
+      (historyYear === "all" || r.annee === historyYear) &&
+      (historyMonth === "all" || r.mois === historyMonth) &&
+      (historyStatus === "all" || r.status === historyStatus)
+    );
+  }, [payrollRuns.runs, historyYear, historyMonth, historyStatus]);
+  const historyYears = useMemo(() => {
+    const ys = new Set<number>([payrollYear]);
+    (payrollRuns.runs as any[]).forEach(r => ys.add(r.annee));
+    history.forEach((h: any) => ys.add(h.annee));
+    return Array.from(ys).sort((a, b) => b - a);
+  }, [payrollRuns.runs, history, payrollYear]);
   if (!canManageHr && employees.length === 0) return <div className="max-w-xl mx-auto mt-12"><GhCard title="Accès RH restreint"><div className="flex gap-3 text-sm text-muted-foreground"><ShieldCheck className="w-5 h-5 text-primary shrink-0" />Les données RH sensibles sont réservées aux administrateurs et coordinateurs. Aucun profil employé n’est lié à votre compte.</div></GhCard></div>;
 
   return (
@@ -1090,6 +1148,9 @@ export default function HrPage() {
             <Input className="w-24 h-9" type="number" value={payrollYear} onChange={e => setPayrollYear(Number(e.target.value))} />
             {canManageHr && <GhButton size="sm" variant="secondary" onClick={handleCalculatePayroll} disabled={isPeriodClosed}>
               <Calculator size={14} className="mr-1" /> Calculer la paie
+            </GhButton>}
+            {canManageHr && <GhButton size="sm" variant="secondary" onClick={() => setBulkConfirm(true)} disabled={allPaies.length === 0 || !!bulkProgress}>
+              <FileDown size={14} className="mr-1" /> Bulletins PDF du mois
             </GhButton>}
             {canManageHr && <GhButton size="sm" variant="secondary" onClick={handleCloseMonth} disabled={isPeriodClosed}>
               {isPeriodClosed ? <Lock size={14} className="mr-1" /> : <Download size={14} className="mr-1" />} Clôturer le mois
@@ -1177,18 +1238,58 @@ export default function HrPage() {
             </GhCard>
           )}
 
-          {/* Payroll History */}
-          {history.length > 0 && (
-            <GhCard title="Historique des clôtures">
+          {/* Payroll History — filterable */}
+          {canManageHr && (
+            <GhCard title={<div className="flex items-center gap-2"><History size={14} /> Historique des paies</div> as any}>
+              <div className="flex flex-wrap gap-2 mb-3 items-center text-xs">
+                <span className="text-muted-foreground">Filtrer :</span>
+                <Select value={String(historyMonth)} onValueChange={v => setHistoryMonth(v === "all" ? "all" : Number(v))}>
+                  <SelectTrigger className="w-[140px] h-8 text-xs"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tous les mois</SelectItem>
+                    {MOIS.map((m, i) => <SelectItem key={i} value={String(i)}>{m}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+                <Select value={String(historyYear)} onValueChange={v => setHistoryYear(v === "all" ? "all" : Number(v))}>
+                  <SelectTrigger className="w-[110px] h-8 text-xs"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Toutes années</SelectItem>
+                    {historyYears.map(y => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+                <Select value={historyStatus} onValueChange={v => setHistoryStatus(v as any)}>
+                  <SelectTrigger className="w-[140px] h-8 text-xs"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tous statuts</SelectItem>
+                    <SelectItem value="draft">Brouillon</SelectItem>
+                    <SelectItem value="calculated">Calculé</SelectItem>
+                    <SelectItem value="validated">Validé</SelectItem>
+                    <SelectItem value="closed">Clôturé</SelectItem>
+                  </SelectContent>
+                </Select>
+                <span className="ml-auto text-muted-foreground">{filteredRuns.length} période(s)</span>
+              </div>
               <div className="space-y-1">
-                {history.map((h: any) => (
-                  <div key={h.id} className="flex justify-between items-center py-1.5 px-2 text-[11px] rounded hover:bg-muted/30">
-                    <span className="font-medium">{MOIS[h.mois]} {h.annee}</span>
-                    <span>{h.nb_employes} emp.</span>
-                    <span className="font-mono">Brut: {fmtXOF(h.total_brut)} F</span>
-                    <span className="font-mono text-primary font-bold">Net: {fmtXOF(h.total_net)} F</span>
-                  </div>
-                ))}
+                {filteredRuns.length === 0 && (
+                  <div className="py-6 text-center text-xs text-muted-foreground">Aucune paie trouvée pour ce filtre</div>
+                )}
+                {filteredRuns.map((r: any) => {
+                  const slipCount = (r.hr_payslips ?? []).length;
+                  const statusVariant = r.status === "closed" ? "default" : r.status === "draft" ? "secondary" : "outline";
+                  return (
+                    <div key={r.id} className="flex flex-wrap justify-between items-center gap-2 py-2 px-3 text-[11px] rounded border border-border/50 hover:bg-muted/30">
+                      <div className="flex items-center gap-2 min-w-[160px]">
+                        {r.status === "closed" ? <Lock size={12} className="text-primary" /> : <CalendarClock size={12} className="text-muted-foreground" />}
+                        <span className="font-medium">{MOIS[r.mois]} {r.annee}</span>
+                        <Badge variant={statusVariant as any} className="h-4 text-[9px] px-1.5">{r.status}</Badge>
+                      </div>
+                      <span className="text-muted-foreground">{r.nb_employes ?? 0} emp.</span>
+                      <span className="text-muted-foreground">{slipCount} bulletin{slipCount > 1 ? "s" : ""}</span>
+                      <span className="font-mono">Brut: {fmtXOF(r.total_brut ?? 0)} F</span>
+                      <span className="font-mono text-primary font-bold">Net: {fmtXOF(r.total_net ?? 0)} F</span>
+                    </div>
+                  );
+                })}
               </div>
             </GhCard>
           )}
@@ -1206,9 +1307,15 @@ export default function HrPage() {
 
         {/* ═══ EMPLOYÉS ═══ */}
         <TabsContent value="employes" className="space-y-4 mt-4">
-          <div className="relative max-w-sm">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Rechercher un employé..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 text-sm" />
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="relative max-w-sm flex-1">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Input placeholder="Rechercher un employé..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 text-sm" />
+            </div>
+            <Badge variant="outline" className="text-[10px] gap-1">
+              <ShieldCheck size={11} />
+              {canManageHr ? "Vue complète RH" : "Vue restreinte — votre fiche uniquement"}
+            </Badge>
           </div>
 
           <GhCard title={`Liste des employés (${filtered.length})`} className="overflow-x-auto">
@@ -1285,6 +1392,46 @@ export default function HrPage() {
       {showNew && <EmployeeFormDialog emp={{ ...EMPTY_EMP }} onSave={handleSave} onClose={() => setShowNew(false)} existingMats={employees.map(e => e.matricule)} conventions={conventions} users={assignableUsers} locked={isPeriodClosed} />}
       {showForm && <EmployeeFormDialog emp={showForm} onSave={handleSave} onClose={() => setShowForm(null)} existingMats={employees.filter(e => e.id !== showForm.id).map(e => e.matricule)} conventions={conventions} users={assignableUsers} locked={isPeriodClosed} />}
       {showBulletin && <BulletinModal emp={showBulletin} params={params} entreprise={entreprise} orgSettings={orgSettings} defaultMois={payrollMonth} defaultAnnee={payrollYear} onClose={() => setShowBulletin(null)} />}
+
+      {/* Bulk PDF — confirmation */}
+      <AlertDialog open={bulkConfirm} onOpenChange={setBulkConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2"><FileDown size={16} /> Générer tous les bulletins du mois ?</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-2 text-xs">
+                <div>Période : <b>{MOIS[payrollMonth]} {payrollYear}</b></div>
+                <div>Employés concernés : <b>{allPaies.length}</b></div>
+                <div>Total brut : <b>{fmtXOF(totaux.brut)} F</b> · Total net : <b>{fmtXOF(totaux.net)} F</b></div>
+                <div className="flex items-start gap-2 p-2 bg-muted/40 rounded text-muted-foreground">
+                  <AlertTriangle size={14} className="shrink-0 mt-0.5 text-amber-600" />
+                  <span>Chaque bulletin sera vérifié (recalcul brut/net) avant téléchargement. En cas d’incohérence, le bulletin est ignoré.</span>
+                </div>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={handleBulkExport}><FileDown size={14} className="mr-1" /> Générer {allPaies.length} PDF</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Bulk PDF — progress */}
+      {bulkProgress && (
+        <Dialog open onOpenChange={() => {}}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2"><FileDown size={16} /> Génération des bulletins</DialogTitle>
+              <DialogDescription>{MOIS[payrollMonth]} {payrollYear} — {bulkProgress.current} / {bulkProgress.total}</DialogDescription>
+            </DialogHeader>
+            <Progress value={Math.round((bulkProgress.current / bulkProgress.total) * 100)} />
+            <div className="text-[11px] text-muted-foreground text-center">
+              {bulkProgress.running ? "Traitement en cours, ne fermez pas cette fenêtre…" : <><CheckCircle2 size={12} className="inline mr-1 text-primary" /> Terminé</>}
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
