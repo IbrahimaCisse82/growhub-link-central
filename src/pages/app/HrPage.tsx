@@ -1407,7 +1407,7 @@ export default function HrPage() {
               {filtered.length > 0 && (
                 <tfoot>
                   <tr className="border-t-2 border-primary/20 bg-primary/5 font-bold text-xs">
-                    <td colSpan={5} className="py-2 px-3 text-primary">TOTAUX — {filtered.length} employé{filtered.length > 1 ? "s" : ""}</td>
+                    <td colSpan={canManageHr ? 6 : 5} className="py-2 px-3 text-primary">TOTAUX — {filtered.length} employé{filtered.length > 1 ? "s" : ""}</td>
                     <td className="py-2 px-3 text-right font-mono">{fmtXOF(filtered.reduce((s, e) => s + e.salaire_base, 0))}</td>
                     <td className="py-2 px-3 text-right font-mono">{fmtXOF(filtered.reduce((s, e) => s + e.paie.brut, 0))}</td>
                     <td className="py-2 px-3 text-right font-mono text-primary">{fmtXOF(filtered.reduce((s, e) => s + e.paie.net, 0))}</td>
