@@ -1435,6 +1435,22 @@ export default function HrPage() {
         <TabsContent value="entreprise" className="mt-4">
           <EntrepriseTab entreprise={entreprise} onSave={setEntreprise} />
         </TabsContent>
+
+        {/* ═══ CONGÉS ═══ */}
+        <TabsContent value="conges" className="mt-4">
+          <HrLeavesPanel
+            canManage={canManageHr}
+            restrictedEmployeeId={!canManageHr && employees[0]?.id ? employees[0].id : null}
+          />
+        </TabsContent>
+
+        {/* ═══ CONTRATS ═══ */}
+        <TabsContent value="contrats" className="mt-4">
+          <HrContractsPanel
+            canManage={canManageHr}
+            restrictedEmployeeId={!canManageHr && employees[0]?.id ? employees[0].id : null}
+          />
+        </TabsContent>
       </Tabs>
 
       {/* Dialogs */}
