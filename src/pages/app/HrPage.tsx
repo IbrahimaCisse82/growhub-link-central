@@ -13,6 +13,9 @@ import { exportLivreDePaieXlsx, exportBankCsv, exportRegistrePersonnelXlsx } fro
 import { Plus, FileText, Users, DollarSign, TrendingUp, Trash2, Pencil, Eye, Download, Search, Settings, Building2, BookOpen, BarChart3, Printer, ShieldCheck, CalendarClock, Lock, Calculator, FileDown, AlertTriangle, CheckCircle2, History, CalendarDays, FileSignature } from "lucide-react";
 import HrLeavesPanel from "@/components/hr/HrLeavesPanel";
 import HrContractsPanel from "@/components/hr/HrContractsPanel";
+import HrAgreementsPanel from "@/components/hr/HrAgreementsPanel";
+import HrAuditPanel from "@/components/hr/HrAuditPanel";
+import HrSelfServicePanel from "@/components/hr/HrSelfServicePanel";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Progress } from "@/components/ui/progress";
