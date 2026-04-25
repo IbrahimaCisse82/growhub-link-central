@@ -123,8 +123,8 @@ export function exportBankCsv(rows: PayrollExportRow[], mois: number, annee: num
   const header = ["Matricule", "Beneficiaire", "Banque", "RIB/IBAN", "Montant_XOF", "Motif"];
   const lines = rows.map((row) => {
     const beneficiaire = `${row.prenom} ${row.nom}`.replace(/[;\n\r]/g, " ");
-    const banque = ((emp as any).banque ?? "").toString().replace(/[;\n\r]/g, " ");
-    const rib = ((emp as any).rib ?? (emp as any).iban ?? "").toString().replace(/[;\n\r]/g, " ");
+    const banque = ((row as any).banque ?? "").toString().replace(/[;\n\r]/g, " ");
+    const rib = ((row as any).rib ?? (row as any).iban ?? "").toString().replace(/[;\n\r]/g, " ");
     const motif = `Salaire ${MOIS[mois] ?? ""} ${annee}`;
     return [row.matricule, beneficiaire, banque, rib, Math.round(row.paie.net), motif].join(";");
   });
