@@ -1386,6 +1386,46 @@ export default function HrPage() {
       {showNew && <EmployeeFormDialog emp={{ ...EMPTY_EMP }} onSave={handleSave} onClose={() => setShowNew(false)} existingMats={employees.map(e => e.matricule)} conventions={conventions} users={assignableUsers} locked={isPeriodClosed} />}
       {showForm && <EmployeeFormDialog emp={showForm} onSave={handleSave} onClose={() => setShowForm(null)} existingMats={employees.filter(e => e.id !== showForm.id).map(e => e.matricule)} conventions={conventions} users={assignableUsers} locked={isPeriodClosed} />}
       {showBulletin && <BulletinModal emp={showBulletin} params={params} entreprise={entreprise} orgSettings={orgSettings} defaultMois={payrollMonth} defaultAnnee={payrollYear} onClose={() => setShowBulletin(null)} />}
+
+      {/* Bulk PDF — confirmation */}
+      <AlertDialog open={bulkConfirm} onOpenChange={setBulkConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2"><FileDown size={16} /> Générer tous les bulletins du mois ?</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-2 text-xs">
+                <div>Période : <b>{MOIS[payrollMonth]} {payrollYear}</b></div>
+                <div>Employés concernés : <b>{allPaies.length}</b></div>
+                <div>Total brut : <b>{fmtXOF(totaux.brut)} F</b> · Total net : <b>{fmtXOF(totaux.net)} F</b></div>
+                <div className="flex items-start gap-2 p-2 bg-muted/40 rounded text-muted-foreground">
+                  <AlertTriangle size={14} className="shrink-0 mt-0.5 text-amber-600" />
+                  <span>Chaque bulletin sera vérifié (recalcul brut/net) avant téléchargement. En cas d’incohérence, le bulletin est ignoré.</span>
+                </div>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={handleBulkExport}><FileDown size={14} className="mr-1" /> Générer {allPaies.length} PDF</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Bulk PDF — progress */}
+      {bulkProgress && (
+        <Dialog open onOpenChange={() => {}}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2"><FileDown size={16} /> Génération des bulletins</DialogTitle>
+              <DialogDescription>{MOIS[payrollMonth]} {payrollYear} — {bulkProgress.current} / {bulkProgress.total}</DialogDescription>
+            </DialogHeader>
+            <Progress value={Math.round((bulkProgress.current / bulkProgress.total) * 100)} />
+            <div className="text-[11px] text-muted-foreground text-center">
+              {bulkProgress.running ? "Traitement en cours, ne fermez pas cette fenêtre…" : <><CheckCircle2 size={12} className="inline mr-1 text-primary" /> Terminé</>}
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
