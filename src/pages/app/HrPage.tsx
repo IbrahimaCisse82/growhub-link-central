@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -1088,18 +1089,39 @@ export default function HrPage() {
     toast.success(`Paie brouillon calculée pour ${MOIS[payrollMonth]} ${payrollYear}`);
   };
 
-  // Bulk PDF export — confirmation + progress
+  // Bulk PDF export — selection + confirmation + progress
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkConfirm, setBulkConfirm] = useState(false);
   const [bulkProgress, setBulkProgress] = useState<{ current: number; total: number; running: boolean } | null>(null);
+  const toggleSelected = (id: string) => setSelectedIds(prev => {
+    const next = new Set(prev);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    return next;
+  });
+  const toggleAllFiltered = () => setSelectedIds(prev => {
+    const ids = filtered.map(e => e.id!).filter(Boolean);
+    const allSelected = ids.length > 0 && ids.every(id => prev.has(id));
+    const next = new Set(prev);
+    if (allSelected) ids.forEach(id => next.delete(id));
+    else ids.forEach(id => next.add(id));
+    return next;
+  });
+  const exportTargets = useMemo(
+    () => selectedIds.size > 0 ? allPaies.filter(e => e.id && selectedIds.has(e.id)) : allPaies,
+    [allPaies, selectedIds]
+  );
+  const exportTotals = useMemo(() => ({
+    brut: exportTargets.reduce((s, e) => s + e.paie.brut, 0),
+    net: exportTargets.reduce((s, e) => s + e.paie.net, 0),
+  }), [exportTargets]);
   const handleBulkExport = async () => {
     setBulkConfirm(false);
-    if (allPaies.length === 0) { toast.error("Aucun employé à exporter"); return; }
-    setBulkProgress({ current: 0, total: allPaies.length, running: true });
+    if (exportTargets.length === 0) { toast.error("Aucun employé à exporter"); return; }
+    setBulkProgress({ current: 0, total: exportTargets.length, running: true });
     let ok = 0, fail = 0;
-    for (let i = 0; i < allPaies.length; i++) {
-      const e = allPaies[i];
+    for (let i = 0; i < exportTargets.length; i++) {
+      const e = exportTargets[i];
       try {
-        // Coherence verif before each export
         const verif = calculerPaie(e, params, new Date(payrollYear, payrollMonth + 1, 0));
         if (Math.abs(verif.net - e.paie.net) > 1 || Math.abs(verif.brut - e.paie.brut) > 1) {
           fail++;
@@ -1108,7 +1130,7 @@ export default function HrPage() {
           ok++;
         }
       } catch { fail++; }
-      setBulkProgress({ current: i + 1, total: allPaies.length, running: i + 1 < allPaies.length });
+      setBulkProgress({ current: i + 1, total: exportTargets.length, running: i + 1 < exportTargets.length });
     }
     setBulkProgress(null);
     if (fail > 0) toast.warning(`${ok} bulletin(s) exporté(s) · ${fail} en échec/incohérence`);
@@ -1149,8 +1171,9 @@ export default function HrPage() {
             {canManageHr && <GhButton size="sm" variant="secondary" onClick={handleCalculatePayroll} disabled={isPeriodClosed}>
               <Calculator size={14} className="mr-1" /> Calculer la paie
             </GhButton>}
-            {canManageHr && <GhButton size="sm" variant="secondary" onClick={() => setBulkConfirm(true)} disabled={allPaies.length === 0 || !!bulkProgress}>
-              <FileDown size={14} className="mr-1" /> Bulletins PDF du mois
+            {canManageHr && <GhButton size="sm" variant="secondary" onClick={() => setBulkConfirm(true)} disabled={exportTargets.length === 0 || !!bulkProgress}>
+              <FileDown size={14} className="mr-1" />
+              {selectedIds.size > 0 ? `Bulletins PDF (${selectedIds.size} sél.)` : "Bulletins PDF du mois"}
             </GhButton>}
             {canManageHr && <GhButton size="sm" variant="secondary" onClick={handleCloseMonth} disabled={isPeriodClosed}>
               {isPeriodClosed ? <Lock size={14} className="mr-1" /> : <Download size={14} className="mr-1" />} Clôturer le mois
@@ -1316,12 +1339,27 @@ export default function HrPage() {
               <ShieldCheck size={11} />
               {canManageHr ? "Vue complète RH" : "Vue restreinte — votre fiche uniquement"}
             </Badge>
+            {canManageHr && selectedIds.size > 0 && (
+              <Badge variant="secondary" className="text-[10px] gap-1">
+                {selectedIds.size} sélectionné{selectedIds.size > 1 ? "s" : ""}
+                <button onClick={() => setSelectedIds(new Set())} className="ml-1 hover:text-destructive">×</button>
+              </Badge>
+            )}
           </div>
 
           <GhCard title={`Liste des employés (${filtered.length})`} className="overflow-x-auto">
             <table className="w-full text-[12px]">
               <thead>
                 <tr className="border-b border-border text-left text-muted-foreground">
+                  {canManageHr && (
+                    <th className="py-2 px-3 w-8">
+                      <Checkbox
+                        checked={filtered.length > 0 && filtered.every(e => e.id && selectedIds.has(e.id))}
+                        onCheckedChange={toggleAllFiltered}
+                        aria-label="Tout sélectionner"
+                      />
+                    </th>
+                  )}
                   <th className="py-2 px-3">Matricule</th>
                   <th className="py-2 px-3">Nom complet</th>
                   <th className="py-2 px-3">Fonction</th>
@@ -1336,6 +1374,15 @@ export default function HrPage() {
               <tbody>
                 {filtered.map(emp => (
                   <tr key={emp.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
+                    {canManageHr && (
+                      <td className="py-2.5 px-3">
+                        <Checkbox
+                          checked={!!emp.id && selectedIds.has(emp.id)}
+                          onCheckedChange={() => emp.id && toggleSelected(emp.id)}
+                          aria-label={`Sélectionner ${emp.prenom} ${emp.nom}`}
+                        />
+                      </td>
+                    )}
                     <td className="py-2.5 px-3 font-mono">{emp.matricule}</td>
                     <td className="py-2.5 px-3 font-medium">{emp.prenom} {emp.nom}</td>
                     <td className="py-2.5 px-3">{emp.fonction}</td>
@@ -1354,13 +1401,13 @@ export default function HrPage() {
                   </tr>
                 ))}
                 {filtered.length === 0 && (
-                  <tr><td colSpan={9} className="py-8 text-center text-muted-foreground">Aucun employé trouvé</td></tr>
+                  <tr><td colSpan={canManageHr ? 10 : 9} className="py-8 text-center text-muted-foreground">Aucun employé trouvé</td></tr>
                 )}
               </tbody>
               {filtered.length > 0 && (
                 <tfoot>
                   <tr className="border-t-2 border-primary/20 bg-primary/5 font-bold text-xs">
-                    <td colSpan={5} className="py-2 px-3 text-primary">TOTAUX — {filtered.length} employé{filtered.length > 1 ? "s" : ""}</td>
+                    <td colSpan={canManageHr ? 6 : 5} className="py-2 px-3 text-primary">TOTAUX — {filtered.length} employé{filtered.length > 1 ? "s" : ""}</td>
                     <td className="py-2 px-3 text-right font-mono">{fmtXOF(filtered.reduce((s, e) => s + e.salaire_base, 0))}</td>
                     <td className="py-2 px-3 text-right font-mono">{fmtXOF(filtered.reduce((s, e) => s + e.paie.brut, 0))}</td>
                     <td className="py-2 px-3 text-right font-mono text-primary">{fmtXOF(filtered.reduce((s, e) => s + e.paie.net, 0))}</td>
@@ -1397,12 +1444,12 @@ export default function HrPage() {
       <AlertDialog open={bulkConfirm} onOpenChange={setBulkConfirm}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2"><FileDown size={16} /> Générer tous les bulletins du mois ?</AlertDialogTitle>
+            <AlertDialogTitle className="flex items-center gap-2"><FileDown size={16} /> {selectedIds.size > 0 ? `Générer les ${exportTargets.length} bulletins sélectionnés ?` : "Générer tous les bulletins du mois ?"}</AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="space-y-2 text-xs">
                 <div>Période : <b>{MOIS[payrollMonth]} {payrollYear}</b></div>
-                <div>Employés concernés : <b>{allPaies.length}</b></div>
-                <div>Total brut : <b>{fmtXOF(totaux.brut)} F</b> · Total net : <b>{fmtXOF(totaux.net)} F</b></div>
+                <div>Portée : <b>{selectedIds.size > 0 ? `${exportTargets.length} employé(s) sélectionné(s)` : `tous les employés (${exportTargets.length})`}</b></div>
+                <div>Total brut : <b>{fmtXOF(exportTotals.brut)} F</b> · Total net : <b>{fmtXOF(exportTotals.net)} F</b></div>
                 <div className="flex items-start gap-2 p-2 bg-muted/40 rounded text-muted-foreground">
                   <AlertTriangle size={14} className="shrink-0 mt-0.5 text-amber-600" />
                   <span>Chaque bulletin sera vérifié (recalcul brut/net) avant téléchargement. En cas d’incohérence, le bulletin est ignoré.</span>
@@ -1412,7 +1459,7 @@ export default function HrPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction onClick={handleBulkExport}><FileDown size={14} className="mr-1" /> Générer {allPaies.length} PDF</AlertDialogAction>
+            <AlertDialogAction onClick={handleBulkExport}><FileDown size={14} className="mr-1" /> Générer {exportTargets.length} PDF</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
