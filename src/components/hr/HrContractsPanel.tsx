@@ -99,14 +99,14 @@ export default function HrContractsPanel({ canManage, restrictedEmployeeId }: Pr
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <StatCard label="Contrats actifs" value={stats.active} icon={<FileSignature size={18} />} />
-        <StatCard label="CDI" value={stats.cdi} icon={<CheckCircle2 size={18} />} />
-        <StatCard label="CDD" value={stats.cdd} icon={<FileSignature size={18} />} />
-        <StatCard label="Alertes" value={stats.alerts} icon={<AlertTriangle size={18} />} />
+        <MiniStat label="Contrats actifs" value={stats.active} icon={<FileSignature size={16} />} accent="emerald" />
+        <MiniStat label="CDI" value={stats.cdi} icon={<CheckCircle2 size={16} />} />
+        <MiniStat label="CDD" value={stats.cdd} icon={<FileSignature size={16} />} />
+        <MiniStat label="Alertes" value={stats.alerts} icon={<AlertTriangle size={16} />} accent="amber" />
       </div>
 
       {canManage && alerts.length > 0 && (
-        <GhCard className="p-3 border-amber-500/40 bg-amber-500/5">
+        <Panel className="p-3 border-amber-500/40 bg-amber-500/5">
           <h3 className="font-semibold text-sm mb-2 flex items-center gap-2">
             <AlertTriangle size={16} className="text-amber-600" />
             Alertes contrats ({alerts.length})

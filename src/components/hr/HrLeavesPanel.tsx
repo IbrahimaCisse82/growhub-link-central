@@ -127,7 +127,7 @@ export default function HrLeavesPanel({ canManage, restrictedEmployeeId }: Props
         <MiniStat label="Jours pris" value={stats.totalDays} icon={<CalendarDays size={16} />} />
       </div>
 
-      <GhCard className="p-3">
+      <Panel className="p-3">
         <div className="flex flex-wrap items-end gap-2">
           <div>
             <Label className="text-xs">Année</Label>
@@ -170,9 +170,9 @@ export default function HrLeavesPanel({ canManage, restrictedEmployeeId }: Props
             <GhButton onClick={() => setDlgOpen(true)} className="gap-1"><Plus size={14} /> Nouvelle demande</GhButton>
           </div>
         </div>
-      </GhCard>
+      </Panel>
 
-      <GhCard className="p-0 overflow-hidden">
+      <Panel className="overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-muted/40 text-xs uppercase tracking-wide">
             <tr>
@@ -220,10 +220,10 @@ export default function HrLeavesPanel({ canManage, restrictedEmployeeId }: Props
             })}
           </tbody>
         </table>
-      </GhCard>
+      </Panel>
 
       {canManage && (
-        <GhCard className="p-3">
+        <Panel className="p-3">
           <h3 className="font-semibold text-sm mb-2">Soldes annuels {year}</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
@@ -257,7 +257,7 @@ export default function HrLeavesPanel({ canManage, restrictedEmployeeId }: Props
               </tbody>
             </table>
           </div>
-        </GhCard>
+        </Panel>
       )}
 
       <Dialog open={dlgOpen} onOpenChange={setDlgOpen}>
