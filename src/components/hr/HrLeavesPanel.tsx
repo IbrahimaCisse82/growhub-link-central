@@ -107,10 +107,10 @@ export default function HrLeavesPanel({ canManage, restrictedEmployeeId }: Props
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-        <StatCard label="Demandes" value={stats.total} icon={<CalendarDays size={18} />} />
-        <StatCard label="En attente" value={stats.pending} icon={<Clock size={18} />} />
-        <StatCard label="Approuvées" value={stats.approved} icon={<CheckCircle2 size={18} />} />
-        <StatCard label="Jours pris" value={stats.totalDays} icon={<CalendarDays size={18} />} />
+        <MiniStat label="Demandes" value={stats.total} icon={<CalendarDays size={16} />} />
+        <MiniStat label="En attente" value={stats.pending} icon={<Clock size={16} />} accent="amber" />
+        <MiniStat label="Approuvées" value={stats.approved} icon={<CheckCircle2 size={16} />} accent="emerald" />
+        <MiniStat label="Jours pris" value={stats.totalDays} icon={<CalendarDays size={16} />} />
       </div>
 
       <GhCard className="p-3">
