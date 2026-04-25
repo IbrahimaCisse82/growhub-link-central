@@ -9,6 +9,7 @@ import { useAssignableUsers } from "@/hooks/useAssignableUsers";
 import { useOrgSettings } from "@/hooks/useOrgSettings";
 import { calculerPaie, fmtXOF, DEFAULT_PAYROLL_PARAMS, MOIS, type HrEmployee, type PayrollParams, type PayrollResult } from "@/lib/payroll";
 import { exportPayrollPayslipPdf } from "@/lib/payrollPdfExport";
+import { exportLivreDePaieXlsx, exportBankCsv, exportRegistrePersonnelXlsx } from "@/lib/hrExports";
 import { Plus, FileText, Users, DollarSign, TrendingUp, Trash2, Pencil, Eye, Download, Search, Settings, Building2, BookOpen, BarChart3, Printer, ShieldCheck, CalendarClock, Lock, Calculator, FileDown, AlertTriangle, CheckCircle2, History, CalendarDays, FileSignature } from "lucide-react";
 import HrLeavesPanel from "@/components/hr/HrLeavesPanel";
 import HrContractsPanel from "@/components/hr/HrContractsPanel";
@@ -1177,6 +1178,18 @@ export default function HrPage() {
               <FileDown size={14} className="mr-1" />
               {selectedIds.size > 0 ? `Bulletins PDF (${selectedIds.size} sél.)` : "Bulletins PDF du mois"}
             </GhButton>}
+            {canManageHr && <GhButton size="sm" variant="secondary" onClick={() => {
+              try { exportLivreDePaieXlsx(exportTargets, payrollMonth, payrollYear); toast.success("Livre de paie exporté"); }
+              catch (e: any) { toast.error(e?.message ?? "Export impossible"); }
+            }} disabled={exportTargets.length === 0}>
+              <FileDown size={14} className="mr-1" /> Livre de paie (Excel)
+            </GhButton>}
+            {canManageHr && <GhButton size="sm" variant="secondary" onClick={() => {
+              try { exportBankCsv(exportTargets, payrollMonth, payrollYear); toast.success("Fichier de virement généré"); }
+              catch (e: any) { toast.error(e?.message ?? "Export impossible"); }
+            }} disabled={exportTargets.length === 0}>
+              <FileDown size={14} className="mr-1" /> Virement bancaire (CSV)
+            </GhButton>}
             {canManageHr && <GhButton size="sm" variant="secondary" onClick={handleCloseMonth} disabled={isPeriodClosed}>
               {isPeriodClosed ? <Lock size={14} className="mr-1" /> : <Download size={14} className="mr-1" />} Clôturer le mois
             </GhButton>}
@@ -1346,6 +1359,14 @@ export default function HrPage() {
                 {selectedIds.size} sélectionné{selectedIds.size > 1 ? "s" : ""}
                 <button onClick={() => setSelectedIds(new Set())} className="ml-1 hover:text-destructive">×</button>
               </Badge>
+            )}
+            {canManageHr && (
+              <GhButton size="sm" variant="secondary" onClick={() => {
+                try { exportRegistrePersonnelXlsx(employees); toast.success("Registre exporté"); }
+                catch (e: any) { toast.error(e?.message ?? "Export impossible"); }
+              }} disabled={employees.length === 0}>
+                <FileDown size={14} className="mr-1" /> Registre du personnel
+              </GhButton>
             )}
           </div>
 
