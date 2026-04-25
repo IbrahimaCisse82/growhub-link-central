@@ -1178,6 +1178,18 @@ export default function HrPage() {
               <FileDown size={14} className="mr-1" />
               {selectedIds.size > 0 ? `Bulletins PDF (${selectedIds.size} sél.)` : "Bulletins PDF du mois"}
             </GhButton>}
+            {canManageHr && <GhButton size="sm" variant="secondary" onClick={() => {
+              try { exportLivreDePaieXlsx(exportTargets, payrollMonth, payrollYear); toast.success("Livre de paie exporté"); }
+              catch (e: any) { toast.error(e?.message ?? "Export impossible"); }
+            }} disabled={exportTargets.length === 0}>
+              <FileDown size={14} className="mr-1" /> Livre de paie (Excel)
+            </GhButton>}
+            {canManageHr && <GhButton size="sm" variant="secondary" onClick={() => {
+              try { exportBankCsv(exportTargets, payrollMonth, payrollYear); toast.success("Fichier de virement généré"); }
+              catch (e: any) { toast.error(e?.message ?? "Export impossible"); }
+            }} disabled={exportTargets.length === 0}>
+              <FileDown size={14} className="mr-1" /> Virement bancaire (CSV)
+            </GhButton>}
             {canManageHr && <GhButton size="sm" variant="secondary" onClick={handleCloseMonth} disabled={isPeriodClosed}>
               {isPeriodClosed ? <Lock size={14} className="mr-1" /> : <Download size={14} className="mr-1" />} Clôturer le mois
             </GhButton>}
