@@ -1089,18 +1089,39 @@ export default function HrPage() {
     toast.success(`Paie brouillon calculée pour ${MOIS[payrollMonth]} ${payrollYear}`);
   };
 
-  // Bulk PDF export — confirmation + progress
+  // Bulk PDF export — selection + confirmation + progress
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkConfirm, setBulkConfirm] = useState(false);
   const [bulkProgress, setBulkProgress] = useState<{ current: number; total: number; running: boolean } | null>(null);
+  const toggleSelected = (id: string) => setSelectedIds(prev => {
+    const next = new Set(prev);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    return next;
+  });
+  const toggleAllFiltered = () => setSelectedIds(prev => {
+    const ids = filtered.map(e => e.id!).filter(Boolean);
+    const allSelected = ids.length > 0 && ids.every(id => prev.has(id));
+    const next = new Set(prev);
+    if (allSelected) ids.forEach(id => next.delete(id));
+    else ids.forEach(id => next.add(id));
+    return next;
+  });
+  const exportTargets = useMemo(
+    () => selectedIds.size > 0 ? allPaies.filter(e => e.id && selectedIds.has(e.id)) : allPaies,
+    [allPaies, selectedIds]
+  );
+  const exportTotals = useMemo(() => ({
+    brut: exportTargets.reduce((s, e) => s + e.paie.brut, 0),
+    net: exportTargets.reduce((s, e) => s + e.paie.net, 0),
+  }), [exportTargets]);
   const handleBulkExport = async () => {
     setBulkConfirm(false);
-    if (allPaies.length === 0) { toast.error("Aucun employé à exporter"); return; }
-    setBulkProgress({ current: 0, total: allPaies.length, running: true });
+    if (exportTargets.length === 0) { toast.error("Aucun employé à exporter"); return; }
+    setBulkProgress({ current: 0, total: exportTargets.length, running: true });
     let ok = 0, fail = 0;
-    for (let i = 0; i < allPaies.length; i++) {
-      const e = allPaies[i];
+    for (let i = 0; i < exportTargets.length; i++) {
+      const e = exportTargets[i];
       try {
-        // Coherence verif before each export
         const verif = calculerPaie(e, params, new Date(payrollYear, payrollMonth + 1, 0));
         if (Math.abs(verif.net - e.paie.net) > 1 || Math.abs(verif.brut - e.paie.brut) > 1) {
           fail++;
@@ -1109,7 +1130,7 @@ export default function HrPage() {
           ok++;
         }
       } catch { fail++; }
-      setBulkProgress({ current: i + 1, total: allPaies.length, running: i + 1 < allPaies.length });
+      setBulkProgress({ current: i + 1, total: exportTargets.length, running: i + 1 < exportTargets.length });
     }
     setBulkProgress(null);
     if (fail > 0) toast.warning(`${ok} bulletin(s) exporté(s) · ${fail} en échec/incohérence`);
