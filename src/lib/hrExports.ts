@@ -1,10 +1,7 @@
 import { exportToExcel, type SheetData } from "./excelExport";
 import { MOIS, type HrEmployee, type PayrollResult } from "./payroll";
 
-export interface PayrollExportRow {
-  emp: HrEmployee;
-  paie: PayrollResult;
-}
+export type PayrollExportRow = HrEmployee & { paie: PayrollResult };
 
 const moisLabel = (mois: number, annee: number) => `${MOIS[mois] ?? mois}_${annee}`;
 
