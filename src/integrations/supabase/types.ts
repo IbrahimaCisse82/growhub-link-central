@@ -2609,6 +2609,88 @@ export type Database = {
         }
         Relationships: []
       }
+      hr_contracts: {
+        Row: {
+          contract_type: Database["public"]["Enums"]["hr_contract_type"]
+          created_at: string
+          document_url: string | null
+          employee_id: string
+          end_date: string | null
+          fonction: string | null
+          id: string
+          is_active: boolean
+          notes: string | null
+          reference: string | null
+          renewal_of: string | null
+          salaire_base: number
+          signed_at: string | null
+          start_date: string
+          sursalaire: number
+          trial_end_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          contract_type?: Database["public"]["Enums"]["hr_contract_type"]
+          created_at?: string
+          document_url?: string | null
+          employee_id: string
+          end_date?: string | null
+          fonction?: string | null
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          reference?: string | null
+          renewal_of?: string | null
+          salaire_base?: number
+          signed_at?: string | null
+          start_date: string
+          sursalaire?: number
+          trial_end_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          contract_type?: Database["public"]["Enums"]["hr_contract_type"]
+          created_at?: string
+          document_url?: string | null
+          employee_id?: string
+          end_date?: string | null
+          fonction?: string | null
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          reference?: string | null
+          renewal_of?: string | null
+          salaire_base?: number
+          signed_at?: string | null
+          start_date?: string
+          sursalaire?: number
+          trial_end_date?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hr_contracts_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "hr_employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hr_contracts_renewal_of_fkey"
+            columns: ["renewal_of"]
+            isOneToOne: false
+            referencedRelation: "hr_contract_alerts"
+            referencedColumns: ["contract_id"]
+          },
+          {
+            foreignKeyName: "hr_contracts_renewal_of_fkey"
+            columns: ["renewal_of"]
+            isOneToOne: false
+            referencedRelation: "hr_contracts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hr_employees: {
         Row: {
           adresse: string | null
@@ -2743,6 +2825,115 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      hr_leave_balances: {
+        Row: {
+          annee: number
+          carried_over: number
+          created_at: string
+          employee_id: string
+          id: string
+          initial_days: number
+          leave_type: Database["public"]["Enums"]["hr_leave_type"]
+          notes: string | null
+          updated_at: string
+          used_days: number
+        }
+        Insert: {
+          annee: number
+          carried_over?: number
+          created_at?: string
+          employee_id: string
+          id?: string
+          initial_days?: number
+          leave_type?: Database["public"]["Enums"]["hr_leave_type"]
+          notes?: string | null
+          updated_at?: string
+          used_days?: number
+        }
+        Update: {
+          annee?: number
+          carried_over?: number
+          created_at?: string
+          employee_id?: string
+          id?: string
+          initial_days?: number
+          leave_type?: Database["public"]["Enums"]["hr_leave_type"]
+          notes?: string | null
+          updated_at?: string
+          used_days?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hr_leave_balances_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "hr_employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hr_leave_requests: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          attachment_url: string | null
+          created_at: string
+          days_count: number
+          employee_id: string
+          end_date: string
+          id: string
+          leave_type: Database["public"]["Enums"]["hr_leave_type"]
+          reason: string | null
+          rejection_reason: string | null
+          requested_by: string | null
+          start_date: string
+          status: Database["public"]["Enums"]["hr_leave_status"]
+          updated_at: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          attachment_url?: string | null
+          created_at?: string
+          days_count?: number
+          employee_id: string
+          end_date: string
+          id?: string
+          leave_type?: Database["public"]["Enums"]["hr_leave_type"]
+          reason?: string | null
+          rejection_reason?: string | null
+          requested_by?: string | null
+          start_date: string
+          status?: Database["public"]["Enums"]["hr_leave_status"]
+          updated_at?: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          attachment_url?: string | null
+          created_at?: string
+          days_count?: number
+          employee_id?: string
+          end_date?: string
+          id?: string
+          leave_type?: Database["public"]["Enums"]["hr_leave_type"]
+          reason?: string | null
+          rejection_reason?: string | null
+          requested_by?: string | null
+          start_date?: string
+          status?: Database["public"]["Enums"]["hr_leave_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hr_leave_requests_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "hr_employees"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       hr_payroll_history: {
         Row: {
@@ -5573,6 +5764,29 @@ export type Database = {
           },
         ]
       }
+      hr_contract_alerts: {
+        Row: {
+          alert_level: string | null
+          contract_id: string | null
+          contract_type: Database["public"]["Enums"]["hr_contract_type"] | null
+          days_remaining: number | null
+          employee_id: string | null
+          end_date: string | null
+          matricule: string | null
+          nom: string | null
+          prenom: string | null
+          trial_end_date: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hr_contracts_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "hr_employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles_safe: {
         Row: {
           avatar_url: string | null
@@ -5789,6 +6003,27 @@ export type Database = {
         | "webinar"
         | "other"
       grant_status: "draft" | "active" | "disbursing" | "closing" | "closed"
+      hr_contract_type:
+        | "CDI"
+        | "CDD"
+        | "stage"
+        | "consultance"
+        | "apprentissage"
+        | "autre"
+      hr_leave_status:
+        | "draft"
+        | "pending"
+        | "approved"
+        | "rejected"
+        | "cancelled"
+      hr_leave_type:
+        | "annuel"
+        | "maladie"
+        | "maternite"
+        | "paternite"
+        | "permission"
+        | "sans_solde"
+        | "autre"
       hr_payroll_run_status:
         | "draft"
         | "calculated"
@@ -5992,6 +6227,30 @@ export const Constants = {
         "other",
       ],
       grant_status: ["draft", "active", "disbursing", "closing", "closed"],
+      hr_contract_type: [
+        "CDI",
+        "CDD",
+        "stage",
+        "consultance",
+        "apprentissage",
+        "autre",
+      ],
+      hr_leave_status: [
+        "draft",
+        "pending",
+        "approved",
+        "rejected",
+        "cancelled",
+      ],
+      hr_leave_type: [
+        "annuel",
+        "maladie",
+        "maternite",
+        "paternite",
+        "permission",
+        "sans_solde",
+        "autre",
+      ],
       hr_payroll_run_status: [
         "draft",
         "calculated",

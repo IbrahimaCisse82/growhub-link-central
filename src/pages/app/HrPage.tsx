@@ -9,7 +9,9 @@ import { useAssignableUsers } from "@/hooks/useAssignableUsers";
 import { useOrgSettings } from "@/hooks/useOrgSettings";
 import { calculerPaie, fmtXOF, DEFAULT_PAYROLL_PARAMS, MOIS, type HrEmployee, type PayrollParams, type PayrollResult } from "@/lib/payroll";
 import { exportPayrollPayslipPdf } from "@/lib/payrollPdfExport";
-import { Plus, FileText, Users, DollarSign, TrendingUp, Trash2, Pencil, Eye, Download, Search, Settings, Building2, BookOpen, BarChart3, Printer, ShieldCheck, CalendarClock, Lock, Calculator, FileDown, AlertTriangle, CheckCircle2, History } from "lucide-react";
+import { Plus, FileText, Users, DollarSign, TrendingUp, Trash2, Pencil, Eye, Download, Search, Settings, Building2, BookOpen, BarChart3, Printer, ShieldCheck, CalendarClock, Lock, Calculator, FileDown, AlertTriangle, CheckCircle2, History, CalendarDays, FileSignature } from "lucide-react";
+import HrLeavesPanel from "@/components/hr/HrLeavesPanel";
+import HrContractsPanel from "@/components/hr/HrContractsPanel";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Progress } from "@/components/ui/progress";
@@ -1432,6 +1434,22 @@ export default function HrPage() {
         {/* ═══ ENTREPRISE ═══ */}
         <TabsContent value="entreprise" className="mt-4">
           <EntrepriseTab entreprise={entreprise} onSave={setEntreprise} />
+        </TabsContent>
+
+        {/* ═══ CONGÉS ═══ */}
+        <TabsContent value="conges" className="mt-4">
+          <HrLeavesPanel
+            canManage={canManageHr}
+            restrictedEmployeeId={!canManageHr && employees[0]?.id ? employees[0].id : null}
+          />
+        </TabsContent>
+
+        {/* ═══ CONTRATS ═══ */}
+        <TabsContent value="contrats" className="mt-4">
+          <HrContractsPanel
+            canManage={canManageHr}
+            restrictedEmployeeId={!canManageHr && employees[0]?.id ? employees[0].id : null}
+          />
         </TabsContent>
       </Tabs>
 
