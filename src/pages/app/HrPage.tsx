@@ -1360,6 +1360,14 @@ export default function HrPage() {
                 <button onClick={() => setSelectedIds(new Set())} className="ml-1 hover:text-destructive">×</button>
               </Badge>
             )}
+            {canManageHr && (
+              <GhButton size="sm" variant="secondary" onClick={() => {
+                try { exportRegistrePersonnelXlsx(employees); toast.success("Registre exporté"); }
+                catch (e: any) { toast.error(e?.message ?? "Export impossible"); }
+              }} disabled={employees.length === 0}>
+                <FileDown size={14} className="mr-1" /> Registre du personnel
+              </GhButton>
+            )}
           </div>
 
           <GhCard title={`Liste des employés (${filtered.length})`} className="overflow-x-auto">
