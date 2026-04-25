@@ -114,7 +114,7 @@ export default function HrContractsPanel({ canManage, restrictedEmployeeId }: Pr
               );
             })}
           </div>
-        </GhCard>
+        </Panel>
       )}
 
       <div className="flex justify-end">
@@ -123,7 +123,7 @@ export default function HrContractsPanel({ canManage, restrictedEmployeeId }: Pr
         )}
       </div>
 
-      <GhCard className="p-0 overflow-hidden">
+      <Panel className="overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-muted/40 text-xs uppercase tracking-wide">
             <tr>
@@ -170,7 +170,7 @@ export default function HrContractsPanel({ canManage, restrictedEmployeeId }: Pr
             })}
           </tbody>
         </table>
-      </GhCard>
+      </Panel>
 
       <Dialog open={dlgOpen} onOpenChange={setDlgOpen}>
         <DialogContent className="max-w-2xl">
