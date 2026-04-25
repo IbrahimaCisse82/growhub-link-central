@@ -1339,12 +1339,27 @@ export default function HrPage() {
               <ShieldCheck size={11} />
               {canManageHr ? "Vue complète RH" : "Vue restreinte — votre fiche uniquement"}
             </Badge>
+            {canManageHr && selectedIds.size > 0 && (
+              <Badge variant="secondary" className="text-[10px] gap-1">
+                {selectedIds.size} sélectionné{selectedIds.size > 1 ? "s" : ""}
+                <button onClick={() => setSelectedIds(new Set())} className="ml-1 hover:text-destructive">×</button>
+              </Badge>
+            )}
           </div>
 
           <GhCard title={`Liste des employés (${filtered.length})`} className="overflow-x-auto">
             <table className="w-full text-[12px]">
               <thead>
                 <tr className="border-b border-border text-left text-muted-foreground">
+                  {canManageHr && (
+                    <th className="py-2 px-3 w-8">
+                      <Checkbox
+                        checked={filtered.length > 0 && filtered.every(e => e.id && selectedIds.has(e.id))}
+                        onCheckedChange={toggleAllFiltered}
+                        aria-label="Tout sélectionner"
+                      />
+                    </th>
+                  )}
                   <th className="py-2 px-3">Matricule</th>
                   <th className="py-2 px-3">Nom complet</th>
                   <th className="py-2 px-3">Fonction</th>
