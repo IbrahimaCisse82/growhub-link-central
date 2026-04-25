@@ -10,51 +10,51 @@ export function exportLivreDePaieXlsx(rows: PayrollExportRow[], mois: number, an
   if (rows.length === 0) throw new Error("Aucune donnée à exporter");
 
   // Feuille 1 — Synthèse complète
-  const synthese = rows.map(({ emp, paie }) => ({
-    matricule: emp.matricule,
-    nom: `${emp.prenom} ${emp.nom}`,
-    fonction: emp.fonction ?? "",
-    statut: emp.statut,
-    convention: emp.convention,
-    categorie: emp.categorie,
-    salaire_base: emp.salaire_base ?? 0,
-    sursalaire: emp.sursalaire ?? 0,
-    transport: paie.transport,
-    anciennete: paie.primeAnc,
-    hs_total: paie.totalHS,
-    brut: paie.brut,
-    ipres: paie.ipresRG_s + paie.ipresRC_s,
-    css: paie.ipm_s,
-    ir: paie.ir,
-    trimf: paie.trimf,
-    avances: paie.totalAvances,
-    autres_retenues: paie.retCooperative + paie.fraisMedicaux,
-    net: paie.net,
-    charges_pat: paie.chargesPat,
-    masse_sal: paie.masse,
+  const synthese = rows.map((row) => ({
+    matricule: row.matricule,
+    nom: `${row.prenom} ${row.nom}`,
+    fonction: row.fonction ?? "",
+    statut: row.statut,
+    convention: row.convention,
+    categorie: row.categorie,
+    salaire_base: row.salaire_base ?? 0,
+    sursalaire: row.sursalaire ?? 0,
+    transport: row.paie.transport,
+    anciennete: row.paie.primeAnc,
+    hs_total: row.paie.totalHS,
+    brut: row.paie.brut,
+    ipres: row.paie.ipresRG_s + row.paie.ipresRC_s,
+    css: row.paie.ipm_s,
+    ir: row.paie.ir,
+    trimf: row.paie.trimf,
+    avances: row.paie.totalAvances,
+    autres_retenues: row.paie.retCooperative + row.paie.fraisMedicaux,
+    net: row.paie.net,
+    charges_pat: row.paie.chargesPat,
+    masse_sal: row.paie.masse,
   }));
 
   // Feuille 2 — Charges patronales (ventilation IPRES/CSS/CFCE)
-  const charges = rows.map(({ emp, paie }) => ({
-    matricule: emp.matricule,
-    nom: `${emp.prenom} ${emp.nom}`,
-    brut: paie.brut,
-    ipres_pat: paie.ipresRG_p + paie.ipresRC_p,
-    css_pat: paie.css_af + paie.css_at,
-    cfce: paie.cfce,
-    total: paie.chargesPat,
+  const charges = rows.map((row) => ({
+    matricule: row.matricule,
+    nom: `${row.prenom} ${row.nom}`,
+    brut: row.paie.brut,
+    ipres_pat: row.paie.ipresRG_p + row.paie.ipresRC_p,
+    css_pat: row.paie.css_af + row.paie.css_at,
+    cfce: row.paie.cfce,
+    total: row.paie.chargesPat,
   }));
 
   // Feuille 3 — Retenues salariales (IR, TRIMF, IPRES, CSS)
-  const retenues = rows.map(({ emp, paie }) => ({
-    matricule: emp.matricule,
-    nom: `${emp.prenom} ${emp.nom}`,
-    brut: paie.brut,
-    ipres_sal: paie.ipresRG_s + paie.ipresRC_s,
-    css_sal: paie.ipm_s,
-    ir: paie.ir,
-    trimf: paie.trimf,
-    total_retenues: paie.ipresRG_s + paie.ipresRC_s + paie.ipm_s + paie.ir + paie.trimf,
+  const retenues = rows.map((row) => ({
+    matricule: row.matricule,
+    nom: `${row.prenom} ${row.nom}`,
+    brut: row.paie.brut,
+    ipres_sal: row.paie.ipresRG_s + row.paie.ipresRC_s,
+    css_sal: row.paie.ipm_s,
+    ir: row.paie.ir,
+    trimf: row.paie.trimf,
+    total_retenues: row.paie.ipresRG_s + row.paie.ipresRC_s + row.paie.ipm_s + row.paie.ir + row.paie.trimf,
   }));
 
   const sheets: SheetData[] = [
@@ -121,12 +121,12 @@ export function exportLivreDePaieXlsx(rows: PayrollExportRow[], mois: number, an
 export function exportBankCsv(rows: PayrollExportRow[], mois: number, annee: number) {
   if (rows.length === 0) throw new Error("Aucune donnée à exporter");
   const header = ["Matricule", "Beneficiaire", "Banque", "RIB/IBAN", "Montant_XOF", "Motif"];
-  const lines = rows.map(({ emp, paie }) => {
-    const beneficiaire = `${emp.prenom} ${emp.nom}`.replace(/[;\n\r]/g, " ");
+  const lines = rows.map((row) => {
+    const beneficiaire = `${row.prenom} ${row.nom}`.replace(/[;\n\r]/g, " ");
     const banque = ((emp as any).banque ?? "").toString().replace(/[;\n\r]/g, " ");
     const rib = ((emp as any).rib ?? (emp as any).iban ?? "").toString().replace(/[;\n\r]/g, " ");
     const motif = `Salaire ${MOIS[mois] ?? ""} ${annee}`;
-    return [emp.matricule, beneficiaire, banque, rib, Math.round(paie.net), motif].join(";");
+    return [row.matricule, beneficiaire, banque, rib, Math.round(row.paie.net), motif].join(";");
   });
   const csv = [header.join(";"), ...lines].join("\r\n");
   // BOM UTF-8 pour Excel
