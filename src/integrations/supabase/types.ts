@@ -2826,6 +2826,133 @@ export type Database = {
         }
         Relationships: []
       }
+      hr_expense_lines: {
+        Row: {
+          amount: number
+          category: string
+          created_at: string
+          currency: string
+          description: string
+          expense_date: string
+          id: string
+          receipt_url: string | null
+          report_id: string
+          sort_order: number | null
+          tax_rate: number | null
+        }
+        Insert: {
+          amount: number
+          category: string
+          created_at?: string
+          currency?: string
+          description: string
+          expense_date: string
+          id?: string
+          receipt_url?: string | null
+          report_id: string
+          sort_order?: number | null
+          tax_rate?: number | null
+        }
+        Update: {
+          amount?: number
+          category?: string
+          created_at?: string
+          currency?: string
+          description?: string
+          expense_date?: string
+          id?: string
+          receipt_url?: string | null
+          report_id?: string
+          sort_order?: number | null
+          tax_rate?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hr_expense_lines_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "hr_expense_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hr_expense_reports: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          currency: string
+          employee_id: string
+          id: string
+          notes: string | null
+          period_end: string
+          period_start: string
+          reference: string | null
+          reimbursed_at: string | null
+          reimbursement_annee: number | null
+          reimbursement_mois: number | null
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["hr_expense_status"]
+          submitted_at: string | null
+          title: string
+          total_amount: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          employee_id: string
+          id?: string
+          notes?: string | null
+          period_end: string
+          period_start: string
+          reference?: string | null
+          reimbursed_at?: string | null
+          reimbursement_annee?: number | null
+          reimbursement_mois?: number | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["hr_expense_status"]
+          submitted_at?: string | null
+          title: string
+          total_amount?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          employee_id?: string
+          id?: string
+          notes?: string | null
+          period_end?: string
+          period_start?: string
+          reference?: string | null
+          reimbursed_at?: string | null
+          reimbursement_annee?: number | null
+          reimbursement_mois?: number | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["hr_expense_status"]
+          submitted_at?: string | null
+          title?: string
+          total_amount?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hr_expense_reports_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "hr_employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hr_leave_balances: {
         Row: {
           annee: number
@@ -6010,6 +6137,12 @@ export type Database = {
         | "consultance"
         | "apprentissage"
         | "autre"
+      hr_expense_status:
+        | "draft"
+        | "submitted"
+        | "approved"
+        | "rejected"
+        | "reimbursed"
       hr_leave_status:
         | "draft"
         | "pending"
@@ -6234,6 +6367,13 @@ export const Constants = {
         "consultance",
         "apprentissage",
         "autre",
+      ],
+      hr_expense_status: [
+        "draft",
+        "submitted",
+        "approved",
+        "rejected",
+        "reimbursed",
       ],
       hr_leave_status: [
         "draft",
