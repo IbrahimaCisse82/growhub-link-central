@@ -42,8 +42,8 @@ export function exportLivreDePaieXlsx(rows: PayrollExportRow[], mois: number, an
     matricule: emp.matricule,
     nom: `${emp.prenom} ${emp.nom}`,
     brut: paie.brut,
-    ipres_pat: paie.ipresPat,
-    css_pat: paie.cssPat,
+    ipres_pat: paie.ipresRG_p + paie.ipresRC_p,
+    css_pat: paie.css_af + paie.css_at,
     cfce: paie.cfce,
     total: paie.chargesPat,
   }));
@@ -53,11 +53,11 @@ export function exportLivreDePaieXlsx(rows: PayrollExportRow[], mois: number, an
     matricule: emp.matricule,
     nom: `${emp.prenom} ${emp.nom}`,
     brut: paie.brut,
-    ipres_sal: paie.ipres,
-    css_sal: paie.css,
+    ipres_sal: paie.ipresRG_s + paie.ipresRC_s,
+    css_sal: paie.ipm_s,
     ir: paie.ir,
     trimf: paie.trimf,
-    total_retenues: paie.ipres + paie.css + paie.ir + paie.trimf,
+    total_retenues: paie.ipresRG_s + paie.ipresRC_s + paie.ipm_s + paie.ir + paie.trimf,
   }));
 
   const sheets: SheetData[] = [
