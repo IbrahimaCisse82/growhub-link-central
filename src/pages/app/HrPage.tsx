@@ -1459,7 +1459,7 @@ export default function HrPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction onClick={handleBulkExport}><FileDown size={14} className="mr-1" /> Générer {allPaies.length} PDF</AlertDialogAction>
+            <AlertDialogAction onClick={handleBulkExport}><FileDown size={14} className="mr-1" /> Générer {exportTargets.length} PDF</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
