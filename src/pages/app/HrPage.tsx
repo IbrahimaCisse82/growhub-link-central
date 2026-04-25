@@ -1238,18 +1238,58 @@ export default function HrPage() {
             </GhCard>
           )}
 
-          {/* Payroll History */}
-          {history.length > 0 && (
-            <GhCard title="Historique des clôtures">
+          {/* Payroll History — filterable */}
+          {canManageHr && (
+            <GhCard title={<div className="flex items-center gap-2"><History size={14} /> Historique des paies</div> as any}>
+              <div className="flex flex-wrap gap-2 mb-3 items-center text-xs">
+                <span className="text-muted-foreground">Filtrer :</span>
+                <Select value={String(historyMonth)} onValueChange={v => setHistoryMonth(v === "all" ? "all" : Number(v))}>
+                  <SelectTrigger className="w-[140px] h-8 text-xs"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tous les mois</SelectItem>
+                    {MOIS.map((m, i) => <SelectItem key={i} value={String(i)}>{m}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+                <Select value={String(historyYear)} onValueChange={v => setHistoryYear(v === "all" ? "all" : Number(v))}>
+                  <SelectTrigger className="w-[110px] h-8 text-xs"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Toutes années</SelectItem>
+                    {historyYears.map(y => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+                <Select value={historyStatus} onValueChange={v => setHistoryStatus(v as any)}>
+                  <SelectTrigger className="w-[140px] h-8 text-xs"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tous statuts</SelectItem>
+                    <SelectItem value="draft">Brouillon</SelectItem>
+                    <SelectItem value="calculated">Calculé</SelectItem>
+                    <SelectItem value="validated">Validé</SelectItem>
+                    <SelectItem value="closed">Clôturé</SelectItem>
+                  </SelectContent>
+                </Select>
+                <span className="ml-auto text-muted-foreground">{filteredRuns.length} période(s)</span>
+              </div>
               <div className="space-y-1">
-                {history.map((h: any) => (
-                  <div key={h.id} className="flex justify-between items-center py-1.5 px-2 text-[11px] rounded hover:bg-muted/30">
-                    <span className="font-medium">{MOIS[h.mois]} {h.annee}</span>
-                    <span>{h.nb_employes} emp.</span>
-                    <span className="font-mono">Brut: {fmtXOF(h.total_brut)} F</span>
-                    <span className="font-mono text-primary font-bold">Net: {fmtXOF(h.total_net)} F</span>
-                  </div>
-                ))}
+                {filteredRuns.length === 0 && (
+                  <div className="py-6 text-center text-xs text-muted-foreground">Aucune paie trouvée pour ce filtre</div>
+                )}
+                {filteredRuns.map((r: any) => {
+                  const slipCount = (r.hr_payslips ?? []).length;
+                  const statusVariant = r.status === "closed" ? "default" : r.status === "draft" ? "secondary" : "outline";
+                  return (
+                    <div key={r.id} className="flex flex-wrap justify-between items-center gap-2 py-2 px-3 text-[11px] rounded border border-border/50 hover:bg-muted/30">
+                      <div className="flex items-center gap-2 min-w-[160px]">
+                        {r.status === "closed" ? <Lock size={12} className="text-primary" /> : <CalendarClock size={12} className="text-muted-foreground" />}
+                        <span className="font-medium">{MOIS[r.mois]} {r.annee}</span>
+                        <Badge variant={statusVariant as any} className="h-4 text-[9px] px-1.5">{r.status}</Badge>
+                      </div>
+                      <span className="text-muted-foreground">{r.nb_employes ?? 0} emp.</span>
+                      <span className="text-muted-foreground">{slipCount} bulletin{slipCount > 1 ? "s" : ""}</span>
+                      <span className="font-mono">Brut: {fmtXOF(r.total_brut ?? 0)} F</span>
+                      <span className="font-mono text-primary font-bold">Net: {fmtXOF(r.total_net ?? 0)} F</span>
+                    </div>
+                  );
+                })}
               </div>
             </GhCard>
           )}
