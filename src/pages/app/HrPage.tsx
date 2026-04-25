@@ -13,6 +13,9 @@ import { exportLivreDePaieXlsx, exportBankCsv, exportRegistrePersonnelXlsx } fro
 import { Plus, FileText, Users, DollarSign, TrendingUp, Trash2, Pencil, Eye, Download, Search, Settings, Building2, BookOpen, BarChart3, Printer, ShieldCheck, CalendarClock, Lock, Calculator, FileDown, AlertTriangle, CheckCircle2, History, CalendarDays, FileSignature } from "lucide-react";
 import HrLeavesPanel from "@/components/hr/HrLeavesPanel";
 import HrContractsPanel from "@/components/hr/HrContractsPanel";
+import HrAgreementsPanel from "@/components/hr/HrAgreementsPanel";
+import HrAuditPanel from "@/components/hr/HrAuditPanel";
+import HrSelfServicePanel from "@/components/hr/HrSelfServicePanel";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Progress } from "@/components/ui/progress";
@@ -1201,13 +1204,17 @@ export default function HrPage() {
       />
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
-          <TabsTrigger value="dashboard" className="gap-1"><BarChart3 size={13} /> Tableau de bord</TabsTrigger>
-          <TabsTrigger value="employes" className="gap-1"><Users size={13} /> Employés</TabsTrigger>
-          <TabsTrigger value="variables" className="gap-1"><CalendarClock size={13} /> Variables</TabsTrigger>
-          <TabsTrigger value="parametres" className="gap-1"><Settings size={13} /> Paramètres</TabsTrigger>
-          <TabsTrigger value="conventions" className="gap-1"><BookOpen size={13} /> Conventions</TabsTrigger>
-          <TabsTrigger value="entreprise" className="gap-1"><Building2 size={13} /> Entreprise</TabsTrigger>
+        <TabsList className="flex-wrap h-auto">
+          {canManageHr && <TabsTrigger value="dashboard" className="gap-1"><BarChart3 size={13} /> Tableau de bord</TabsTrigger>}
+          <TabsTrigger value="employes" className="gap-1"><Users size={13} /> {canManageHr ? "Employés" : "Ma fiche"}</TabsTrigger>
+          {canManageHr && <TabsTrigger value="variables" className="gap-1"><CalendarClock size={13} /> Variables</TabsTrigger>}
+          <TabsTrigger value="conges" className="gap-1"><CalendarDays size={13} /> Congés</TabsTrigger>
+          <TabsTrigger value="contrats" className="gap-1"><FileSignature size={13} /> Contrats</TabsTrigger>
+          {!canManageHr && <TabsTrigger value="mes-bulletins" className="gap-1"><FileText size={13} /> Mes bulletins</TabsTrigger>}
+          {canManageHr && <TabsTrigger value="parametres" className="gap-1"><Settings size={13} /> Paramètres</TabsTrigger>}
+          {canManageHr && <TabsTrigger value="conventions" className="gap-1"><BookOpen size={13} /> Conventions</TabsTrigger>}
+          {canManageHr && <TabsTrigger value="entreprise" className="gap-1"><Building2 size={13} /> Entreprise</TabsTrigger>}
+          {canManageHr && <TabsTrigger value="audit" className="gap-1"><History size={13} /> Audit</TabsTrigger>}
         </TabsList>
 
         {/* ═══ DASHBOARD ═══ */}
@@ -1449,7 +1456,7 @@ export default function HrPage() {
 
         {/* ═══ CONVENTIONS ═══ */}
         <TabsContent value="conventions" className="mt-4">
-          <ConventionsTab conventions={conventions} setConventions={setConventions} />
+          <HrAgreementsPanel />
         </TabsContent>
 
         {/* ═══ ENTREPRISE ═══ */}
@@ -1472,6 +1479,20 @@ export default function HrPage() {
             restrictedEmployeeId={!canManageHr && employees[0]?.id ? employees[0].id : null}
           />
         </TabsContent>
+
+        {/* ═══ MES BULLETINS (self-service) ═══ */}
+        {!canManageHr && employees[0]?.id && (
+          <TabsContent value="mes-bulletins" className="mt-4">
+            <HrSelfServicePanel employeeId={employees[0].id} />
+          </TabsContent>
+        )}
+
+        {/* ═══ AUDIT TRAIL RH ═══ */}
+        {canManageHr && (
+          <TabsContent value="audit" className="mt-4">
+            <HrAuditPanel />
+          </TabsContent>
+        )}
       </Tabs>
 
       {/* Dialogs */}
