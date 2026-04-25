@@ -1201,13 +1201,17 @@ export default function HrPage() {
       />
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
-          <TabsTrigger value="dashboard" className="gap-1"><BarChart3 size={13} /> Tableau de bord</TabsTrigger>
-          <TabsTrigger value="employes" className="gap-1"><Users size={13} /> Employés</TabsTrigger>
-          <TabsTrigger value="variables" className="gap-1"><CalendarClock size={13} /> Variables</TabsTrigger>
-          <TabsTrigger value="parametres" className="gap-1"><Settings size={13} /> Paramètres</TabsTrigger>
-          <TabsTrigger value="conventions" className="gap-1"><BookOpen size={13} /> Conventions</TabsTrigger>
-          <TabsTrigger value="entreprise" className="gap-1"><Building2 size={13} /> Entreprise</TabsTrigger>
+        <TabsList className="flex-wrap h-auto">
+          {canManageHr && <TabsTrigger value="dashboard" className="gap-1"><BarChart3 size={13} /> Tableau de bord</TabsTrigger>}
+          <TabsTrigger value="employes" className="gap-1"><Users size={13} /> {canManageHr ? "Employés" : "Ma fiche"}</TabsTrigger>
+          {canManageHr && <TabsTrigger value="variables" className="gap-1"><CalendarClock size={13} /> Variables</TabsTrigger>}
+          <TabsTrigger value="conges" className="gap-1"><CalendarDays size={13} /> Congés</TabsTrigger>
+          <TabsTrigger value="contrats" className="gap-1"><FileSignature size={13} /> Contrats</TabsTrigger>
+          {!canManageHr && <TabsTrigger value="mes-bulletins" className="gap-1"><FileText size={13} /> Mes bulletins</TabsTrigger>}
+          {canManageHr && <TabsTrigger value="parametres" className="gap-1"><Settings size={13} /> Paramètres</TabsTrigger>}
+          {canManageHr && <TabsTrigger value="conventions" className="gap-1"><BookOpen size={13} /> Conventions</TabsTrigger>}
+          {canManageHr && <TabsTrigger value="entreprise" className="gap-1"><Building2 size={13} /> Entreprise</TabsTrigger>}
+          {canManageHr && <TabsTrigger value="audit" className="gap-1"><History size={13} /> Audit</TabsTrigger>}
         </TabsList>
 
         {/* ═══ DASHBOARD ═══ */}
