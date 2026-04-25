@@ -1088,7 +1088,50 @@ export default function HrPage() {
     toast.success(`Paie brouillon calculée pour ${MOIS[payrollMonth]} ${payrollYear}`);
   };
 
-  if (isLoading) return <div className="flex items-center justify-center h-40"><div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>;
+  // Bulk PDF export — confirmation + progress
+  const [bulkConfirm, setBulkConfirm] = useState(false);
+  const [bulkProgress, setBulkProgress] = useState<{ current: number; total: number; running: boolean } | null>(null);
+  const handleBulkExport = async () => {
+    setBulkConfirm(false);
+    if (allPaies.length === 0) { toast.error("Aucun employé à exporter"); return; }
+    setBulkProgress({ current: 0, total: allPaies.length, running: true });
+    let ok = 0, fail = 0;
+    for (let i = 0; i < allPaies.length; i++) {
+      const e = allPaies[i];
+      try {
+        // Coherence verif before each export
+        const verif = calculerPaie(e, params, new Date(payrollYear, payrollMonth + 1, 0));
+        if (Math.abs(verif.net - e.paie.net) > 1 || Math.abs(verif.brut - e.paie.brut) > 1) {
+          fail++;
+        } else {
+          await exportPayrollPayslipPdf(e, e.paie, payrollMonth, payrollYear, orgSettings ?? null);
+          ok++;
+        }
+      } catch { fail++; }
+      setBulkProgress({ current: i + 1, total: allPaies.length, running: i + 1 < allPaies.length });
+    }
+    setBulkProgress(null);
+    if (fail > 0) toast.warning(`${ok} bulletin(s) exporté(s) · ${fail} en échec/incohérence`);
+    else toast.success(`${ok} bulletin(s) PDF générés pour ${MOIS[payrollMonth]} ${payrollYear}`);
+  };
+
+  // History filter
+  const [historyYear, setHistoryYear] = useState<number | "all">(payrollYear);
+  const [historyMonth, setHistoryMonth] = useState<number | "all">("all");
+  const [historyStatus, setHistoryStatus] = useState<"all" | "draft" | "calculated" | "validated" | "closed">("all");
+  const filteredRuns = useMemo(() => {
+    return (payrollRuns.runs as any[]).filter(r =>
+      (historyYear === "all" || r.annee === historyYear) &&
+      (historyMonth === "all" || r.mois === historyMonth) &&
+      (historyStatus === "all" || r.status === historyStatus)
+    );
+  }, [payrollRuns.runs, historyYear, historyMonth, historyStatus]);
+  const historyYears = useMemo(() => {
+    const ys = new Set<number>([payrollYear]);
+    (payrollRuns.runs as any[]).forEach(r => ys.add(r.annee));
+    history.forEach((h: any) => ys.add(h.annee));
+    return Array.from(ys).sort((a, b) => b - a);
+  }, [payrollRuns.runs, history, payrollYear]);
   if (!canManageHr && employees.length === 0) return <div className="max-w-xl mx-auto mt-12"><GhCard title="Accès RH restreint"><div className="flex gap-3 text-sm text-muted-foreground"><ShieldCheck className="w-5 h-5 text-primary shrink-0" />Les données RH sensibles sont réservées aux administrateurs et coordinateurs. Aucun profil employé n’est lié à votre compte.</div></GhCard></div>;
 
   return (
