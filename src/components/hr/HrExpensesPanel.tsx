@@ -115,10 +115,10 @@ export default function HrExpensesPanel({ restrictedEmployeeId, canManageHr }: P
     <>
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-        <StatCard label="Brouillons" value={String(kpis.draft)} icon={FileText} />
-        <StatCard label="En attente" value={String(kpis.submitted)} icon={AlertCircle} />
-        <StatCard label="Approuvées" value={String(kpis.approved)} icon={CheckCircle2} />
-        <StatCard label="À rembourser" value={fmtXOF(kpis.pending)} icon={Wallet} />
+        <StatCard label="Brouillons" value={String(kpis.draft)} note="à compléter" color="blue" icon={<FileText size={14} />} />
+        <StatCard label="En attente" value={String(kpis.submitted)} note="à valider" color="amber" icon={<AlertCircle size={14} />} />
+        <StatCard label="Approuvées" value={String(kpis.approved)} note="prêtes au paiement" color="green" icon={<CheckCircle2 size={14} />} />
+        <StatCard label="À rembourser" value={fmtXOF(kpis.pending)} note="approuvées non payées" color="purple" icon={<Wallet size={14} />} />
       </div>
 
       <GhCard
