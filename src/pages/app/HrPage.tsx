@@ -211,8 +211,20 @@ function BulletinModal({ emp, params, entreprise, orgSettings, defaultMois, defa
   };
 
   const downloadPDF = async () => {
+    // Coherence check: recompute paie just before generation and compare to displayed values
+    const verif = calculerPaie(emp, params, refDate);
+    const tol = 1; // tolerance FCFA
+    const diffs: string[] = [];
+    if (Math.abs(verif.brut - paie.brut) > tol) diffs.push(`Brut: ${fmtXOF(paie.brut)} ≠ ${fmtXOF(verif.brut)}`);
+    if (Math.abs(verif.net - paie.net) > tol) diffs.push(`Net: ${fmtXOF(paie.net)} ≠ ${fmtXOF(verif.net)}`);
+    if (Math.abs(verif.totalRet - paie.totalRet) > tol) diffs.push(`Retenues: ${fmtXOF(paie.totalRet)} ≠ ${fmtXOF(verif.totalRet)}`);
+    if (Math.abs(verif.chargesPat - paie.chargesPat) > tol) diffs.push(`Charges: ${fmtXOF(paie.chargesPat)} ≠ ${fmtXOF(verif.chargesPat)}`);
+    if (diffs.length > 0) {
+      toast.error(`Incohérence aperçu/PDF — ${diffs.join(" · ")}`);
+      return;
+    }
     await exportPayrollPayslipPdf(emp, paie, mois, annee, orgSettings ?? null);
-    toast.success("Bulletin PDF généré");
+    toast.success("Bulletin PDF généré (montants vérifiés)");
   };
 
   const Row = ({ l, v, c, bold, neg }: { l: string; v: number; c?: string; bold?: boolean; neg?: boolean }) => (
