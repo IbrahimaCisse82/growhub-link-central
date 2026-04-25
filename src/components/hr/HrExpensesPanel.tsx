@@ -216,7 +216,7 @@ export default function HrExpensesPanel({ restrictedEmployeeId, canManageHr }: P
                           {canManageHr && r.status === "submitted" && (
                             <>
                               <GhButton size="sm" variant="ghost" onClick={() => approveReport.mutate(r.id)} title="Approuver">
-                                <Check size={12} className="text-green-600" />
+                                <Check size={12} className="text-primary" />
                               </GhButton>
                               <GhButton size="sm" variant="ghost" onClick={() => { setRejectReason(""); setRejectOpen({ id: r.id }); }} title="Rejeter">
                                 <X size={12} className="text-destructive" />
