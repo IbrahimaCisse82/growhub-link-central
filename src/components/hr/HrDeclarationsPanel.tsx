@@ -344,6 +344,73 @@ export default function HrDeclarationsPanel() {
           </Button>
         </div>
       </Card>
+
+      {/* Exports légaux avancés */}
+      <Card className="p-4 space-y-4">
+        <div className="flex items-start gap-3">
+          <div className="rounded-lg bg-primary/10 p-2">
+            <BookText className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <div className="font-semibold">Exports légaux & bancaires</div>
+            <div className="text-xs text-muted-foreground">
+              Documents officiels conformes au Code du Travail sénégalais et formats acceptés par
+              les principales banques de l'UEMOA.
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="border border-border rounded-lg p-3">
+            <div className="flex items-center gap-2 font-medium text-sm">
+              <Banknote className="h-4 w-4 text-emerald-600" />
+              Virement bancaire multiple
+            </div>
+            <div className="text-xs text-muted-foreground mt-1">
+              CSV multi-banques + ordre de virement PDF signé pour {periodLabel}.
+            </div>
+            <div className="flex gap-2 mt-3">
+              <Button variant="outline" size="sm" onClick={handleBankCsv} disabled={!hasData || mois === "all"}>
+                <FileDown className="h-4 w-4 mr-1" /> CSV bancaire
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleBankPdf} disabled={!hasData || mois === "all"}>
+                <Printer className="h-4 w-4 mr-1" /> Ordre PDF
+              </Button>
+            </div>
+          </div>
+
+          <div className="border border-border rounded-lg p-3">
+            <div className="flex items-center gap-2 font-medium text-sm">
+              <BookText className="h-4 w-4 text-primary" />
+              Livre de paie annuel {annee}
+            </div>
+            <div className="text-xs text-muted-foreground mt-1">
+              Document légal récapitulatif (synthèse + détail mensuel + totaux) en Excel.
+            </div>
+            <div className="flex gap-2 mt-3">
+              <Button variant="outline" size="sm" onClick={handleLivreAnnuel} disabled={!hasData}>
+                <FileDown className="h-4 w-4 mr-1" /> Livre {annee}
+              </Button>
+            </div>
+          </div>
+
+          <div className="border border-border rounded-lg p-3 md:col-span-2">
+            <div className="flex items-center gap-2 font-medium text-sm">
+              <Users className="h-4 w-4 text-amber-600" />
+              Registre du personnel
+            </div>
+            <div className="text-xs text-muted-foreground mt-1">
+              Document légal obligatoire (Code du Travail). Liste tous les employés actifs avec
+              identité, contrat, date d'entrée, catégorie et salaire.
+            </div>
+            <div className="flex gap-2 mt-3">
+              <Button variant="outline" size="sm" onClick={handleRegistre}>
+                <Printer className="h-4 w-4 mr-1" /> Générer le registre (PDF)
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Card>
     </div>
   );
 }
