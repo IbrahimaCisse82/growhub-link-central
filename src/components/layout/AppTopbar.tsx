@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useNotifications, useUnreadCount, useMarkNotificationRead, useMarkAllRead } from "@/hooks/useNotifications";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import SearchDialog from "./SearchDialog";
+import GlobalSearchDialog from "./GlobalSearchDialog";
 import { useTheme } from "@/hooks/useTheme";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -154,7 +154,7 @@ export default function AppTopbar({ onToggleSidebar, showMenuButton }: AppTopbar
           </DropdownMenu>
         </div>
       </div>
-      <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
+      <GlobalSearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
     </>
   );
 }

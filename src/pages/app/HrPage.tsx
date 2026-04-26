@@ -1353,6 +1353,13 @@ export default function HrPage() {
           )}
         </TabsContent>
 
+        {/* ═══ ANALYTIQUE RH ═══ */}
+        {canManageHr && (
+          <TabsContent value="analytique" className="space-y-4 mt-4">
+            <HrAdvancedDashboard />
+          </TabsContent>
+        )}
+
         {/* ═══ VARIABLES ═══ */}
         <TabsContent value="variables" className="space-y-4 mt-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
