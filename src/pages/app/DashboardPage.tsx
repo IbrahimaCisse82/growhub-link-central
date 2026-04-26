@@ -177,6 +177,9 @@ export default function DashboardPage() {
         </div>
       )}
 
+      {/* HR KPIs — admin only */}
+      {isAdmin && <HrKpiBlock />}
+
       <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-4">
         {/* Main content — role-adapted */}
         {isMentor && !isAdmin ? (
