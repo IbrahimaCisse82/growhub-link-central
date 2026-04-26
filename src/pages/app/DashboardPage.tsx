@@ -25,6 +25,9 @@ import { useStartupKpis } from "@/hooks/useStartupKpis";
 import { exportToCSV } from "@/lib/exportUtils";
 import { useMilestones } from "@/hooks/useMilestones";
 import DashboardAlerts from "@/components/dashboard/DashboardAlerts";
+import { useHrEmployees } from "@/hooks/useHrEmployees";
+import { useHrContracts, useHrLeaveRequests } from "@/hooks/useHrLeaves";
+import { Briefcase, AlertTriangle as AlertTriangleIcon, CalendarClock } from "lucide-react";
 
 const statusColor: Record<string, "green" | "blue" | "amber" | "gray"> = {
   active: "green", draft: "gray", paused: "amber", completed: "blue", cancelled: "gray",
