@@ -10,7 +10,14 @@ import { useOrgSettings } from "@/hooks/useOrgSettings";
 import { calculerPaie, fmtXOF, DEFAULT_PAYROLL_PARAMS, MOIS, type HrEmployee, type PayrollParams, type PayrollResult } from "@/lib/payroll";
 import { exportPayrollPayslipPdf } from "@/lib/payrollPdfExport";
 import { exportLivreDePaieXlsx, exportBankCsv, exportRegistrePersonnelXlsx } from "@/lib/hrExports";
-import { Plus, FileText, Users, DollarSign, TrendingUp, Trash2, Pencil, Eye, Download, Search, Settings, Building2, BookOpen, BarChart3, Printer, ShieldCheck, CalendarClock, Lock, Calculator, FileDown, AlertTriangle, CheckCircle2, History, CalendarDays, FileSignature, Receipt } from "lucide-react";
+import {
+  buildBankRowsFromPayslips,
+  exportBankCsvFormal,
+  exportBankOrderPdf,
+  exportLivreDePaieAnnuelXlsx,
+  exportRegistrePersonnelPdf,
+} from "@/lib/hrAdvancedExports";
+import { Plus, FileText, Users, DollarSign, TrendingUp, Trash2, Pencil, Eye, Download, Search, Settings, Building2, BookOpen, BarChart3, Printer, ShieldCheck, CalendarClock, Lock, Calculator, FileDown, AlertTriangle, CheckCircle2, History, CalendarDays, FileSignature, Receipt, BookText, Banknote } from "lucide-react";
 import HrLeavesPanel from "@/components/hr/HrLeavesPanel";
 import HrContractsPanel from "@/components/hr/HrContractsPanel";
 import HrAgreementsPanel from "@/components/hr/HrAgreementsPanel";
@@ -18,6 +25,7 @@ import HrAuditPanel from "@/components/hr/HrAuditPanel";
 import HrSelfServicePanel from "@/components/hr/HrSelfServicePanel";
 import HrExpensesPanel from "@/components/hr/HrExpensesPanel";
 import HrDeclarationsPanel from "@/components/hr/HrDeclarationsPanel";
+import HrAdvancedDashboard from "@/components/hr/HrAdvancedDashboard";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Progress } from "@/components/ui/progress";
