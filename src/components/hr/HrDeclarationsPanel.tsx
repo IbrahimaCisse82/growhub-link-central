@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
-import GhCard from "@/components/shared/GhCard";
-import GhButton from "@/components/shared/GhButton";
-import StatCard from "@/components/shared/StatCard";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
@@ -22,33 +21,50 @@ const fmtXOF = (n: number) =>
 
 const CAISSE_META: Record<
   DeclarationKind,
-  { label: string; description: string; icon: typeof Building2; color: string }
+  { label: string; description: string; icon: typeof Building2; tone: string }
 > = {
   IPRES: {
     label: "IPRES",
     description: "Régime Général + Régime Complémentaire (retraite)",
     icon: ShieldCheck,
-    color: "text-blue-600",
+    tone: "text-primary",
   },
   CSS: {
     label: "CSS",
     description: "Allocations familiales (7%) + Accidents du travail",
     icon: Wallet,
-    color: "text-emerald-600",
+    tone: "text-emerald-500",
   },
   IR_TRIMF: {
     label: "IR / TRIMF",
     description: "Impôt sur le revenu et minimum fiscal",
     icon: Receipt,
-    color: "text-amber-600",
+    tone: "text-amber-500",
   },
   CFCE: {
     label: "CFCE",
     description: "Contribution forfaitaire à la charge des employeurs (3%)",
     icon: Building2,
-    color: "text-purple-600",
+    tone: "text-purple-500",
   },
 };
+
+interface KpiTileProps {
+  label: string;
+  value: string;
+  icon: typeof Building2;
+}
+function KpiTile({ label, value, icon: Icon }: KpiTileProps) {
+  return (
+    <Card className="p-4 flex items-start justify-between">
+      <div>
+        <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
+        <div className="text-lg font-bold mt-1">{value}</div>
+      </div>
+      <Icon className="h-5 w-5 text-muted-foreground" />
+    </Card>
+  );
+}
 
 export default function HrDeclarationsPanel() {
   const now = new Date();
@@ -61,11 +77,11 @@ export default function HrDeclarationsPanel() {
     mois: moisFilter,
     onlyClosed: true,
   });
-  const { orgSettings } = useOrgSettings();
+  const { data: orgSettings } = useOrgSettings();
 
   const hasData = payslips.length > 0;
   const periodLabel = useMemo(
-    () => (mois === "all" ? `Année ${annee}` : `${MOIS[mois]} ${annee}`),
+    () => (mois === "all" ? `Année ${annee}` : `${MOIS[mois as number]} ${annee}`),
     [mois, annee],
   );
 
@@ -75,7 +91,7 @@ export default function HrDeclarationsPanel() {
       return;
     }
     try {
-      await exportDeclarationPdf(kind, totals, payslips, { mois: moisFilter, annee }, orgSettings);
+      await exportDeclarationPdf(kind, totals, payslips, { mois: moisFilter, annee }, orgSettings ?? null);
       toast.success(`Déclaration ${kind} exportée (PDF)`);
     } catch (e: any) {
       toast.error(e.message ?? "Export PDF impossible");
@@ -107,12 +123,12 @@ export default function HrDeclarationsPanel() {
   const years = useMemo(() => {
     const y = now.getFullYear();
     return [y - 2, y - 1, y, y + 1];
-  }, [now]);
+  }, []);
 
   return (
     <div className="space-y-6">
       {/* Filtres période */}
-      <GhCard>
+      <Card className="p-4">
         <div className="flex flex-wrap items-end gap-4">
           <div>
             <Label className="text-xs text-muted-foreground">Année</Label>
@@ -153,10 +169,10 @@ export default function HrDeclarationsPanel() {
             <Badge variant="outline">{payslips.length} bulletin(s)</Badge>
           </div>
         </div>
-      </GhCard>
+      </Card>
 
       {!hasData && !isLoading && (
-        <GhCard>
+        <Card className="p-4">
           <div className="flex items-start gap-3 text-sm text-muted-foreground">
             <AlertCircle className="h-5 w-5 text-amber-500 mt-0.5" />
             <div>
@@ -165,15 +181,15 @@ export default function HrDeclarationsPanel() {
               paie du mois concerné depuis l'onglet « Paie ».
             </div>
           </div>
-        </GhCard>
+        </Card>
       )}
 
       {/* KPI synthèse */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard label="Masse salariale brute" value={fmtXOF(totals.masseSalarialeBrute)} icon={Wallet} />
-        <StatCard label="Total IPRES" value={fmtXOF(totals.ipresTotal)} icon={ShieldCheck} />
-        <StatCard label="Total CSS" value={fmtXOF(totals.cssTotal)} icon={Building2} />
-        <StatCard label="IR + TRIMF + CFCE" value={fmtXOF(totals.ir + totals.trimf + totals.cfce)} icon={Receipt} />
+        <KpiTile label="Masse salariale brute" value={fmtXOF(totals.masseSalarialeBrute)} icon={Wallet} />
+        <KpiTile label="Total IPRES" value={fmtXOF(totals.ipresTotal)} icon={ShieldCheck} />
+        <KpiTile label="Total CSS" value={fmtXOF(totals.cssTotal)} icon={Building2} />
+        <KpiTile label="IR + TRIMF + CFCE" value={fmtXOF(totals.ir + totals.trimf + totals.cfce)} icon={Receipt} />
       </div>
 
       {/* Cartes par caisse */}
@@ -187,11 +203,11 @@ export default function HrDeclarationsPanel() {
           if (kind === "IR_TRIMF") amount = totals.ir + totals.trimf;
           if (kind === "CFCE") amount = totals.cfce;
           return (
-            <GhCard key={kind}>
+            <Card key={kind} className="p-4">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-start gap-3">
                   <div className="rounded-lg bg-muted p-2">
-                    <Icon className={`h-5 w-5 ${meta.color}`} />
+                    <Icon className={`h-5 w-5 ${meta.tone}`} />
                   </div>
                   <div>
                     <div className="font-semibold">{meta.label}</div>
@@ -204,22 +220,22 @@ export default function HrDeclarationsPanel() {
                 </div>
               </div>
               <div className="mt-4 flex gap-2">
-                <GhButton variant="outline" size="sm" onClick={() => handlePdf(kind)} disabled={!hasData}>
+                <Button variant="outline" size="sm" onClick={() => handlePdf(kind)} disabled={!hasData}>
                   <Printer className="h-4 w-4 mr-1" />
                   PDF
-                </GhButton>
-                <GhButton variant="outline" size="sm" onClick={() => handleXlsx(kind)} disabled={!hasData}>
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => handleXlsx(kind)} disabled={!hasData}>
                   <FileDown className="h-4 w-4 mr-1" />
                   Excel
-                </GhButton>
+                </Button>
               </div>
-            </GhCard>
+            </Card>
           );
         })}
       </div>
 
       {/* État global des charges */}
-      <GhCard>
+      <Card className="p-4">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-start gap-3">
             <div className="rounded-lg bg-primary/10 p-2">
@@ -233,12 +249,12 @@ export default function HrDeclarationsPanel() {
               </div>
             </div>
           </div>
-          <GhButton onClick={handleEtat} disabled={!hasData}>
+          <Button onClick={handleEtat} disabled={!hasData}>
             <FileDown className="h-4 w-4 mr-1" />
             Télécharger l'état complet (Excel)
-          </GhButton>
+          </Button>
         </div>
-      </GhCard>
+      </Card>
     </div>
   );
 }
