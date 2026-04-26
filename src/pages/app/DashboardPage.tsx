@@ -522,3 +522,90 @@ export default function DashboardPage() {
     </motion.div>
   );
 }
+
+// ─── HR KPI Block (admin dashboard) ───
+function HrKpiBlock() {
+  const navigate = useNavigate();
+  const { employees } = useHrEmployees();
+  const { contracts } = useHrContracts();
+  const { leaves } = useHrLeaveRequests();
+
+  const stats = useMemo(() => {
+    const active = employees.filter((e) => e.is_active);
+    const total = active.length;
+
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    const departed = employees.filter(
+      (e) => e.archived_at && new Date(e.archived_at) >= oneYearAgo,
+    ).length;
+    const turnoverPct = total > 0 ? (departed / (total + departed)) * 100 : 0;
+
+    const in60d = new Date();
+    in60d.setDate(in60d.getDate() + 60);
+    const expiring = (contracts ?? []).filter((c) => {
+      if (!c.end_date || !c.is_active) return false;
+      const end = new Date(c.end_date);
+      return end >= new Date() && end <= in60d;
+    }).length;
+
+    const today = new Date();
+    const monthLeaves = (leaves ?? []).filter((l) => {
+      if (l.status !== "approved") return false;
+      const start = new Date(l.start_date);
+      return start.getMonth() === today.getMonth() && start.getFullYear() === today.getFullYear();
+    }).length;
+
+    return { total, turnoverPct, expiring, monthLeaves };
+  }, [employees, contracts, leaves]);
+
+  if (stats.total === 0) return null;
+
+  return (
+    <div className="mb-5">
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="font-mono text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+          Ressources Humaines
+        </h3>
+        <button
+          onClick={() => navigate("/app/rh")}
+          className="text-[10px] text-primary hover:underline flex items-center gap-1"
+        >
+          Voir le module RH <ArrowRight size={10} />
+        </button>
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div onClick={() => navigate("/app/rh")} className="cursor-pointer">
+          <StatCard label="Effectif actif" value={String(stats.total)} note="" icon={<Users size={20} />} color="blue" />
+        </div>
+        <div onClick={() => navigate("/app/rh")} className="cursor-pointer">
+          <StatCard
+            label="Turnover 12 mois"
+            value={`${stats.turnoverPct.toFixed(1)}%`}
+            note=""
+            icon={<TrendingDown size={20} />}
+            color={stats.turnoverPct > 15 ? "amber" : "green"}
+          />
+        </div>
+        <div onClick={() => navigate("/app/rh")} className="cursor-pointer">
+          <StatCard
+            label="Contrats à renouveler"
+            value={String(stats.expiring)}
+            note="≤ 60 jours"
+            icon={<AlertTriangleIcon size={20} />}
+            color={stats.expiring > 0 ? "amber" : "green"}
+          />
+        </div>
+        <div onClick={() => navigate("/app/rh")} className="cursor-pointer">
+          <StatCard
+            label="Congés ce mois"
+            value={String(stats.monthLeaves)}
+            note="Approuvés"
+            icon={<CalendarClock size={20} />}
+            color="purple"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
