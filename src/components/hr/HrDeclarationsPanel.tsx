@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { useHrDeclarations } from "@/hooks/useHrDeclarations";
+import { useHrEmployees } from "@/hooks/useHrEmployees";
 import { useOrgSettings } from "@/hooks/useOrgSettings";
 import {
   exportDeclarationPdf,
@@ -12,8 +13,27 @@ import {
   exportEtatChargesXlsx,
   type DeclarationKind,
 } from "@/lib/declarationsExport";
+import {
+  buildBankRowsFromPayslips,
+  exportBankCsvFormal,
+  exportBankOrderPdf,
+  exportLivreDePaieAnnuelXlsx,
+  exportRegistrePersonnelPdf,
+} from "@/lib/hrAdvancedExports";
 import { MOIS } from "@/lib/payroll";
-import { Building2, FileDown, Printer, Receipt, ShieldCheck, Wallet, Layers, AlertCircle } from "lucide-react";
+import {
+  Building2,
+  FileDown,
+  Printer,
+  Receipt,
+  ShieldCheck,
+  Wallet,
+  Layers,
+  AlertCircle,
+  Banknote,
+  BookText,
+  Users,
+} from "lucide-react";
 import { toast } from "sonner";
 
 const fmtXOF = (n: number) =>
