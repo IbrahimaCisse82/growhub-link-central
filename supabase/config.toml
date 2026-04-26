@@ -25,3 +25,5 @@ project_id = "ylaeamzzatebohcwepak"
     verify_jwt = true
   [functions.crm-daily-job]
     verify_jwt = false
+  [functions.hr-daily-reminders]
+    verify_jwt = false
