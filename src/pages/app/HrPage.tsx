@@ -1216,6 +1216,7 @@ export default function HrPage() {
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="flex-wrap h-auto">
           {canManageHr && <TabsTrigger value="dashboard" className="gap-1"><BarChart3 size={13} /> Tableau de bord</TabsTrigger>}
+          {canManageHr && <TabsTrigger value="analytique" className="gap-1"><TrendingUp size={13} /> Analytique RH</TabsTrigger>}
           <TabsTrigger value="employes" className="gap-1"><Users size={13} /> {canManageHr ? "Employés" : "Ma fiche"}</TabsTrigger>
           {canManageHr && <TabsTrigger value="variables" className="gap-1"><CalendarClock size={13} /> Variables</TabsTrigger>}
           <TabsTrigger value="conges" className="gap-1"><CalendarDays size={13} /> Congés</TabsTrigger>
