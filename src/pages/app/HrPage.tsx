@@ -17,6 +17,7 @@ import HrAgreementsPanel from "@/components/hr/HrAgreementsPanel";
 import HrAuditPanel from "@/components/hr/HrAuditPanel";
 import HrSelfServicePanel from "@/components/hr/HrSelfServicePanel";
 import HrExpensesPanel from "@/components/hr/HrExpensesPanel";
+import HrDeclarationsPanel from "@/components/hr/HrDeclarationsPanel";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Progress } from "@/components/ui/progress";
@@ -1212,6 +1213,7 @@ export default function HrPage() {
           <TabsTrigger value="conges" className="gap-1"><CalendarDays size={13} /> Congés</TabsTrigger>
           <TabsTrigger value="contrats" className="gap-1"><FileSignature size={13} /> Contrats</TabsTrigger>
           <TabsTrigger value="notes-frais" className="gap-1"><Receipt size={13} /> Notes de frais</TabsTrigger>
+          {canManageHr && <TabsTrigger value="declarations" className="gap-1"><ShieldCheck size={13} /> Déclarations</TabsTrigger>}
           {!canManageHr && <TabsTrigger value="mes-bulletins" className="gap-1"><FileText size={13} /> Mes bulletins</TabsTrigger>}
           {canManageHr && <TabsTrigger value="parametres" className="gap-1"><Settings size={13} /> Paramètres</TabsTrigger>}
           {canManageHr && <TabsTrigger value="conventions" className="gap-1"><BookOpen size={13} /> Conventions</TabsTrigger>}
@@ -1494,6 +1496,13 @@ export default function HrPage() {
         {!canManageHr && employees[0]?.id && (
           <TabsContent value="mes-bulletins" className="mt-4">
             <HrSelfServicePanel employeeId={employees[0].id} />
+          </TabsContent>
+        )}
+
+        {/* ═══ DÉCLARATIONS LÉGALES ═══ */}
+        {canManageHr && (
+          <TabsContent value="declarations" className="mt-4">
+            <HrDeclarationsPanel />
           </TabsContent>
         )}
 
