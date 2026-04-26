@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { useHrDeclarations } from "@/hooks/useHrDeclarations";
+import { useHrEmployees } from "@/hooks/useHrEmployees";
 import { useOrgSettings } from "@/hooks/useOrgSettings";
 import {
   exportDeclarationPdf,
@@ -12,8 +13,27 @@ import {
   exportEtatChargesXlsx,
   type DeclarationKind,
 } from "@/lib/declarationsExport";
+import {
+  buildBankRowsFromPayslips,
+  exportBankCsvFormal,
+  exportBankOrderPdf,
+  exportLivreDePaieAnnuelXlsx,
+  exportRegistrePersonnelPdf,
+} from "@/lib/hrAdvancedExports";
 import { MOIS } from "@/lib/payroll";
-import { Building2, FileDown, Printer, Receipt, ShieldCheck, Wallet, Layers, AlertCircle } from "lucide-react";
+import {
+  Building2,
+  FileDown,
+  Printer,
+  Receipt,
+  ShieldCheck,
+  Wallet,
+  Layers,
+  AlertCircle,
+  Banknote,
+  BookText,
+  Users,
+} from "lucide-react";
 import { toast } from "sonner";
 
 const fmtXOF = (n: number) =>
@@ -78,6 +98,8 @@ export default function HrDeclarationsPanel() {
     onlyClosed: true,
   });
   const { data: orgSettings } = useOrgSettings();
+  const { employees } = useHrEmployees();
+  const employeeIndex = useMemo(() => new Map(employees.map((e) => [e.id, e])), [employees]);
 
   const hasData = payslips.length > 0;
   const periodLabel = useMemo(
@@ -118,6 +140,73 @@ export default function HrDeclarationsPanel() {
     }
     exportEtatChargesXlsx(totals, payslips, { mois: moisFilter, annee });
     toast.success("État des charges exporté");
+  };
+
+  // Virement bancaire (CSV multi-banques)
+  const handleBankCsv = () => {
+    if (mois === "all") {
+      toast.error("Sélectionnez un mois précis pour générer un virement");
+      return;
+    }
+    if (!hasData) {
+      toast.error("Aucun bulletin clôturé pour cette période");
+      return;
+    }
+    try {
+      const rows = buildBankRowsFromPayslips(payslips, mois as number, annee, employeeIndex);
+      exportBankCsvFormal(rows, mois as number, annee);
+      toast.success("Fichier de virement CSV généré");
+    } catch (e: any) {
+      toast.error(e.message ?? "Export CSV impossible");
+    }
+  };
+
+  // Ordre de virement formel (PDF signé)
+  const handleBankPdf = async () => {
+    if (mois === "all") {
+      toast.error("Sélectionnez un mois précis pour générer un ordre de virement");
+      return;
+    }
+    if (!hasData) {
+      toast.error("Aucun bulletin clôturé pour cette période");
+      return;
+    }
+    try {
+      const rows = buildBankRowsFromPayslips(payslips, mois as number, annee, employeeIndex);
+      await exportBankOrderPdf(rows, mois as number, annee, orgSettings ?? null);
+      toast.success("Ordre de virement PDF généré");
+    } catch (e: any) {
+      toast.error(e.message ?? "Export PDF impossible");
+    }
+  };
+
+  // Livre de paie annuel (XLSX multi-feuilles)
+  const handleLivreAnnuel = () => {
+    if (!hasData) {
+      toast.error("Aucun bulletin clôturé pour cette année");
+      return;
+    }
+    try {
+      exportLivreDePaieAnnuelXlsx(payslips, annee, employeeIndex);
+      toast.success(`Livre de paie ${annee} exporté`);
+    } catch (e: any) {
+      toast.error(e.message ?? "Export impossible");
+    }
+  };
+
+  // Registre du personnel (PDF légal)
+  const handleRegistre = async () => {
+    const active = employees.filter((e) => e.is_active);
+    if (active.length === 0) {
+      toast.error("Aucun employé actif à exporter");
+      return;
+    }
+    try {
+      await exportRegistrePersonnelPdf(active, orgSettings ?? null);
+      toast.success("Registre du personnel généré");
+    } catch (e: any) {
+      toast.error(e.message ?? "Export impossible");
+    }
   };
 
   const years = useMemo(() => {
@@ -253,6 +342,73 @@ export default function HrDeclarationsPanel() {
             <FileDown className="h-4 w-4 mr-1" />
             Télécharger l'état complet (Excel)
           </Button>
+        </div>
+      </Card>
+
+      {/* Exports légaux avancés */}
+      <Card className="p-4 space-y-4">
+        <div className="flex items-start gap-3">
+          <div className="rounded-lg bg-primary/10 p-2">
+            <BookText className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <div className="font-semibold">Exports légaux & bancaires</div>
+            <div className="text-xs text-muted-foreground">
+              Documents officiels conformes au Code du Travail sénégalais et formats acceptés par
+              les principales banques de l'UEMOA.
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="border border-border rounded-lg p-3">
+            <div className="flex items-center gap-2 font-medium text-sm">
+              <Banknote className="h-4 w-4 text-emerald-600" />
+              Virement bancaire multiple
+            </div>
+            <div className="text-xs text-muted-foreground mt-1">
+              CSV multi-banques + ordre de virement PDF signé pour {periodLabel}.
+            </div>
+            <div className="flex gap-2 mt-3">
+              <Button variant="outline" size="sm" onClick={handleBankCsv} disabled={!hasData || mois === "all"}>
+                <FileDown className="h-4 w-4 mr-1" /> CSV bancaire
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleBankPdf} disabled={!hasData || mois === "all"}>
+                <Printer className="h-4 w-4 mr-1" /> Ordre PDF
+              </Button>
+            </div>
+          </div>
+
+          <div className="border border-border rounded-lg p-3">
+            <div className="flex items-center gap-2 font-medium text-sm">
+              <BookText className="h-4 w-4 text-primary" />
+              Livre de paie annuel {annee}
+            </div>
+            <div className="text-xs text-muted-foreground mt-1">
+              Document légal récapitulatif (synthèse + détail mensuel + totaux) en Excel.
+            </div>
+            <div className="flex gap-2 mt-3">
+              <Button variant="outline" size="sm" onClick={handleLivreAnnuel} disabled={!hasData}>
+                <FileDown className="h-4 w-4 mr-1" /> Livre {annee}
+              </Button>
+            </div>
+          </div>
+
+          <div className="border border-border rounded-lg p-3 md:col-span-2">
+            <div className="flex items-center gap-2 font-medium text-sm">
+              <Users className="h-4 w-4 text-amber-600" />
+              Registre du personnel
+            </div>
+            <div className="text-xs text-muted-foreground mt-1">
+              Document légal obligatoire (Code du Travail). Liste tous les employés actifs avec
+              identité, contrat, date d'entrée, catégorie et salaire.
+            </div>
+            <div className="flex gap-2 mt-3">
+              <Button variant="outline" size="sm" onClick={handleRegistre}>
+                <Printer className="h-4 w-4 mr-1" /> Générer le registre (PDF)
+              </Button>
+            </div>
+          </div>
         </div>
       </Card>
     </div>
