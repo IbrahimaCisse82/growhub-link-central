@@ -3367,6 +3367,41 @@ export type Database = {
           },
         ]
       }
+      hr_reminder_log: {
+        Row: {
+          employee_id: string
+          id: string
+          metadata: Json | null
+          reference_date: string
+          reminder_type: string
+          sent_at: string
+        }
+        Insert: {
+          employee_id: string
+          id?: string
+          metadata?: Json | null
+          reference_date: string
+          reminder_type: string
+          sent_at?: string
+        }
+        Update: {
+          employee_id?: string
+          id?: string
+          metadata?: Json | null
+          reference_date?: string
+          reminder_type?: string
+          sent_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hr_reminder_log_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "hr_employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hr_salary_categories: {
         Row: {
           agreement_id: string | null
