@@ -33,19 +33,19 @@ const CAISSE_META: Record<
     label: "CSS",
     description: "Allocations familiales (7%) + Accidents du travail",
     icon: Wallet,
-    tone: "text-emerald-500",
+    tone: "text-primary",
   },
   IR_TRIMF: {
     label: "IR / TRIMF",
     description: "Impôt sur le revenu et minimum fiscal",
     icon: Receipt,
-    tone: "text-amber-500",
+    tone: "text-primary",
   },
   CFCE: {
     label: "CFCE",
     description: "Contribution forfaitaire à la charge des employeurs (3%)",
     icon: Building2,
-    tone: "text-purple-500",
+    tone: "text-primary",
   },
 };
 
@@ -174,7 +174,7 @@ export default function HrDeclarationsPanel() {
       {!hasData && !isLoading && (
         <Card className="p-4">
           <div className="flex items-start gap-3 text-sm text-muted-foreground">
-            <AlertCircle className="h-5 w-5 text-amber-500 mt-0.5" />
+            <AlertCircle className="h-5 w-5 text-primary mt-0.5" />
             <div>
               <div className="font-medium text-foreground">Aucun bulletin clôturé pour {periodLabel}</div>
               Les déclarations sont calculées à partir des paies validées ou clôturées. Clôturez la
