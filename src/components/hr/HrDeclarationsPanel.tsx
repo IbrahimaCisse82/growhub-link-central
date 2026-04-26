@@ -98,6 +98,8 @@ export default function HrDeclarationsPanel() {
     onlyClosed: true,
   });
   const { data: orgSettings } = useOrgSettings();
+  const { employees } = useHrEmployees();
+  const employeeIndex = useMemo(() => new Map(employees.map((e) => [e.id, e])), [employees]);
 
   const hasData = payslips.length > 0;
   const periodLabel = useMemo(
@@ -138,6 +140,73 @@ export default function HrDeclarationsPanel() {
     }
     exportEtatChargesXlsx(totals, payslips, { mois: moisFilter, annee });
     toast.success("État des charges exporté");
+  };
+
+  // Virement bancaire (CSV multi-banques)
+  const handleBankCsv = () => {
+    if (mois === "all") {
+      toast.error("Sélectionnez un mois précis pour générer un virement");
+      return;
+    }
+    if (!hasData) {
+      toast.error("Aucun bulletin clôturé pour cette période");
+      return;
+    }
+    try {
+      const rows = buildBankRowsFromPayslips(payslips, mois as number, annee, employeeIndex);
+      exportBankCsvFormal(rows, mois as number, annee);
+      toast.success("Fichier de virement CSV généré");
+    } catch (e: any) {
+      toast.error(e.message ?? "Export CSV impossible");
+    }
+  };
+
+  // Ordre de virement formel (PDF signé)
+  const handleBankPdf = async () => {
+    if (mois === "all") {
+      toast.error("Sélectionnez un mois précis pour générer un ordre de virement");
+      return;
+    }
+    if (!hasData) {
+      toast.error("Aucun bulletin clôturé pour cette période");
+      return;
+    }
+    try {
+      const rows = buildBankRowsFromPayslips(payslips, mois as number, annee, employeeIndex);
+      await exportBankOrderPdf(rows, mois as number, annee, orgSettings ?? null);
+      toast.success("Ordre de virement PDF généré");
+    } catch (e: any) {
+      toast.error(e.message ?? "Export PDF impossible");
+    }
+  };
+
+  // Livre de paie annuel (XLSX multi-feuilles)
+  const handleLivreAnnuel = () => {
+    if (!hasData) {
+      toast.error("Aucun bulletin clôturé pour cette année");
+      return;
+    }
+    try {
+      exportLivreDePaieAnnuelXlsx(payslips, annee, employeeIndex);
+      toast.success(`Livre de paie ${annee} exporté`);
+    } catch (e: any) {
+      toast.error(e.message ?? "Export impossible");
+    }
+  };
+
+  // Registre du personnel (PDF légal)
+  const handleRegistre = async () => {
+    const active = employees.filter((e) => e.is_active);
+    if (active.length === 0) {
+      toast.error("Aucun employé actif à exporter");
+      return;
+    }
+    try {
+      await exportRegistrePersonnelPdf(active, orgSettings ?? null);
+      toast.success("Registre du personnel généré");
+    } catch (e: any) {
+      toast.error(e.message ?? "Export impossible");
+    }
   };
 
   const years = useMemo(() => {
