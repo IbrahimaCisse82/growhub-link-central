@@ -21,7 +21,7 @@ import {
 import { useStartups } from "@/hooks/useStartups";
 import { useProjects } from "@/hooks/useProjects";
 import { useHrEmployees } from "@/hooks/useHrEmployees";
-import { useHrContracts } from "@/hooks/useHrContracts";
+import { useHrContracts } from "@/hooks/useHrLeaves";
 import { useContreparties, useInvoices } from "@/hooks/useCrm";
 import { useAuth } from "@/hooks/useAuth";
 

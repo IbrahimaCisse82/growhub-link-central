@@ -1,8 +1,7 @@
 import { useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { useHrEmployees } from "@/hooks/useHrEmployees";
-import { useHrLeaves } from "@/hooks/useHrLeaves";
-import { useHrContracts } from "@/hooks/useHrContracts";
+import { useHrLeaveRequests, useHrContracts } from "@/hooks/useHrLeaves";
 import {
   Users,
   TrendingDown,
@@ -72,7 +71,7 @@ function tenureYears(d?: string | null): number | null {
 
 export default function HrAdvancedDashboard() {
   const { employees } = useHrEmployees();
-  const { leaves } = useHrLeaves();
+  const { leaves } = useHrLeaveRequests();
   const { contracts } = useHrContracts();
 
   const stats = useMemo(() => {
