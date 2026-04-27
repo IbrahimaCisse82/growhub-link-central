@@ -410,7 +410,17 @@ export async function exportProjectWord(data: ProjectWordData) {
 
   // ═══════ 13. PERSONNEL CLÉ ═══════
   children.push(h1("13. Personnel clé impliqué", true));
-  children.push(...multiPara(nl(meta.personnel_cle)));
+  const personnel = meta.personnel_cle;
+  if (Array.isArray(personnel) && personnel.length > 0 && typeof personnel[0] === "object") {
+    children.push(buildTable(
+      [{ text: "Rôle / Fonction", width: 3000 }, { text: "Profil / Description", width: 5000 }],
+      (personnel as { role?: string; profil?: string; name?: string }[])
+        .filter(p => p.role || p.name)
+        .map(p => [{ text: p.role ?? p.name ?? "", bold: true, color: NAVY }, p.profil ?? ""]),
+    ));
+  } else {
+    children.push(...multiPara(nl(personnel)));
+  }
 
   // ═══════ 14. PARTENAIRES ═══════
   children.push(h1("14. Partenaires cibles"));
