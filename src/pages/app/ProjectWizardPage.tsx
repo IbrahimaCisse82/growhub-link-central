@@ -69,6 +69,7 @@ const fmt = (n: number) => new Intl.NumberFormat("fr-FR", { maximumFractionDigit
 // --- Metadata interface ---
 interface ProjectMetadata {
   introduction?: string; resume_executif?: string;
+  abreviations?: { sigle: string; signification: string }[];
   contexte_justification?: string; contexte_territorial?: string;
   contraintes?: string; alignement_strategique?: string; justification?: string;
   strategie_objectif?: string; strategie_axes?: string[];
@@ -82,6 +83,9 @@ interface ProjectMetadata {
   version_document?: string; budget_total_label?: string;
   risques?: RiskDraft[];
   contingency_pct?: number; currency?: string;
+  mecanismes_apprentissage?: string;
+  os_mappings?: string[]; // index aligned with WPs
+  wp_details?: Record<string, { title: string; os_mapping: string; objective: string; activities: string; results: string; indicators: string; milestones: string }>;
 }
 
 // --- Array Editor ---
