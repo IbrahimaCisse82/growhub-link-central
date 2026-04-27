@@ -377,9 +377,13 @@ export default function ProjectWizardPage() {
       setOverallObjective(existingLogframe.overall_objective || "");
       setAssumptions(existingLogframe.assumptions || "");
       setPreConditions(existingLogframe.pre_conditions || "");
-      setWps(parseWpsFromLogframe(existingLogframe));
+      const parsed = parseWpsFromLogframe(existingLogframe);
+      // Hydrate osMapping from project metadata
+      const meta: ProjectMetadata = ((existingProject as any)?.metadata as ProjectMetadata) || {};
+      const osMappings = meta.os_mappings || [];
+      setWps(parsed.map((wp, i) => ({ ...wp, osMapping: osMappings[i] || "" })));
     }
-  }, [existingLogframe]);
+  }, [existingLogframe, existingProject]);
 
   useEffect(() => {
     if (existingToc) {
