@@ -352,16 +352,19 @@ export function exportProjectPdf({ project, logFrame, toc, indicators, budgetLin
   html += field(nl(meta.justification));
 
   // ═══════════════ 5. THÉORIE DU CHANGEMENT ═══════════════
+  // ═══════════════ 5. THÉORIE DU CHANGEMENT ═══════════════
   html += `<h2 class="section-break">5. THÉORIE DU CHANGEMENT</h2>`;
   if (meta.theorie_changement) {
     html += field(nl(meta.theorie_changement));
   }
+  // 5.1 Cheminement du changement (Intrants → Activités → Extrants → Effets → Impact)
   if (toc) {
-    if (toc.inputs) { html += `<h3>5.1 Intrants</h3>`; html += field(nl(toc.inputs)); }
-    if (toc.activities) { html += `<h3>5.2 Activités</h3>`; html += field(nl(toc.activities)); }
-    if (toc.outputs) { html += `<h3>5.3 Extrants (Outputs)</h3>`; html += field(nl(toc.outputs)); }
-    if (toc.outcomes) { html += `<h3>5.4 Effets (Outcomes)</h3>`; html += field(nl(toc.outcomes)); }
-    if (toc.impact) { html += `<h3>5.5 Impact</h3>`; html += field(nl(toc.impact)); }
+    html += `<h3>5.1 Cheminement du changement</h3>`;
+    if (toc.inputs) { html += `<h4>Intrants</h4>`; html += field(nl(toc.inputs)); }
+    if (toc.activities) { html += `<h4>Activités</h4>`; html += field(nl(toc.activities)); }
+    if (toc.outputs) { html += `<h4>Extrants (Outputs)</h4>`; html += field(nl(toc.outputs)); }
+    if (toc.outcomes) { html += `<h4>Effets (Outcomes)</h4>`; html += field(nl(toc.outcomes)); }
+    if (toc.impact) { html += `<h4>Impact</h4>`; html += field(nl(toc.impact)); }
     if (toc.assumptions) { html += `<h3>5.2 Hypothèses clés</h3>`; html += field(nl(toc.assumptions)); }
   }
   if (meta.mecanismes_apprentissage) {
