@@ -756,6 +756,11 @@ export default function ProjectWizardPage() {
                 <div className="space-y-2"><label className={labelCls}>Hypothèses clés</label><ArrayEditor items={tocAssumptions} onChange={setTocAssumptions} placeholder="Hypothèse" /></div>
                 <div className="space-y-2"><label className={labelCls}>Risques</label><ArrayEditor items={tocRisks} onChange={setTocRisks} placeholder="Risque" /></div>
               </div>
+              <div className="space-y-2 pt-4 border-t border-border">
+                <label className={labelCls}>4.3 Mécanismes d'apprentissage et d'adaptation</label>
+                <textarea value={mecanismesApprentissage} onChange={e => setMecanismesApprentissage(e.target.value)} className={textareaLgCls} placeholder="Boucles de retour, capitalisation, ajustements méthodologiques continus, partage de connaissances entre les régions…" />
+                <p className={helpCls}>Section 5.3 du document — Comment le projet capitalise les enseignements et adapte sa stratégie en cours de mise en œuvre.</p>
+              </div>
             </div>
           )}
 
