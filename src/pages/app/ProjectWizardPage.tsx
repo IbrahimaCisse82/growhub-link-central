@@ -206,6 +206,7 @@ export default function ProjectWizardPage() {
   const [contraintes, setContraintes] = useState("");
   const [alignement, setAlignement] = useState("");
   const [justification, setJustification] = useState("");
+  const [abreviations, setAbreviations] = useState<{ sigle: string; signification: string }[]>([{ sigle: "", signification: "" }]);
 
   // Step 2: Théorie du changement
   const [tocInputs, setTocInputs] = useState<string[]>([""]);
@@ -215,6 +216,7 @@ export default function ProjectWizardPage() {
   const [tocImpact, setTocImpact] = useState("");
   const [tocAssumptions, setTocAssumptions] = useState<string[]>([""]);
   const [tocRisks, setTocRisks] = useState<string[]>([""]);
+  const [mecanismesApprentissage, setMecanismesApprentissage] = useState("");
 
   // Step 3: Objectifs & WPs
   const [overallObjective, setOverallObjective] = useState("");
