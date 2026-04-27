@@ -287,6 +287,7 @@ export function exportProjectPdf({ project, logFrame, toc, indicators, budgetLin
     ["main", "5. THÉORIE DU CHANGEMENT", ""],
     ["sub", "5.1 Cheminement du changement", ""],
     ["sub", "5.2 Hypothèses clés", ""],
+    ["sub", "5.3 Mécanismes d'apprentissage et d'adaptation", ""],
     ["main", "6. OBJECTIF GÉNÉRAL ET OBJECTIFS SPÉCIFIQUES DU PROJET", ""],
     ["sub", "6.1 Objectif général du projet", ""],
     ["sub", "6.2 Objectifs spécifiques", ""],
