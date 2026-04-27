@@ -113,9 +113,10 @@ function flattenWpObjectives(wps: WpDraft[]): string[] {
   return wps.map(wp => wp.title ? `${wp.title}: ${wp.objective}` : wp.objective);
 }
 
-function parseWpsFromLogframe(logframe: { specific_objectives?: unknown; activities?: unknown; expected_results?: unknown }): WpDraft[] {
+function parseWpsFromLogframe(logframe: { specific_objectives?: unknown; activities?: unknown; expected_results?: unknown; assumptions?: unknown }): WpDraft[] {
   const objectives = toArr(logframe.specific_objectives);
   if (objectives.length === 0) return [emptyWp()];
+  // os_mappings stored as JSON in assumptions field via metadata fallback - handled in parent
   return objectives.map((obj, idx) => {
     const wpNum = idx + 1;
     let title = "";
@@ -124,7 +125,7 @@ function parseWpsFromLogframe(logframe: { specific_objectives?: unknown; activit
     if (colonIdx > 0 && colonIdx < 80) { title = obj.substring(0, colonIdx).trim(); objective = obj.substring(colonIdx + 1).trim(); }
     const activities = toArr(logframe.activities).filter(a => new RegExp(`^A${wpNum}\\.\\d`, "i").test(a.trim())).map(a => a.replace(/^A\d+\.\d+\s*/i, "").trim());
     const results = toArr(logframe.expected_results).filter(r => new RegExp(`^R${wpNum}\\.\\d`, "i").test(r.trim())).map(r => r.replace(/^R\d+\.\d+\s*/i, "").trim());
-    return { title, objective, activities: activities.length > 0 ? activities : [""], results: results.length > 0 ? results : [""] };
+    return { title, objective, activities: activities.length > 0 ? activities : [""], results: results.length > 0 ? results : [""], osMapping: "" };
   });
 }
 
