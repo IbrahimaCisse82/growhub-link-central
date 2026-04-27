@@ -8,7 +8,7 @@
 import {
   Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
   AlignmentType, HeadingLevel, LevelFormat, ShadingType, WidthType, BorderStyle,
-  PageBreak, Header, Footer, PageNumber,
+  PageBreak, Header, Footer, PageNumber, TabStopType, TabStopPosition,
 } from "docx";
 import { saveAs } from "file-saver";
 
