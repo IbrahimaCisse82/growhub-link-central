@@ -555,7 +555,16 @@ export function exportProjectPdf({ project, logFrame, toc, indicators, budgetLin
 
   // ═══════════════ 13. PERSONNEL CLÉ ═══════════════
   html += `<h2 class="section-break">13. PERSONNEL CLÉ IMPLIQUÉ DANS LE PROGRAMME</h2>`;
-  html += field(nl(meta.personnel_cle));
+  const personnel = meta.personnel_cle;
+  if (Array.isArray(personnel) && personnel.length > 0 && typeof personnel[0] === "object") {
+    html += `<table class="data-table"><thead><tr><th style="width:35%">Rôle / Fonction</th><th>Profil / Description</th></tr></thead><tbody>`;
+    (personnel as { role?: string; profil?: string; name?: string }[]).filter(p => p.role || p.name).forEach(p => {
+      html += `<tr><td><strong>${e(p.role ?? p.name ?? "")}</strong></td><td>${e(p.profil ?? "")}</td></tr>`;
+    });
+    html += `</tbody></table>`;
+  } else {
+    html += field(nl(personnel));
+  }
 
   // ═══════════════ 14. PARTENAIRES ═══════════════
   html += `<h2>14. PARTENAIRES CIBLES DU PROGRAMME</h2>`;
