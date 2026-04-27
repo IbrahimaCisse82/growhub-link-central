@@ -325,7 +325,16 @@ export function exportProjectPdf({ project, logFrame, toc, indicators, budgetLin
   // ═══════════════ 0. ABRÉVIATIONS ═══════════════
   html += header();
   html += `<h2>0. LISTE DES ABRÉVIATIONS</h2>`;
-  html += field(nl(meta.abreviations));
+  const abrevs = meta.abreviations;
+  if (Array.isArray(abrevs) && abrevs.length > 0 && typeof abrevs[0] === "object") {
+    html += `<table class="data-table"><thead><tr><th style="width:25%">Sigle</th><th>Signification</th></tr></thead><tbody>`;
+    (abrevs as { sigle: string; signification: string }[]).filter(a => a.sigle).forEach(a => {
+      html += `<tr><td><strong>${e(a.sigle)}</strong></td><td>${e(a.signification || "")}</td></tr>`;
+    });
+    html += `</tbody></table>`;
+  } else {
+    html += field(nl(abrevs));
+  }
 
   // ═══════════════ 1. RÉSUMÉ EXÉCUTIF ═══════════════
   html += `<h2>1. RÉSUMÉ EXÉCUTIF</h2>`;
