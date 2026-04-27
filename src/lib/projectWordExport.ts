@@ -562,10 +562,11 @@ export async function exportProjectWord(data: ProjectWordData) {
         default: new Header({
           children: [new Paragraph({
             alignment: AlignmentType.LEFT,
+            tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
             border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: GREY_BORDER, space: 4 } },
             children: [
               new TextRun({ text: "PAERID — Projet d'Appui à l'Entrepreneuriat Rural Innovant et Durable", italics: true, color: "5D6D7E", size: 18, font: "Arial" }),
-              new TextRun({ text: "\t\tSénégal — Kédougou · Kolda · Ziguinchor", color: GREEN, bold: true, size: 18, font: "Arial" }),
+              new TextRun({ text: "\tSénégal — Kédougou · Kolda · Ziguinchor", color: GREEN, bold: true, size: 18, font: "Arial" }),
             ],
           })],
         }),
