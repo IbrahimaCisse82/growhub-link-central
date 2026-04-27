@@ -36,10 +36,27 @@ const cellBorders = { top: cellBorder, bottom: cellBorder, left: cellBorder, rig
 const fmtNum = (n: number) => n.toLocaleString("fr-FR");
 const fmtDate = (d: string) => new Date(d).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
 
+/** Convertit n'importe quelle valeur en texte multiligne lisible (gère arrays d'objets). */
 const nl = (v: unknown): string => {
   if (v == null) return "";
   if (typeof v === "string") return v;
-  if (Array.isArray(v)) return v.join("\n");
+  if (Array.isArray(v)) {
+    return v.map(item => {
+      if (item == null) return "";
+      if (typeof item === "string") return item;
+      if (typeof item === "object") {
+        // Cas typique : { role, name, description } ou { sigle, signification }
+        const obj = item as Record<string, unknown>;
+        const vals = Object.values(obj).filter(x => x != null && x !== "").map(x => String(x));
+        return vals.join(" — ");
+      }
+      return String(item);
+    }).filter(Boolean).join("\n");
+  }
+  if (typeof v === "object") {
+    const obj = v as Record<string, unknown>;
+    return Object.entries(obj).filter(([, x]) => x != null && x !== "").map(([k, x]) => `${k}: ${x}`).join("\n");
+  }
   return String(v);
 };
 
