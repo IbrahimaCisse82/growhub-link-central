@@ -828,6 +828,14 @@ export default function ProjectWizardPage() {
                                 </select>
                                 <input value={kpi.responsible} onChange={e => { const n = [...kpis]; n[globalIdx] = { ...n[globalIdx], responsible: e.target.value }; setKpis(n); }} className={inputCls} placeholder="Responsable" />
                               </div>
+                              <div className="pt-2 border-t border-border">
+                                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Cibles régionales</p>
+                                <div className="grid grid-cols-3 gap-2">
+                                  <div><label className="text-[10px] text-muted-foreground">Kédougou</label><input type="number" value={kpi.regionalTargets.kedougou} onChange={e => { const n = [...kpis]; n[globalIdx] = { ...n[globalIdx], regionalTargets: { ...n[globalIdx].regionalTargets, kedougou: Number(e.target.value) } }; setKpis(n); }} className={inputCls} placeholder="0" /></div>
+                                  <div><label className="text-[10px] text-muted-foreground">Kolda</label><input type="number" value={kpi.regionalTargets.kolda} onChange={e => { const n = [...kpis]; n[globalIdx] = { ...n[globalIdx], regionalTargets: { ...n[globalIdx].regionalTargets, kolda: Number(e.target.value) } }; setKpis(n); }} className={inputCls} placeholder="0" /></div>
+                                  <div><label className="text-[10px] text-muted-foreground">Ziguinchor</label><input type="number" value={kpi.regionalTargets.ziguinchor} onChange={e => { const n = [...kpis]; n[globalIdx] = { ...n[globalIdx], regionalTargets: { ...n[globalIdx].regionalTargets, ziguinchor: Number(e.target.value) } }; setKpis(n); }} className={inputCls} placeholder="0" /></div>
+                                </div>
+                              </div>
                             </div>
                           );
                         })}
