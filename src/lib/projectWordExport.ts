@@ -181,7 +181,17 @@ export async function exportProjectWord(data: ProjectWordData) {
 
   // ═══════ 0. ABRÉVIATIONS ═══════
   children.push(h1("0. Liste des abréviations", true));
-  children.push(...multiPara(nl(meta.abreviations)));
+  const abrevs = meta.abreviations;
+  if (Array.isArray(abrevs) && abrevs.length > 0 && typeof abrevs[0] === "object") {
+    children.push(buildTable(
+      [{ text: "Sigle", width: 2000 }, { text: "Signification", width: 6000 }],
+      (abrevs as { sigle?: string; signification?: string }[])
+        .filter(a => a.sigle)
+        .map(a => [{ text: a.sigle ?? "", bold: true, color: NAVY }, a.signification ?? ""]),
+    ));
+  } else {
+    children.push(...multiPara(nl(abrevs)));
+  }
 
   // ═══════ 1. RÉSUMÉ EXÉCUTIF ═══════
   children.push(h1("1. Résumé exécutif", true));
@@ -211,12 +221,17 @@ export async function exportProjectWord(data: ProjectWordData) {
   children.push(h1("5. Théorie du changement", true));
   if (meta.theorie_changement) children.push(...multiPara(nl(meta.theorie_changement)));
   if (toc) {
-    if (toc.inputs) { children.push(h2("5.1 Intrants")); children.push(...multiPara(nl(toc.inputs))); }
-    if (toc.activities) { children.push(h2("5.2 Activités")); children.push(...multiPara(nl(toc.activities))); }
-    if (toc.outputs) { children.push(h2("5.3 Extrants (Outputs)")); children.push(...multiPara(nl(toc.outputs))); }
-    if (toc.outcomes) { children.push(h2("5.4 Effets (Outcomes)")); children.push(...multiPara(nl(toc.outcomes))); }
-    if (toc.impact) { children.push(h2("5.5 Impact")); children.push(...multiPara(nl(toc.impact))); }
-    if (toc.assumptions) { children.push(h2("5.6 Hypothèses clés")); children.push(...multiPara(nl(toc.assumptions))); }
+    children.push(h2("5.1 Cheminement du changement"));
+    if (toc.inputs) { children.push(h3("Intrants")); children.push(...multiPara(nl(toc.inputs))); }
+    if (toc.activities) { children.push(h3("Activités")); children.push(...multiPara(nl(toc.activities))); }
+    if (toc.outputs) { children.push(h3("Extrants (Outputs)")); children.push(...multiPara(nl(toc.outputs))); }
+    if (toc.outcomes) { children.push(h3("Effets (Outcomes)")); children.push(...multiPara(nl(toc.outcomes))); }
+    if (toc.impact) { children.push(h3("Impact")); children.push(...multiPara(nl(toc.impact))); }
+    if (toc.assumptions) { children.push(h2("5.2 Hypothèses clés")); children.push(...multiPara(nl(toc.assumptions))); }
+  }
+  if (meta.mecanismes_apprentissage) {
+    children.push(h2("5.3 Mécanismes d'apprentissage et d'adaptation"));
+    children.push(...multiPara(nl(meta.mecanismes_apprentissage)));
   }
 
   // ═══════ 6. OBJECTIFS ═══════
@@ -246,23 +261,30 @@ export async function exportProjectWord(data: ProjectWordData) {
     children.push(h2("7.1 Tableau des indicateurs KPIs"));
     children.push(buildTable(
       [
-        { text: "Indicateur", width: 2400 },
-        { text: "Catégorie", width: 1200 },
-        { text: "Référence", width: 900 },
-        { text: "Cible", width: 900 },
-        { text: "Actuel", width: 900 },
-        { text: "Unité", width: 900 },
-        { text: "Fréquence", width: 1200 },
+        { text: "Indicateur", width: 2200 },
+        { text: "Catégorie", width: 1000 },
+        { text: "Réf.", width: 700 },
+        { text: "Cible", width: 700 },
+        { text: "Unité", width: 700 },
+        { text: "Fréq.", width: 900 },
+        { text: "Kédougou", width: 900 },
+        { text: "Kolda", width: 800 },
+        { text: "Ziguinchor", width: 900 },
       ],
-      indicators.map(ind => [
-        ind.name ?? "",
-        ind.category ?? "",
-        String(ind.baseline_value ?? "—"),
-        String(ind.target_value ?? "—"),
-        String(ind.current_value ?? "—"),
-        ind.unit ?? "",
-        ind.frequency ?? "",
-      ]),
+      indicators.map(ind => {
+        const rt = (ind.metadata?.regional_targets) || {};
+        return [
+          ind.name ?? "",
+          ind.category ?? "",
+          String(ind.baseline_value ?? "—"),
+          String(ind.target_value ?? "—"),
+          ind.unit ?? "",
+          ind.frequency ?? "",
+          String(rt.kedougou ?? "—"),
+          String(rt.kolda ?? "—"),
+          String(rt.ziguinchor ?? "—"),
+        ];
+      }),
     ));
   }
 
