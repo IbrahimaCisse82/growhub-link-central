@@ -1188,6 +1188,11 @@ function WpEditor({ wp, index, total, onChange, onRemove }: {
             <div className="space-y-1"><label className="text-[11px] text-muted-foreground font-medium">Titre du WP *</label><input value={wp.title} onChange={e => onChange({ title: e.target.value })} className={inputCls} placeholder="Ex: Renforcement des compétences" /></div>
             <div className="space-y-1 col-span-2 sm:col-span-1"><label className="text-[11px] text-muted-foreground font-medium">Objectif spécifique *</label><textarea value={wp.objective} onChange={e => onChange({ objective: e.target.value })} className={inputCls + " h-20 resize-none"} placeholder="Objectif de ce Work Package…" /></div>
           </div>
+          <div className="space-y-1">
+            <label className="text-[11px] text-muted-foreground font-medium">Mapping Objectifs Stratégiques (OS)</label>
+            <input value={wp.osMapping} onChange={e => onChange({ osMapping: e.target.value })} className={inputCls} placeholder="Ex: OS1, OS3, OS6 (objectifs stratégiques contribués par ce WP)" />
+            <p className="text-[10px] text-muted-foreground">Liste des Objectifs Stratégiques auxquels ce Work Package contribue (pour la table de synthèse 8.4).</p>
+          </div>
           <div className="space-y-2"><label className="text-[11px] text-muted-foreground font-medium">Activités</label><ArrayEditor items={wp.activities} onChange={a => onChange({ activities: a })} placeholder={`A${index + 1}.X`} /></div>
           <div className="space-y-2"><label className="text-[11px] text-muted-foreground font-medium">Résultats attendus</label><ArrayEditor items={wp.results} onChange={r => onChange({ results: r })} placeholder={`R${index + 1}.X`} /></div>
         </div>
