@@ -36,10 +36,27 @@ const cellBorders = { top: cellBorder, bottom: cellBorder, left: cellBorder, rig
 const fmtNum = (n: number) => n.toLocaleString("fr-FR");
 const fmtDate = (d: string) => new Date(d).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
 
+/** Convertit n'importe quelle valeur en texte multiligne lisible (gère arrays d'objets). */
 const nl = (v: unknown): string => {
   if (v == null) return "";
   if (typeof v === "string") return v;
-  if (Array.isArray(v)) return v.join("\n");
+  if (Array.isArray(v)) {
+    return v.map(item => {
+      if (item == null) return "";
+      if (typeof item === "string") return item;
+      if (typeof item === "object") {
+        // Cas typique : { role, name, description } ou { sigle, signification }
+        const obj = item as Record<string, unknown>;
+        const vals = Object.values(obj).filter(x => x != null && x !== "").map(x => String(x));
+        return vals.join(" — ");
+      }
+      return String(item);
+    }).filter(Boolean).join("\n");
+  }
+  if (typeof v === "object") {
+    const obj = v as Record<string, unknown>;
+    return Object.entries(obj).filter(([, x]) => x != null && x !== "").map(([k, x]) => `${k}: ${x}`).join("\n");
+  }
   return String(v);
 };
 
@@ -164,7 +181,17 @@ export async function exportProjectWord(data: ProjectWordData) {
 
   // ═══════ 0. ABRÉVIATIONS ═══════
   children.push(h1("0. Liste des abréviations", true));
-  children.push(...multiPara(nl(meta.abreviations)));
+  const abrevs = meta.abreviations;
+  if (Array.isArray(abrevs) && abrevs.length > 0 && typeof abrevs[0] === "object") {
+    children.push(buildTable(
+      [{ text: "Sigle", width: 2000 }, { text: "Signification", width: 6000 }],
+      (abrevs as { sigle?: string; signification?: string }[])
+        .filter(a => a.sigle)
+        .map(a => [{ text: a.sigle ?? "", bold: true, color: NAVY }, a.signification ?? ""]),
+    ));
+  } else {
+    children.push(...multiPara(nl(abrevs)));
+  }
 
   // ═══════ 1. RÉSUMÉ EXÉCUTIF ═══════
   children.push(h1("1. Résumé exécutif", true));
@@ -194,12 +221,17 @@ export async function exportProjectWord(data: ProjectWordData) {
   children.push(h1("5. Théorie du changement", true));
   if (meta.theorie_changement) children.push(...multiPara(nl(meta.theorie_changement)));
   if (toc) {
-    if (toc.inputs) { children.push(h2("5.1 Intrants")); children.push(...multiPara(nl(toc.inputs))); }
-    if (toc.activities) { children.push(h2("5.2 Activités")); children.push(...multiPara(nl(toc.activities))); }
-    if (toc.outputs) { children.push(h2("5.3 Extrants (Outputs)")); children.push(...multiPara(nl(toc.outputs))); }
-    if (toc.outcomes) { children.push(h2("5.4 Effets (Outcomes)")); children.push(...multiPara(nl(toc.outcomes))); }
-    if (toc.impact) { children.push(h2("5.5 Impact")); children.push(...multiPara(nl(toc.impact))); }
-    if (toc.assumptions) { children.push(h2("5.6 Hypothèses clés")); children.push(...multiPara(nl(toc.assumptions))); }
+    children.push(h2("5.1 Cheminement du changement"));
+    if (toc.inputs) { children.push(h3("Intrants")); children.push(...multiPara(nl(toc.inputs))); }
+    if (toc.activities) { children.push(h3("Activités")); children.push(...multiPara(nl(toc.activities))); }
+    if (toc.outputs) { children.push(h3("Extrants (Outputs)")); children.push(...multiPara(nl(toc.outputs))); }
+    if (toc.outcomes) { children.push(h3("Effets (Outcomes)")); children.push(...multiPara(nl(toc.outcomes))); }
+    if (toc.impact) { children.push(h3("Impact")); children.push(...multiPara(nl(toc.impact))); }
+    if (toc.assumptions) { children.push(h2("5.2 Hypothèses clés")); children.push(...multiPara(nl(toc.assumptions))); }
+  }
+  if (meta.mecanismes_apprentissage) {
+    children.push(h2("5.3 Mécanismes d'apprentissage et d'adaptation"));
+    children.push(...multiPara(nl(meta.mecanismes_apprentissage)));
   }
 
   // ═══════ 6. OBJECTIFS ═══════
@@ -229,23 +261,30 @@ export async function exportProjectWord(data: ProjectWordData) {
     children.push(h2("7.1 Tableau des indicateurs KPIs"));
     children.push(buildTable(
       [
-        { text: "Indicateur", width: 2400 },
-        { text: "Catégorie", width: 1200 },
-        { text: "Référence", width: 900 },
-        { text: "Cible", width: 900 },
-        { text: "Actuel", width: 900 },
-        { text: "Unité", width: 900 },
-        { text: "Fréquence", width: 1200 },
+        { text: "Indicateur", width: 2200 },
+        { text: "Catégorie", width: 1000 },
+        { text: "Réf.", width: 700 },
+        { text: "Cible", width: 700 },
+        { text: "Unité", width: 700 },
+        { text: "Fréq.", width: 900 },
+        { text: "Kédougou", width: 900 },
+        { text: "Kolda", width: 800 },
+        { text: "Ziguinchor", width: 900 },
       ],
-      indicators.map(ind => [
-        ind.name ?? "",
-        ind.category ?? "",
-        String(ind.baseline_value ?? "—"),
-        String(ind.target_value ?? "—"),
-        String(ind.current_value ?? "—"),
-        ind.unit ?? "",
-        ind.frequency ?? "",
-      ]),
+      indicators.map(ind => {
+        const rt = (ind.metadata?.regional_targets) || {};
+        return [
+          ind.name ?? "",
+          ind.category ?? "",
+          String(ind.baseline_value ?? "—"),
+          String(ind.target_value ?? "—"),
+          ind.unit ?? "",
+          ind.frequency ?? "",
+          String(rt.kedougou ?? "—"),
+          String(rt.kolda ?? "—"),
+          String(rt.ziguinchor ?? "—"),
+        ];
+      }),
     ));
   }
 
@@ -254,31 +293,83 @@ export async function exportProjectWord(data: ProjectWordData) {
   if (meta.strategie_objectif) { children.push(h2("8.1 Objectif de la stratégie")); children.push(...multiPara(nl(meta.strategie_objectif))); }
   if (meta.strategie_axes) { children.push(h2("8.2 Principaux axes d'action")); children.push(...multiPara(nl(meta.strategie_axes))); }
   if (meta.strategie_modalites) { children.push(h2("8.3 Modalités de mise en œuvre")); children.push(...multiPara(nl(meta.strategie_modalites))); }
-  if (budgetDetails.length) {
+  // 8.4 → 8.8 : reconstruction WP1-WP4 depuis logFrame + indicators + milestones
+  const osMappings = (meta.os_mappings as string[] | undefined) ?? [];
+  const lfObjectives = Array.isArray(logFrame?.specific_objectives) ? (logFrame!.specific_objectives as string[]) : [];
+  const lfActivities = Array.isArray(logFrame?.activities) ? (logFrame!.activities as string[]) : [];
+  const lfResults = Array.isArray(logFrame?.expected_results) ? (logFrame!.expected_results as string[]) : [];
+
+  const buildWpFromLogframe = (n: number) => {
+    const obj = lfObjectives[n - 1] || "";
+    const colon = obj.indexOf(":");
+    const title = colon > 0 && colon < 80 ? obj.substring(0, colon).trim() : "";
+    const objective = colon > 0 && colon < 80 ? obj.substring(colon + 1).trim() : obj;
+    const acts = lfActivities.filter(a => new RegExp(`^A${n}\\.\\d`, "i").test(a.trim())).join("\n");
+    const res = lfResults.filter(r => new RegExp(`^R${n}\\.\\d`, "i").test(r.trim())).join("\n");
+    const inds = indicators.filter(i => new RegExp(`^I${n}\\.\\d`, "i").test((i.name || "").trim())).map(i => i.name).join("\n");
+    const ms = milestones.filter(m => new RegExp(`^M${n}\\.\\d`, "i").test((m.title || "").trim())).map(m => m.title).join("\n");
+    return { title, objective, activities: acts, results: res, indicators: inds, milestones: ms, os_mapping: osMappings[n - 1] || "" };
+  };
+
+  const explicitWp = (meta.wp_details ?? {}) as Record<string, { title?: string; objective?: string; activities?: string; results?: string; indicators?: string; milestones?: string; os_mapping?: string }>;
+  const wpKeys = ["WP1", "WP2", "WP3", "WP4", "WP5", "WP6"].slice(0, Math.max(lfObjectives.length, 4));
+  const wpMeta: typeof explicitWp = {};
+  wpKeys.forEach((k, i) => { wpMeta[k] = { ...buildWpFromLogframe(i + 1), ...(explicitWp[k] || {}) }; });
+  const hasWp = wpKeys.some(k => wpMeta[k]?.objective || wpMeta[k]?.activities) || budgetDetails.length > 0;
+
+  if (hasWp) {
     children.push(h2("8.4 Architecture opérationnelle — Work Packages"));
-    const wps = [...new Set(budgetDetails.map(d => d.work_package).filter(Boolean))].sort();
-    wps.forEach(wp => {
-      const wpDetails = budgetDetails.filter(d => d.work_package === wp);
-      const wpTotal = wpDetails.reduce((s, d) => s + (Number(d.total) || 0), 0);
-      children.push(h3(`${wp} — ${fmtNum(wpTotal)} USD`));
+    const synthRows = wpKeys
+      .filter(k => wpMeta[k]?.title || wpMeta[k]?.objective)
+      .map(k => {
+        const w = wpMeta[k];
+        return [
+          { text: `${k} — ${w.title ?? ""}`, bold: true, color: NAVY },
+          w.os_mapping ?? "",
+          (w.activities ?? "").split("\n").slice(0, 3).join(" • "),
+        ];
+      });
+    if (synthRows.length) {
       children.push(buildTable(
-        [
-          { text: "Code", width: 900 },
-          { text: "Activité", width: 3500 },
-          { text: "Catégorie", width: 1800 },
-          { text: "Qté", width: 700 },
-          { text: "Coût unit.", width: 1200 },
-          { text: "Total", width: 1300 },
-        ],
-        wpDetails.map(d => [
-          d.code ?? "",
-          d.activity ?? "",
-          d.category ?? "",
-          String(d.quantity ?? ""),
-          fmtNum(Number(d.unit_cost) || 0),
-          fmtNum(Number(d.total) || 0),
-        ]),
+        [{ text: "Composante (WP)", width: 3000 }, { text: "OS liés", width: 2000 }, { text: "Activités clés", width: 4000 }],
+        synthRows,
       ));
+    }
+
+    // Détail par WP
+    wpKeys.forEach((k, idx) => {
+      const w = wpMeta[k];
+      if (!w?.objective && !w?.activities && !w?.results) return;
+      children.push(h2(`8.${5 + idx} ${k} — ${w.title ?? ""}`));
+      if (w.objective) { children.push(h3("Objectif")); children.push(...multiPara(w.objective)); }
+      if (w.activities) { children.push(h3("Activités")); children.push(...multiPara(w.activities)); }
+      if (w.results) { children.push(h3("Résultats attendus")); children.push(...multiPara(w.results)); }
+      if (w.indicators) { children.push(h3("Indicateurs clés")); children.push(...multiPara(w.indicators)); }
+      if (w.milestones) { children.push(h3("Jalons clés")); children.push(...multiPara(w.milestones)); }
+
+      const wpBudget = budgetDetails.filter(d => (d.work_package ?? "").toUpperCase().startsWith(k));
+      if (wpBudget.length) {
+        const total = wpBudget.reduce((s, d) => s + (Number(d.total) || 0), 0);
+        children.push(h3(`Budget ${k} — ${fmtNum(total)} USD`));
+        children.push(buildTable(
+          [
+            { text: "Code", width: 900 },
+            { text: "Activité", width: 3500 },
+            { text: "Catégorie", width: 1800 },
+            { text: "Qté", width: 700 },
+            { text: "Coût unit.", width: 1200 },
+            { text: "Total", width: 1300 },
+          ],
+          wpBudget.map(d => [
+            d.code ?? "",
+            d.activity ?? "",
+            d.category ?? "",
+            String(d.quantity ?? ""),
+            fmtNum(Number(d.unit_cost) || 0),
+            fmtNum(Number(d.total) || 0),
+          ]),
+        ));
+      }
     });
   }
 
