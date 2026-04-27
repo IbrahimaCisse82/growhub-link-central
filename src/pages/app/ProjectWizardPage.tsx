@@ -32,12 +32,12 @@ const STEPS = [
 ];
 
 // --- Work Package Draft ---
-interface WpDraft { title: string; objective: string; activities: string[]; results: string[] }
-const emptyWp = (): WpDraft => ({ title: "", objective: "", activities: [""], results: [""] });
+interface WpDraft { title: string; objective: string; activities: string[]; results: string[]; osMapping: string }
+const emptyWp = (): WpDraft => ({ title: "", objective: "", activities: [""], results: [""], osMapping: "" });
 
 // --- KPI per WP ---
-interface KpiRow { name: string; category: string; unit: string; baseline: number; target: number; frequency: string; source: string; responsible: string; wpIndex: number }
-const emptyKpi = (wpIndex: number): KpiRow => ({ name: "", category: "output", unit: "", baseline: 0, target: 0, frequency: "quarterly", source: "", responsible: "", wpIndex });
+interface KpiRow { name: string; category: string; unit: string; baseline: number; target: number; frequency: string; source: string; responsible: string; wpIndex: number; regionalTargets: { kedougou: number; kolda: number; ziguinchor: number } }
+const emptyKpi = (wpIndex: number): KpiRow => ({ name: "", category: "output", unit: "", baseline: 0, target: 0, frequency: "quarterly", source: "", responsible: "", wpIndex, regionalTargets: { kedougou: 0, kolda: 0, ziguinchor: 0 } });
 
 // --- Milestone per WP ---
 interface MilestoneDraft { title: string; dueDate: string; wpIndex: number }
