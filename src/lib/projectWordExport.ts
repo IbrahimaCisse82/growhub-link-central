@@ -372,8 +372,6 @@ export async function exportProjectWord(data: ProjectWordData) {
       }
     });
   }
-    });
-  }
 
   // ═══════ 9. MÉTHODOLOGIE ═══════
   children.push(h1("9. Méthodologie", true));
