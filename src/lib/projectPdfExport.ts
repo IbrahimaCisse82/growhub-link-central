@@ -231,7 +231,27 @@ export function exportProjectPdf({ project, logFrame, toc, indicators, budgetLin
   </style>`;
 
   const e = escapeHtml;
-  const nl = (v: unknown): string => typeof v === "string" ? v : (Array.isArray(v) ? v.join("\n") : JSON.stringify(v ?? ""));
+  const nl = (v: unknown): string => {
+    if (v == null) return "";
+    if (typeof v === "string") return v;
+    if (Array.isArray(v)) {
+      return v.map(item => {
+        if (item == null) return "";
+        if (typeof item === "string") return item;
+        if (typeof item === "object") {
+          const vals = Object.values(item as Record<string, unknown>).filter(x => x != null && x !== "").map(String);
+          return vals.join(" — ");
+        }
+        return String(item);
+      }).filter(Boolean).join("\n");
+    }
+    if (typeof v === "object") {
+      return Object.entries(v as Record<string, unknown>)
+        .filter(([, x]) => x != null && x !== "")
+        .map(([k, x]) => `${k}: ${x}`).join("\n");
+    }
+    return String(v);
+  };
   const fmtDate = (d: string) => new Date(d).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
   const fmtNum = (n: number) => n.toLocaleString("fr-FR");
 
