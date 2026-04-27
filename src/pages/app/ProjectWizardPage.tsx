@@ -32,12 +32,12 @@ const STEPS = [
 ];
 
 // --- Work Package Draft ---
-interface WpDraft { title: string; objective: string; activities: string[]; results: string[] }
-const emptyWp = (): WpDraft => ({ title: "", objective: "", activities: [""], results: [""] });
+interface WpDraft { title: string; objective: string; activities: string[]; results: string[]; osMapping: string }
+const emptyWp = (): WpDraft => ({ title: "", objective: "", activities: [""], results: [""], osMapping: "" });
 
 // --- KPI per WP ---
-interface KpiRow { name: string; category: string; unit: string; baseline: number; target: number; frequency: string; source: string; responsible: string; wpIndex: number }
-const emptyKpi = (wpIndex: number): KpiRow => ({ name: "", category: "output", unit: "", baseline: 0, target: 0, frequency: "quarterly", source: "", responsible: "", wpIndex });
+interface KpiRow { name: string; category: string; unit: string; baseline: number; target: number; frequency: string; source: string; responsible: string; wpIndex: number; regionalTargets: { kedougou: number; kolda: number; ziguinchor: number } }
+const emptyKpi = (wpIndex: number): KpiRow => ({ name: "", category: "output", unit: "", baseline: 0, target: 0, frequency: "quarterly", source: "", responsible: "", wpIndex, regionalTargets: { kedougou: 0, kolda: 0, ziguinchor: 0 } });
 
 // --- Milestone per WP ---
 interface MilestoneDraft { title: string; dueDate: string; wpIndex: number }
@@ -69,6 +69,7 @@ const fmt = (n: number) => new Intl.NumberFormat("fr-FR", { maximumFractionDigit
 // --- Metadata interface ---
 interface ProjectMetadata {
   introduction?: string; resume_executif?: string;
+  abreviations?: { sigle: string; signification: string }[];
   contexte_justification?: string; contexte_territorial?: string;
   contraintes?: string; alignement_strategique?: string; justification?: string;
   strategie_objectif?: string; strategie_axes?: string[];
@@ -82,6 +83,9 @@ interface ProjectMetadata {
   version_document?: string; budget_total_label?: string;
   risques?: RiskDraft[];
   contingency_pct?: number; currency?: string;
+  mecanismes_apprentissage?: string;
+  os_mappings?: string[]; // index aligned with WPs
+  wp_details?: Record<string, { title: string; os_mapping: string; objective: string; activities: string; results: string; indicators: string; milestones: string }>;
 }
 
 // --- Array Editor ---
@@ -113,9 +117,10 @@ function flattenWpObjectives(wps: WpDraft[]): string[] {
   return wps.map(wp => wp.title ? `${wp.title}: ${wp.objective}` : wp.objective);
 }
 
-function parseWpsFromLogframe(logframe: { specific_objectives?: unknown; activities?: unknown; expected_results?: unknown }): WpDraft[] {
+function parseWpsFromLogframe(logframe: { specific_objectives?: unknown; activities?: unknown; expected_results?: unknown; assumptions?: unknown }): WpDraft[] {
   const objectives = toArr(logframe.specific_objectives);
   if (objectives.length === 0) return [emptyWp()];
+  // os_mappings stored as JSON in assumptions field via metadata fallback - handled in parent
   return objectives.map((obj, idx) => {
     const wpNum = idx + 1;
     let title = "";
@@ -124,7 +129,7 @@ function parseWpsFromLogframe(logframe: { specific_objectives?: unknown; activit
     if (colonIdx > 0 && colonIdx < 80) { title = obj.substring(0, colonIdx).trim(); objective = obj.substring(colonIdx + 1).trim(); }
     const activities = toArr(logframe.activities).filter(a => new RegExp(`^A${wpNum}\\.\\d`, "i").test(a.trim())).map(a => a.replace(/^A\d+\.\d+\s*/i, "").trim());
     const results = toArr(logframe.expected_results).filter(r => new RegExp(`^R${wpNum}\\.\\d`, "i").test(r.trim())).map(r => r.replace(/^R\d+\.\d+\s*/i, "").trim());
-    return { title, objective, activities: activities.length > 0 ? activities : [""], results: results.length > 0 ? results : [""] };
+    return { title, objective, activities: activities.length > 0 ? activities : [""], results: results.length > 0 ? results : [""], osMapping: "" };
   });
 }
 
@@ -201,6 +206,7 @@ export default function ProjectWizardPage() {
   const [contraintes, setContraintes] = useState("");
   const [alignement, setAlignement] = useState("");
   const [justification, setJustification] = useState("");
+  const [abreviations, setAbreviations] = useState<{ sigle: string; signification: string }[]>([{ sigle: "", signification: "" }]);
 
   // Step 2: Théorie du changement
   const [tocInputs, setTocInputs] = useState<string[]>([""]);
@@ -210,6 +216,7 @@ export default function ProjectWizardPage() {
   const [tocImpact, setTocImpact] = useState("");
   const [tocAssumptions, setTocAssumptions] = useState<string[]>([""]);
   const [tocRisks, setTocRisks] = useState<string[]>([""]);
+  const [mecanismesApprentissage, setMecanismesApprentissage] = useState("");
 
   // Step 3: Objectifs & WPs
   const [overallObjective, setOverallObjective] = useState("");
@@ -360,6 +367,8 @@ export default function ProjectWizardPage() {
       setCurrency(meta.currency || "USD");
       setContingencyPct(meta.contingency_pct ?? 7);
       if (meta.risques?.length) setRisks(meta.risques);
+      if (meta.abreviations?.length) setAbreviations(meta.abreviations);
+      setMecanismesApprentissage(meta.mecanismes_apprentissage || "");
     }
   }, [existingProject]);
 
@@ -368,9 +377,13 @@ export default function ProjectWizardPage() {
       setOverallObjective(existingLogframe.overall_objective || "");
       setAssumptions(existingLogframe.assumptions || "");
       setPreConditions(existingLogframe.pre_conditions || "");
-      setWps(parseWpsFromLogframe(existingLogframe));
+      const parsed = parseWpsFromLogframe(existingLogframe);
+      // Hydrate osMapping from project metadata
+      const meta: ProjectMetadata = ((existingProject as any)?.metadata as ProjectMetadata) || {};
+      const osMappings = meta.os_mappings || [];
+      setWps(parsed.map((wp, i) => ({ ...wp, osMapping: osMappings[i] || "" })));
     }
-  }, [existingLogframe]);
+  }, [existingLogframe, existingProject]);
 
   useEffect(() => {
     if (existingToc) {
@@ -389,7 +402,9 @@ export default function ProjectWizardPage() {
       setKpis(existingKpis.map(k => {
         const match = k.name.match(/^I(\d+)\.\d+\s*/i);
         const wpIdx = match ? parseInt(match[1]) - 1 : 0;
-        return { name: k.name.replace(/^I\d+\.\d+\s*/i, "").trim(), category: k.category || "output", unit: k.unit || "", baseline: Number(k.baseline_value) || 0, target: Number(k.target_value) || 0, frequency: k.frequency || "quarterly", source: k.data_source || "", responsible: k.responsible || "", wpIndex: wpIdx };
+        const meta = (k as any).metadata || {};
+        const rt = meta.regional_targets || {};
+        return { name: k.name.replace(/^I\d+\.\d+\s*/i, "").trim(), category: k.category || "output", unit: k.unit || "", baseline: Number(k.baseline_value) || 0, target: Number(k.target_value) || 0, frequency: k.frequency || "quarterly", source: k.data_source || "", responsible: k.responsible || "", wpIndex: wpIdx, regionalTargets: { kedougou: Number(rt.kedougou) || 0, kolda: Number(rt.kolda) || 0, ziguinchor: Number(rt.ziguinchor) || 0 } };
       }));
     }
   }, [existingKpis]);
@@ -464,12 +479,15 @@ export default function ProjectWizardPage() {
   // --- Build metadata ---
   const buildMetadata = (): ProjectMetadata => ({
     introduction, contexte_justification: contexteJustification, contexte_territorial: contexteT, contraintes, alignement_strategique: alignement, justification,
+    abreviations: abreviations.filter(a => a.sigle),
     strategie_objectif: strategieObjectif, strategie_axes: strategieAxes.filter(Boolean), strategie_modalites: strategieModalites,
     methodologie, population_cible: populationCible, estimation_beneficiaires: estimationBeneficiaires,
     personnel_cle: personnelCle.filter(p => p.role), partenaires: partenaires.filter(p => p.categorie),
     suivi_outils: suiviOutils, suivi_evaluation: suiviEvaluation, suivi_rapports: suiviRapports, plan_sortie: planSortie,
     secteurs_prioritaires: secteurs, porteur, alignement_odd: alignementOdd, version_document: versionDoc,
     risques: risks.filter(r => r.description), contingency_pct: contingencyPct, currency,
+    mecanismes_apprentissage: mecanismesApprentissage,
+    os_mappings: wps.map(wp => wp.osMapping || ""),
   });
 
   // --- Save functions ---
@@ -525,7 +543,7 @@ export default function ProjectWizardPage() {
       await supabase.from("project_indicators").insert(
         validKpis.map(k => {
           kpiCounters[k.wpIndex] = (kpiCounters[k.wpIndex] || 0) + 1;
-          return { project_id: pid, name: `I${k.wpIndex + 1}.${kpiCounters[k.wpIndex]} ${k.name}`, category: k.category, unit: k.unit || null, baseline_value: k.baseline, target_value: k.target, frequency: k.frequency, data_source: k.source || null, responsible: k.responsible || null };
+          return { project_id: pid, name: `I${k.wpIndex + 1}.${kpiCounters[k.wpIndex]} ${k.name}`, category: k.category, unit: k.unit || null, baseline_value: k.baseline, target_value: k.target, frequency: k.frequency, data_source: k.source || null, responsible: k.responsible || null, metadata: { regional_targets: k.regionalTargets } as any };
         })
       ).throwOnError();
     }
@@ -700,6 +718,17 @@ export default function ProjectWizardPage() {
               <div className="space-y-2"><label className={labelCls}>3.2 Contraintes structurelles et vulnérabilités</label><textarea value={contraintes} onChange={e => setContraintes(e.target.value)} className={textareaLgCls} placeholder="Contraintes identifiées : accès limité aux financements, faible productivité…" /></div>
               <div className="space-y-2"><label className={labelCls}>3.3 Alignement avec les orientations stratégiques</label><textarea value={alignement} onChange={e => setAlignement(e.target.value)} className={textareaCls} placeholder="Cohérence avec les politiques nationales, ODD, NDC…" /></div>
               <div className="space-y-2"><label className={labelCls}>3.4 Justification de l'intervention</label><textarea value={justification} onChange={e => setJustification(e.target.value)} className={textareaLgCls} placeholder="Pourquoi ce projet est nécessaire et comment il répond aux problèmes…" /></div>
+
+              <div className={sectionTitleCls + " mt-6"}>Liste des abréviations</div>
+              <p className={helpCls}>Glossaire des sigles et acronymes utilisés dans le document de projet.</p>
+              {abreviations.map((a, i) => (
+                <div key={i} className="grid grid-cols-[140px_1fr_auto] gap-2 items-center">
+                  <input value={a.sigle} onChange={e => { const n = [...abreviations]; n[i] = { ...n[i], sigle: e.target.value }; setAbreviations(n); }} className={inputCls} placeholder="Sigle (ex: PAERID)" />
+                  <input value={a.signification} onChange={e => { const n = [...abreviations]; n[i] = { ...n[i], signification: e.target.value }; setAbreviations(n); }} className={inputCls} placeholder="Signification complète" />
+                  <button type="button" onClick={() => setAbreviations(abreviations.filter((_, j) => j !== i))} className="text-destructive text-xs px-2 hover:bg-destructive/10 rounded-lg">✕</button>
+                </div>
+              ))}
+              <button type="button" onClick={() => setAbreviations([...abreviations, { sigle: "", signification: "" }])} className="text-xs text-primary font-semibold hover:underline">+ Ajouter une abréviation</button>
             </div>
           )}
 
@@ -726,6 +755,11 @@ export default function ProjectWizardPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2"><label className={labelCls}>Hypothèses clés</label><ArrayEditor items={tocAssumptions} onChange={setTocAssumptions} placeholder="Hypothèse" /></div>
                 <div className="space-y-2"><label className={labelCls}>Risques</label><ArrayEditor items={tocRisks} onChange={setTocRisks} placeholder="Risque" /></div>
+              </div>
+              <div className="space-y-2 pt-4 border-t border-border">
+                <label className={labelCls}>4.3 Mécanismes d'apprentissage et d'adaptation</label>
+                <textarea value={mecanismesApprentissage} onChange={e => setMecanismesApprentissage(e.target.value)} className={textareaLgCls} placeholder="Boucles de retour, capitalisation, ajustements méthodologiques continus, partage de connaissances entre les régions…" />
+                <p className={helpCls}>Section 5.3 du document — Comment le projet capitalise les enseignements et adapte sa stratégie en cours de mise en œuvre.</p>
               </div>
             </div>
           )}
@@ -793,6 +827,14 @@ export default function ProjectWizardPage() {
                                   <option value="monthly">Mensuelle</option><option value="quarterly">Trimestrielle</option><option value="biannual">Semestrielle</option><option value="annual">Annuelle</option>
                                 </select>
                                 <input value={kpi.responsible} onChange={e => { const n = [...kpis]; n[globalIdx] = { ...n[globalIdx], responsible: e.target.value }; setKpis(n); }} className={inputCls} placeholder="Responsable" />
+                              </div>
+                              <div className="pt-2 border-t border-border">
+                                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Cibles régionales</p>
+                                <div className="grid grid-cols-3 gap-2">
+                                  <div><label className="text-[10px] text-muted-foreground">Kédougou</label><input type="number" value={kpi.regionalTargets.kedougou} onChange={e => { const n = [...kpis]; n[globalIdx] = { ...n[globalIdx], regionalTargets: { ...n[globalIdx].regionalTargets, kedougou: Number(e.target.value) } }; setKpis(n); }} className={inputCls} placeholder="0" /></div>
+                                  <div><label className="text-[10px] text-muted-foreground">Kolda</label><input type="number" value={kpi.regionalTargets.kolda} onChange={e => { const n = [...kpis]; n[globalIdx] = { ...n[globalIdx], regionalTargets: { ...n[globalIdx].regionalTargets, kolda: Number(e.target.value) } }; setKpis(n); }} className={inputCls} placeholder="0" /></div>
+                                  <div><label className="text-[10px] text-muted-foreground">Ziguinchor</label><input type="number" value={kpi.regionalTargets.ziguinchor} onChange={e => { const n = [...kpis]; n[globalIdx] = { ...n[globalIdx], regionalTargets: { ...n[globalIdx].regionalTargets, ziguinchor: Number(e.target.value) } }; setKpis(n); }} className={inputCls} placeholder="0" /></div>
+                                </div>
                               </div>
                             </div>
                           );
@@ -1153,6 +1195,11 @@ function WpEditor({ wp, index, total, onChange, onRemove }: {
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1"><label className="text-[11px] text-muted-foreground font-medium">Titre du WP *</label><input value={wp.title} onChange={e => onChange({ title: e.target.value })} className={inputCls} placeholder="Ex: Renforcement des compétences" /></div>
             <div className="space-y-1 col-span-2 sm:col-span-1"><label className="text-[11px] text-muted-foreground font-medium">Objectif spécifique *</label><textarea value={wp.objective} onChange={e => onChange({ objective: e.target.value })} className={inputCls + " h-20 resize-none"} placeholder="Objectif de ce Work Package…" /></div>
+          </div>
+          <div className="space-y-1">
+            <label className="text-[11px] text-muted-foreground font-medium">Mapping Objectifs Stratégiques (OS)</label>
+            <input value={wp.osMapping} onChange={e => onChange({ osMapping: e.target.value })} className={inputCls} placeholder="Ex: OS1, OS3, OS6 (objectifs stratégiques contribués par ce WP)" />
+            <p className="text-[10px] text-muted-foreground">Liste des Objectifs Stratégiques auxquels ce Work Package contribue (pour la table de synthèse 8.4).</p>
           </div>
           <div className="space-y-2"><label className="text-[11px] text-muted-foreground font-medium">Activités</label><ArrayEditor items={wp.activities} onChange={a => onChange({ activities: a })} placeholder={`A${index + 1}.X`} /></div>
           <div className="space-y-2"><label className="text-[11px] text-muted-foreground font-medium">Résultats attendus</label><ArrayEditor items={wp.results} onChange={r => onChange({ results: r })} placeholder={`R${index + 1}.X`} /></div>

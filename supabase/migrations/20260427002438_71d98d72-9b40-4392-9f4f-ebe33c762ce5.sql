@@ -1,0 +1,1 @@
+ALTER TABLE public.project_indicators ADD COLUMN IF NOT EXISTS metadata jsonb DEFAULT '{}'::jsonb;

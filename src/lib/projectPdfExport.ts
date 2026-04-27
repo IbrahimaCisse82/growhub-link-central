@@ -325,7 +325,16 @@ export function exportProjectPdf({ project, logFrame, toc, indicators, budgetLin
   // ═══════════════ 0. ABRÉVIATIONS ═══════════════
   html += header();
   html += `<h2>0. LISTE DES ABRÉVIATIONS</h2>`;
-  html += field(nl(meta.abreviations));
+  const abrevs = meta.abreviations;
+  if (Array.isArray(abrevs) && abrevs.length > 0 && typeof abrevs[0] === "object") {
+    html += `<table class="data-table"><thead><tr><th style="width:25%">Sigle</th><th>Signification</th></tr></thead><tbody>`;
+    (abrevs as { sigle: string; signification: string }[]).filter(a => a.sigle).forEach(a => {
+      html += `<tr><td><strong>${e(a.sigle)}</strong></td><td>${e(a.signification || "")}</td></tr>`;
+    });
+    html += `</tbody></table>`;
+  } else {
+    html += field(nl(abrevs));
+  }
 
   // ═══════════════ 1. RÉSUMÉ EXÉCUTIF ═══════════════
   html += `<h2>1. RÉSUMÉ EXÉCUTIF</h2>`;
@@ -399,9 +408,10 @@ export function exportProjectPdf({ project, logFrame, toc, indicators, budgetLin
   // 7.1 Indicateurs KPI
   if (indicators.length > 0) {
     html += `<h3>7.1 Tableau des indicateurs KPIs</h3>`;
-    html += `<table><thead><tr><th>Indicateur</th><th>Catégorie</th><th>Référence</th><th>Cible</th><th>Actuel</th><th>Unité</th><th>Fréquence</th></tr></thead><tbody>`;
+    html += `<table><thead><tr><th>Indicateur</th><th>Catégorie</th><th>Réf.</th><th>Cible</th><th>Unité</th><th>Fréq.</th><th>Kédougou</th><th>Kolda</th><th>Ziguinchor</th></tr></thead><tbody>`;
     indicators.forEach(ind => {
-      html += `<tr><td>${e(ind.name)}</td><td>${e(ind.category ?? "")}</td><td>${ind.baseline_value ?? "—"}</td><td>${ind.target_value ?? "—"}</td><td>${ind.current_value ?? "—"}</td><td>${e(ind.unit ?? "")}</td><td>${e(ind.frequency ?? "")}</td></tr>`;
+      const rt = (ind.metadata?.regional_targets) || {};
+      html += `<tr><td>${e(ind.name)}</td><td>${e(ind.category ?? "")}</td><td>${ind.baseline_value ?? "—"}</td><td>${ind.target_value ?? "—"}</td><td>${e(ind.unit ?? "")}</td><td>${e(ind.frequency ?? "")}</td><td>${rt.kedougou ?? "—"}</td><td>${rt.kolda ?? "—"}</td><td>${rt.ziguinchor ?? "—"}</td></tr>`;
     });
     html += `</tbody></table>`;
   }
@@ -413,9 +423,32 @@ export function exportProjectPdf({ project, logFrame, toc, indicators, budgetLin
   if (meta.strategie_modalites) { html += `<h3>8.3 Modalités de mise en œuvre</h3>`; html += field(nl(meta.strategie_modalites)); }
 
   // Work Packages — synthèse architecture
-  const wpMeta = (meta.wp_details ?? {}) as Record<string, { title?: string; objective?: string; activities?: string; results?: string; indicators?: string; milestones?: string; os_mapping?: string }>;
-  const wpKeys = ["WP1", "WP2", "WP3", "WP4"];
-  const hasAnyWp = wpKeys.some(k => wpMeta[k]) || budgetDetails.length > 0;
+  // Construire wp_details automatiquement depuis logFrame + indicators + milestones + os_mappings
+  const osMappings = (meta.os_mappings as string[] | undefined) ?? [];
+  const lfObjectives = Array.isArray(logFrame?.specific_objectives) ? (logFrame!.specific_objectives as string[]) : [];
+  const lfActivities = Array.isArray(logFrame?.activities) ? (logFrame!.activities as string[]) : [];
+  const lfResults = Array.isArray(logFrame?.expected_results) ? (logFrame!.expected_results as string[]) : [];
+
+  const buildWpFromLogframe = (wpNum: number) => {
+    const obj = lfObjectives[wpNum - 1] || "";
+    const colonIdx = obj.indexOf(":");
+    const title = colonIdx > 0 && colonIdx < 80 ? obj.substring(0, colonIdx).trim() : "";
+    const objective = colonIdx > 0 && colonIdx < 80 ? obj.substring(colonIdx + 1).trim() : obj;
+    const acts = lfActivities.filter(a => new RegExp(`^A${wpNum}\\.\\d`, "i").test(a.trim())).join("\n");
+    const res = lfResults.filter(r => new RegExp(`^R${wpNum}\\.\\d`, "i").test(r.trim())).join("\n");
+    const inds = indicators.filter(i => new RegExp(`^I${wpNum}\\.\\d`, "i").test((i.name || "").trim())).map(i => i.name).join("\n");
+    const ms = milestones.filter(m => new RegExp(`^M${wpNum}\\.\\d`, "i").test((m.title || "").trim())).map(m => m.title).join("\n");
+    return { title, objective, activities: acts, results: res, indicators: inds, milestones: ms, os_mapping: osMappings[wpNum - 1] || "" };
+  };
+
+  const explicitWpMeta = (meta.wp_details ?? {}) as Record<string, { title?: string; objective?: string; activities?: string; results?: string; indicators?: string; milestones?: string; os_mapping?: string }>;
+  const wpKeys = ["WP1", "WP2", "WP3", "WP4", "WP5", "WP6"].slice(0, Math.max(lfObjectives.length, 4));
+  const wpMeta: typeof explicitWpMeta = {};
+  wpKeys.forEach((k, idx) => {
+    const auto = buildWpFromLogframe(idx + 1);
+    wpMeta[k] = { ...auto, ...(explicitWpMeta[k] || {}) };
+  });
+  const hasAnyWp = wpKeys.some(k => wpMeta[k]?.objective || wpMeta[k]?.activities) || budgetDetails.length > 0;
 
   if (hasAnyWp) {
     html += `<h3>8.4 Architecture opérationnelle — Work Packages</h3>`;
