@@ -287,13 +287,21 @@ export function exportProjectPdf({ project, logFrame, toc, indicators, budgetLin
     ["main", "5. THÉORIE DU CHANGEMENT", ""],
     ["sub", "5.1 Cheminement du changement", ""],
     ["sub", "5.2 Hypothèses clés", ""],
+    ["sub", "5.3 Mécanismes d'apprentissage et d'adaptation", ""],
     ["main", "6. OBJECTIF GÉNÉRAL ET OBJECTIFS SPÉCIFIQUES DU PROJET", ""],
     ["sub", "6.1 Objectif général du projet", ""],
     ["sub", "6.2 Objectifs spécifiques", ""],
     ["main", "7. RÉSULTATS ATTENDUS", ""],
     ["sub", "7.1 Tableau des indicateurs KPIs", ""],
     ["main", "8. STRATÉGIE D'IMPLÉMENTATION DU PROJET", ""],
-    ["sub", "8.1 Architecture opérationnelle — Work Packages", ""],
+    ["sub", "8.1 Objectif de la stratégie", ""],
+    ["sub", "8.2 Principaux axes d'action", ""],
+    ["sub", "8.3 Modalités de mise en œuvre", ""],
+    ["sub", "8.4 Architecture opérationnelle — Work Packages", ""],
+    ["sub", "8.5 WP1 — Renforcement des compétences", ""],
+    ["sub", "8.6 WP2 — Accès aux marchés", ""],
+    ["sub", "8.7 WP3 — Accès au financement", ""],
+    ["sub", "8.8 WP4 — Innovation, durabilité, écosystème", ""],
     ["main", "9. MÉTHODOLOGIE", ""],
     ["main", "10. DURÉE DU PROGRAMME", ""],
     ["main", "11. LIEU(X) D'IMPLÉMENTATION DU PROJET", ""],
@@ -344,17 +352,24 @@ export function exportProjectPdf({ project, logFrame, toc, indicators, budgetLin
   html += field(nl(meta.justification));
 
   // ═══════════════ 5. THÉORIE DU CHANGEMENT ═══════════════
+  // ═══════════════ 5. THÉORIE DU CHANGEMENT ═══════════════
   html += `<h2 class="section-break">5. THÉORIE DU CHANGEMENT</h2>`;
   if (meta.theorie_changement) {
     html += field(nl(meta.theorie_changement));
   }
+  // 5.1 Cheminement du changement (Intrants → Activités → Extrants → Effets → Impact)
   if (toc) {
-    if (toc.inputs) { html += `<h3>5.1 Intrants</h3>`; html += field(nl(toc.inputs)); }
-    if (toc.activities) { html += `<h3>5.2 Activités</h3>`; html += field(nl(toc.activities)); }
-    if (toc.outputs) { html += `<h3>5.3 Extrants (Outputs)</h3>`; html += field(nl(toc.outputs)); }
-    if (toc.outcomes) { html += `<h3>5.4 Effets (Outcomes)</h3>`; html += field(nl(toc.outcomes)); }
-    if (toc.impact) { html += `<h3>5.5 Impact</h3>`; html += field(nl(toc.impact)); }
-    if (toc.assumptions) { html += `<h3>5.6 Hypothèses clés</h3>`; html += field(nl(toc.assumptions)); }
+    html += `<h3>5.1 Cheminement du changement</h3>`;
+    if (toc.inputs) { html += `<h4>Intrants</h4>`; html += field(nl(toc.inputs)); }
+    if (toc.activities) { html += `<h4>Activités</h4>`; html += field(nl(toc.activities)); }
+    if (toc.outputs) { html += `<h4>Extrants (Outputs)</h4>`; html += field(nl(toc.outputs)); }
+    if (toc.outcomes) { html += `<h4>Effets (Outcomes)</h4>`; html += field(nl(toc.outcomes)); }
+    if (toc.impact) { html += `<h4>Impact</h4>`; html += field(nl(toc.impact)); }
+    if (toc.assumptions) { html += `<h3>5.2 Hypothèses clés</h3>`; html += field(nl(toc.assumptions)); }
+  }
+  if (meta.mecanismes_apprentissage) {
+    html += `<h3>5.3 Mécanismes d'apprentissage et d'adaptation</h3>`;
+    html += field(nl(meta.mecanismes_apprentissage));
   }
 
   // ═══════════════ 6. OBJECTIFS ═══════════════
@@ -397,9 +412,50 @@ export function exportProjectPdf({ project, logFrame, toc, indicators, budgetLin
   if (meta.strategie_axes) { html += `<h3>8.2 Principaux axes d'action</h3>`; html += field(nl(meta.strategie_axes)); }
   if (meta.strategie_modalites) { html += `<h3>8.3 Modalités de mise en œuvre</h3>`; html += field(nl(meta.strategie_modalites)); }
 
-  // Work Packages
-  if (budgetDetails.length > 0) {
+  // Work Packages — synthèse architecture
+  const wpMeta = (meta.wp_details ?? {}) as Record<string, { title?: string; objective?: string; activities?: string; results?: string; indicators?: string; milestones?: string; os_mapping?: string }>;
+  const wpKeys = ["WP1", "WP2", "WP3", "WP4"];
+  const hasAnyWp = wpKeys.some(k => wpMeta[k]) || budgetDetails.length > 0;
+
+  if (hasAnyWp) {
     html += `<h3>8.4 Architecture opérationnelle — Work Packages</h3>`;
+    // Tableau synthèse comme dans le DOCX
+    html += `<table><thead><tr><th>Composante (WP)</th><th>OS liés</th><th>Activités clés</th></tr></thead><tbody>`;
+    wpKeys.forEach(k => {
+      const w = wpMeta[k];
+      if (w?.title || w?.objective) {
+        html += `<tr><td><strong>${e(k)} — ${e(w.title ?? "")}</strong></td><td>${e(w.os_mapping ?? "")}</td><td>${e((w.activities ?? "").split("\n").slice(0, 3).join(" • "))}</td></tr>`;
+      }
+    });
+    html += `</tbody></table>`;
+  }
+
+  // Détail par WP (8.5 → 8.8) — Objectif / Activités / Résultats / Indicateurs / Jalons
+  wpKeys.forEach((k, idx) => {
+    const w = wpMeta[k];
+    if (!w?.objective && !w?.activities && !w?.results) return;
+    html += `<h3 class="${idx === 0 ? "section-break" : ""}">8.${5 + idx} ${k} — ${e(w.title ?? "")}</h3>`;
+    if (w.objective) { html += `<h4>Objectif</h4>`; html += field(w.objective); }
+    if (w.activities) { html += `<h4>Activités</h4>`; html += field(w.activities); }
+    if (w.results) { html += `<h4>Résultats attendus</h4>`; html += field(w.results); }
+    if (w.indicators) { html += `<h4>Indicateurs clés</h4>`; html += field(w.indicators); }
+    if (w.milestones) { html += `<h4>Jalons clés (Milestones)</h4>`; html += field(w.milestones); }
+
+    // Tableau budget de ce WP s'il existe
+    const wpBudget = budgetDetails.filter(d => (d.work_package ?? "").toUpperCase().startsWith(k));
+    if (wpBudget.length > 0) {
+      const wpTotal = wpBudget.reduce((s, d) => s + (Number(d.total) || 0), 0);
+      html += `<h4>Budget ${k} — ${fmtNum(wpTotal)} USD</h4>`;
+      html += `<table><thead><tr><th>Code</th><th>Activité</th><th>Catégorie</th><th>Qté</th><th>Coût unit.</th><th>Total</th></tr></thead><tbody>`;
+      wpBudget.forEach(d => {
+        html += `<tr><td>${e(d.code ?? "")}</td><td>${e(d.activity ?? "")}</td><td>${e(d.category ?? "")}</td><td>${d.quantity ?? ""}</td><td>${fmtNum(Number(d.unit_cost) || 0)}</td><td>${fmtNum(Number(d.total) || 0)}</td></tr>`;
+      });
+      html += `</tbody></table>`;
+    }
+  });
+
+  // Si aucune méta WP saisie, fallback : tableau budget par WP comme avant
+  if (!wpKeys.some(k => wpMeta[k]) && budgetDetails.length > 0) {
     const wps = [...new Set(budgetDetails.map(d => d.work_package).filter(Boolean))].sort();
     wps.forEach(wp => {
       const wpDetails = budgetDetails.filter(d => d.work_package === wp);
