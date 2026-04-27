@@ -4585,6 +4585,7 @@ export type Database = {
           data_source: string | null
           frequency: string | null
           id: string
+          metadata: Json | null
           name: string
           project_id: string
           responsible: string | null
@@ -4600,6 +4601,7 @@ export type Database = {
           data_source?: string | null
           frequency?: string | null
           id?: string
+          metadata?: Json | null
           name: string
           project_id: string
           responsible?: string | null
@@ -4615,6 +4617,7 @@ export type Database = {
           data_source?: string | null
           frequency?: string | null
           id?: string
+          metadata?: Json | null
           name?: string
           project_id?: string
           responsible?: string | null
