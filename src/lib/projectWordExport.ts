@@ -312,7 +312,7 @@ export async function exportProjectWord(data: ProjectWordData) {
   };
 
   const explicitWp = (meta.wp_details ?? {}) as Record<string, { title?: string; objective?: string; activities?: string; results?: string; indicators?: string; milestones?: string; os_mapping?: string }>;
-  const wpKeys = ["WP1", "WP2", "WP3", "WP4", "WP5", "WP6"].slice(0, Math.max(lfObjectives.length, 4));
+  const wpKeys = ["WP1", "WP2", "WP3", "WP4"];
   const wpMeta: typeof explicitWp = {};
   wpKeys.forEach((k, i) => { wpMeta[k] = { ...buildWpFromLogframe(i + 1), ...(explicitWp[k] || {}) }; });
   const hasWp = wpKeys.some(k => wpMeta[k]?.objective || wpMeta[k]?.activities) || budgetDetails.length > 0;
