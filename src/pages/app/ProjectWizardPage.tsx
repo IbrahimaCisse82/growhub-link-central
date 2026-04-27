@@ -390,7 +390,9 @@ export default function ProjectWizardPage() {
       setKpis(existingKpis.map(k => {
         const match = k.name.match(/^I(\d+)\.\d+\s*/i);
         const wpIdx = match ? parseInt(match[1]) - 1 : 0;
-        return { name: k.name.replace(/^I\d+\.\d+\s*/i, "").trim(), category: k.category || "output", unit: k.unit || "", baseline: Number(k.baseline_value) || 0, target: Number(k.target_value) || 0, frequency: k.frequency || "quarterly", source: k.data_source || "", responsible: k.responsible || "", wpIndex: wpIdx };
+        const meta = (k as any).metadata || {};
+        const rt = meta.regional_targets || {};
+        return { name: k.name.replace(/^I\d+\.\d+\s*/i, "").trim(), category: k.category || "output", unit: k.unit || "", baseline: Number(k.baseline_value) || 0, target: Number(k.target_value) || 0, frequency: k.frequency || "quarterly", source: k.data_source || "", responsible: k.responsible || "", wpIndex: wpIdx, regionalTargets: { kedougou: Number(rt.kedougou) || 0, kolda: Number(rt.kolda) || 0, ziguinchor: Number(rt.ziguinchor) || 0 } };
       }));
     }
   }, [existingKpis]);
