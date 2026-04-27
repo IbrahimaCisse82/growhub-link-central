@@ -408,9 +408,10 @@ export function exportProjectPdf({ project, logFrame, toc, indicators, budgetLin
   // 7.1 Indicateurs KPI
   if (indicators.length > 0) {
     html += `<h3>7.1 Tableau des indicateurs KPIs</h3>`;
-    html += `<table><thead><tr><th>Indicateur</th><th>Catégorie</th><th>Référence</th><th>Cible</th><th>Actuel</th><th>Unité</th><th>Fréquence</th></tr></thead><tbody>`;
+    html += `<table><thead><tr><th>Indicateur</th><th>Catégorie</th><th>Réf.</th><th>Cible</th><th>Unité</th><th>Fréq.</th><th>Kédougou</th><th>Kolda</th><th>Ziguinchor</th></tr></thead><tbody>`;
     indicators.forEach(ind => {
-      html += `<tr><td>${e(ind.name)}</td><td>${e(ind.category ?? "")}</td><td>${ind.baseline_value ?? "—"}</td><td>${ind.target_value ?? "—"}</td><td>${ind.current_value ?? "—"}</td><td>${e(ind.unit ?? "")}</td><td>${e(ind.frequency ?? "")}</td></tr>`;
+      const rt = (ind.metadata?.regional_targets) || {};
+      html += `<tr><td>${e(ind.name)}</td><td>${e(ind.category ?? "")}</td><td>${ind.baseline_value ?? "—"}</td><td>${ind.target_value ?? "—"}</td><td>${e(ind.unit ?? "")}</td><td>${e(ind.frequency ?? "")}</td><td>${rt.kedougou ?? "—"}</td><td>${rt.kolda ?? "—"}</td><td>${rt.ziguinchor ?? "—"}</td></tr>`;
     });
     html += `</tbody></table>`;
   }
