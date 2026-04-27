@@ -718,6 +718,17 @@ export default function ProjectWizardPage() {
               <div className="space-y-2"><label className={labelCls}>3.2 Contraintes structurelles et vulnérabilités</label><textarea value={contraintes} onChange={e => setContraintes(e.target.value)} className={textareaLgCls} placeholder="Contraintes identifiées : accès limité aux financements, faible productivité…" /></div>
               <div className="space-y-2"><label className={labelCls}>3.3 Alignement avec les orientations stratégiques</label><textarea value={alignement} onChange={e => setAlignement(e.target.value)} className={textareaCls} placeholder="Cohérence avec les politiques nationales, ODD, NDC…" /></div>
               <div className="space-y-2"><label className={labelCls}>3.4 Justification de l'intervention</label><textarea value={justification} onChange={e => setJustification(e.target.value)} className={textareaLgCls} placeholder="Pourquoi ce projet est nécessaire et comment il répond aux problèmes…" /></div>
+
+              <div className={sectionTitleCls + " mt-6"}>Liste des abréviations</div>
+              <p className={helpCls}>Glossaire des sigles et acronymes utilisés dans le document de projet.</p>
+              {abreviations.map((a, i) => (
+                <div key={i} className="grid grid-cols-[140px_1fr_auto] gap-2 items-center">
+                  <input value={a.sigle} onChange={e => { const n = [...abreviations]; n[i] = { ...n[i], sigle: e.target.value }; setAbreviations(n); }} className={inputCls} placeholder="Sigle (ex: PAERID)" />
+                  <input value={a.signification} onChange={e => { const n = [...abreviations]; n[i] = { ...n[i], signification: e.target.value }; setAbreviations(n); }} className={inputCls} placeholder="Signification complète" />
+                  <button type="button" onClick={() => setAbreviations(abreviations.filter((_, j) => j !== i))} className="text-destructive text-xs px-2 hover:bg-destructive/10 rounded-lg">✕</button>
+                </div>
+              ))}
+              <button type="button" onClick={() => setAbreviations([...abreviations, { sigle: "", signification: "" }])} className="text-xs text-primary font-semibold hover:underline">+ Ajouter une abréviation</button>
             </div>
           )}
 
