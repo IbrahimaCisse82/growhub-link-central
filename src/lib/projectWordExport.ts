@@ -8,7 +8,7 @@
 import {
   Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
   AlignmentType, HeadingLevel, LevelFormat, ShadingType, WidthType, BorderStyle,
-  PageBreak, Header, Footer, PageNumber,
+  PageBreak, Header, Footer, PageNumber, TabStopType, TabStopPosition,
 } from "docx";
 import { saveAs } from "file-saver";
 
@@ -312,7 +312,7 @@ export async function exportProjectWord(data: ProjectWordData) {
   };
 
   const explicitWp = (meta.wp_details ?? {}) as Record<string, { title?: string; objective?: string; activities?: string; results?: string; indicators?: string; milestones?: string; os_mapping?: string }>;
-  const wpKeys = ["WP1", "WP2", "WP3", "WP4", "WP5", "WP6"].slice(0, Math.max(lfObjectives.length, 4));
+  const wpKeys = ["WP1", "WP2", "WP3", "WP4"];
   const wpMeta: typeof explicitWp = {};
   wpKeys.forEach((k, i) => { wpMeta[k] = { ...buildWpFromLogframe(i + 1), ...(explicitWp[k] || {}) }; });
   const hasWp = wpKeys.some(k => wpMeta[k]?.objective || wpMeta[k]?.activities) || budgetDetails.length > 0;
@@ -410,7 +410,17 @@ export async function exportProjectWord(data: ProjectWordData) {
 
   // ═══════ 13. PERSONNEL CLÉ ═══════
   children.push(h1("13. Personnel clé impliqué", true));
-  children.push(...multiPara(nl(meta.personnel_cle)));
+  const personnel = meta.personnel_cle;
+  if (Array.isArray(personnel) && personnel.length > 0 && typeof personnel[0] === "object") {
+    children.push(buildTable(
+      [{ text: "Rôle / Fonction", width: 3000 }, { text: "Profil / Description", width: 5000 }],
+      (personnel as { role?: string; profil?: string; name?: string }[])
+        .filter(p => p.role || p.name)
+        .map(p => [{ text: p.role ?? p.name ?? "", bold: true, color: NAVY }, p.profil ?? ""]),
+    ));
+  } else {
+    children.push(...multiPara(nl(personnel)));
+  }
 
   // ═══════ 14. PARTENAIRES ═══════
   children.push(h1("14. Partenaires cibles"));
@@ -552,10 +562,11 @@ export async function exportProjectWord(data: ProjectWordData) {
         default: new Header({
           children: [new Paragraph({
             alignment: AlignmentType.LEFT,
+            tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
             border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: GREY_BORDER, space: 4 } },
             children: [
               new TextRun({ text: "PAERID — Projet d'Appui à l'Entrepreneuriat Rural Innovant et Durable", italics: true, color: "5D6D7E", size: 18, font: "Arial" }),
-              new TextRun({ text: "\t\tSénégal — Kédougou · Kolda · Ziguinchor", color: GREEN, bold: true, size: 18, font: "Arial" }),
+              new TextRun({ text: "\tSénégal — Kédougou · Kolda · Ziguinchor", color: GREEN, bold: true, size: 18, font: "Arial" }),
             ],
           })],
         }),
