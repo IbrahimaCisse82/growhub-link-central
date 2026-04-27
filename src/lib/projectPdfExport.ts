@@ -362,7 +362,11 @@ export function exportProjectPdf({ project, logFrame, toc, indicators, budgetLin
     if (toc.outputs) { html += `<h3>5.3 Extrants (Outputs)</h3>`; html += field(nl(toc.outputs)); }
     if (toc.outcomes) { html += `<h3>5.4 Effets (Outcomes)</h3>`; html += field(nl(toc.outcomes)); }
     if (toc.impact) { html += `<h3>5.5 Impact</h3>`; html += field(nl(toc.impact)); }
-    if (toc.assumptions) { html += `<h3>5.6 Hypothèses clés</h3>`; html += field(nl(toc.assumptions)); }
+    if (toc.assumptions) { html += `<h3>5.2 Hypothèses clés</h3>`; html += field(nl(toc.assumptions)); }
+  }
+  if (meta.mecanismes_apprentissage) {
+    html += `<h3>5.3 Mécanismes d'apprentissage et d'adaptation</h3>`;
+    html += field(nl(meta.mecanismes_apprentissage));
   }
 
   // ═══════════════ 6. OBJECTIFS ═══════════════
