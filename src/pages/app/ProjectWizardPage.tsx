@@ -367,6 +367,8 @@ export default function ProjectWizardPage() {
       setCurrency(meta.currency || "USD");
       setContingencyPct(meta.contingency_pct ?? 7);
       if (meta.risques?.length) setRisks(meta.risques);
+      if (meta.abreviations?.length) setAbreviations(meta.abreviations);
+      setMecanismesApprentissage(meta.mecanismes_apprentissage || "");
     }
   }, [existingProject]);
 
