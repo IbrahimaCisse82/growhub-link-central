@@ -543,7 +543,7 @@ export default function ProjectWizardPage() {
       await supabase.from("project_indicators").insert(
         validKpis.map(k => {
           kpiCounters[k.wpIndex] = (kpiCounters[k.wpIndex] || 0) + 1;
-          return { project_id: pid, name: `I${k.wpIndex + 1}.${kpiCounters[k.wpIndex]} ${k.name}`, category: k.category, unit: k.unit || null, baseline_value: k.baseline, target_value: k.target, frequency: k.frequency, data_source: k.source || null, responsible: k.responsible || null };
+          return { project_id: pid, name: `I${k.wpIndex + 1}.${kpiCounters[k.wpIndex]} ${k.name}`, category: k.category, unit: k.unit || null, baseline_value: k.baseline, target_value: k.target, frequency: k.frequency, data_source: k.source || null, responsible: k.responsible || null, metadata: { regional_targets: k.regionalTargets } as any };
         })
       ).throwOnError();
     }
