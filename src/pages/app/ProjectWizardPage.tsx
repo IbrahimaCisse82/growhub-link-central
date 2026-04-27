@@ -479,12 +479,15 @@ export default function ProjectWizardPage() {
   // --- Build metadata ---
   const buildMetadata = (): ProjectMetadata => ({
     introduction, contexte_justification: contexteJustification, contexte_territorial: contexteT, contraintes, alignement_strategique: alignement, justification,
+    abreviations: abreviations.filter(a => a.sigle),
     strategie_objectif: strategieObjectif, strategie_axes: strategieAxes.filter(Boolean), strategie_modalites: strategieModalites,
     methodologie, population_cible: populationCible, estimation_beneficiaires: estimationBeneficiaires,
     personnel_cle: personnelCle.filter(p => p.role), partenaires: partenaires.filter(p => p.categorie),
     suivi_outils: suiviOutils, suivi_evaluation: suiviEvaluation, suivi_rapports: suiviRapports, plan_sortie: planSortie,
     secteurs_prioritaires: secteurs, porteur, alignement_odd: alignementOdd, version_document: versionDoc,
     risques: risks.filter(r => r.description), contingency_pct: contingencyPct, currency,
+    mecanismes_apprentissage: mecanismesApprentissage,
+    os_mappings: wps.map(wp => wp.osMapping || ""),
   });
 
   // --- Save functions ---
