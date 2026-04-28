@@ -243,8 +243,11 @@ export async function exportProjectWord(data: ProjectWordData) {
   if (Array.isArray(logFrame?.specific_objectives) && logFrame.specific_objectives.length) {
     children.push(h2("6.2 Objectifs spécifiques"));
     (logFrame.specific_objectives as string[]).forEach((obj, i) => {
-      children.push(h3(`OS${i + 1}`));
-      children.push(p(typeof obj === "string" ? obj : JSON.stringify(obj)));
+      const text = typeof obj === "string" ? obj : JSON.stringify(obj);
+      // Évite le doublon "OS1\n\nOS1: ..." — n'ajoute le préfixe que s'il est absent
+      const prefix = `OS${i + 1}`;
+      const display = text.trim().toUpperCase().startsWith(prefix.toUpperCase()) ? text : `${prefix} : ${text}`;
+      children.push(p([new TextRun({ text: display, font: "Arial", size: 22 })]));
     });
   }
 
