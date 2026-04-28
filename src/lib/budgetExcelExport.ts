@@ -171,6 +171,8 @@ export async function exportBudgetToExcel({ projectId, projectName = "PAERID", c
   const wpRowMap: Record<string, { start: number; end: number }> = {};
   // Map sub-poste code (WP1.2) → row in feuille 2 to allow precise cross-sheet refs
   const subPosteRowMap: Record<string, number> = {};
+  // Fallback: rows by WP in sequential order (for code mismatches like A1.1 vs WP1.1)
+  const wpRowsSequence: Record<string, number[]> = {};
 
   WP_ORDER.filter(wp => wpGroups[wp]?.length).forEach(wp => {
     setCell(ws2, XLSX.utils.encode_cell({ r: row, c: 0 }), WP_LABELS[wp], wpRowStyle);
@@ -178,6 +180,7 @@ export async function exportBudgetToExcel({ projectId, projectName = "PAERID", c
     for (let c = 1; c < 12; c++) setCell(ws2, XLSX.utils.encode_cell({ r: row, c }), "", wpRowStyle);
     row++;
     const start = row;
+    wpRowsSequence[wp] = [];
     wpGroups[wp].forEach(d => {
       const r = row;
       setCell(ws2, XLSX.utils.encode_cell({ r, c: 0 }), d.code, cellStyle);
@@ -191,8 +194,9 @@ export async function exportBudgetToExcel({ projectId, projectName = "PAERID", c
       );
       const excelRow = r + 1;
       setCell(ws2, XLSX.utils.encode_cell({ r, c: 11 }), 0, totalStyle, `SUM(G${excelRow}:K${excelRow})`);
-      // Map sub-poste code (e.g. "WP1.2") to its row for cross-sheet refs from Feuille 1
+      // Map sub-poste code (e.g. "WP1.2" or "A1.2") to its row for cross-sheet refs from Feuille 1
       if (d.code) subPosteRowMap[String(d.code)] = excelRow;
+      wpRowsSequence[wp].push(excelRow);
       row++;
     });
     const end = row - 1;
