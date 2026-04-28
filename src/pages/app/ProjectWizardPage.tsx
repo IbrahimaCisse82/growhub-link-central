@@ -140,27 +140,67 @@ function toArr(val: unknown): string[] {
 
 const wpColors = ["from-primary/80 to-primary", "from-accent/80 to-accent", "from-emerald-500/80 to-emerald-600", "from-amber-500/80 to-amber-600", "from-violet-500/80 to-violet-600", "from-rose-500/80 to-rose-600"];
 
-// --- Budget default template lines (PAERID structure) ---
-function buildDefaultBudgetFromWps(wps: WpDraft[]): BudgetActivity[] {
-  const lines: BudgetActivity[] = [];
-  wps.forEach((_wp, i) => {
-    const wpCode = `WP${i + 1}`;
-    lines.push({ ...emptyBudgetActivity(wpCode, 1), description: `Personnel ${wpCode}`, category: "Ressources Humaines", unit: "ETP/an" });
-    lines.push({ ...emptyBudgetActivity(wpCode, 2), description: `Activités opérationnelles ${wpCode}`, category: "Formation/Animation", unit: "session" });
-  });
-  // GC
-  lines.push({ ...emptyBudgetActivity("GC", 1), description: "Chef de projet & équipe de coordination", category: "Ressources Humaines", unit: "ETP/an" });
-  lines.push({ ...emptyBudgetActivity("GC", 2), description: "Frais de fonctionnement & logistique", category: "Fonctionnement", unit: "forfait/an" });
-  lines.push({ ...emptyBudgetActivity("GC", 3), description: "Déplacements & transport terrain", category: "Transport/Logistique", unit: "véhicule/an" });
-  lines.push({ ...emptyBudgetActivity("GC", 4), description: "Communication & visibilité projet", category: "Communication", unit: "forfait/an" });
-  lines.push({ ...emptyBudgetActivity("GC", 5), description: "Audits financiers annuels", category: "Audit/Contrôle", unit: "audit/an" });
-  // SE
-  lines.push({ ...emptyBudgetActivity("SE", 1), description: "Système de suivi-évaluation", category: "Consultants/Études", unit: "forfait" });
-  lines.push({ ...emptyBudgetActivity("SE", 2), description: "Évaluation à mi-parcours", category: "Évaluation Externe", unit: "mission" });
-  lines.push({ ...emptyBudgetActivity("SE", 3), description: "Évaluation finale", category: "Évaluation Externe", unit: "mission" });
-  lines.push({ ...emptyBudgetActivity("SE", 4), description: "Études de base & enquêtes endline", category: "Consultants/Études", unit: "étude" });
-  lines.push({ ...emptyBudgetActivity("SE", 5), description: "Rapports & publications résultats", category: "Communication", unit: "rapport/an" });
-  return lines;
+// --- Budget PAERID template (sous-postes WP1.1 → SE.3 préremplis) ---
+// Coûts indicatifs en XOF (Franc CFA), répartis sur 5 ans selon le modèle PAERID v.finale
+type BudgetSeed = {
+  wp: string; idx: number; description: string; category: string; unit: string;
+  qty: number; unitCost: number; y1: number; y2: number; y3: number; y4: number; y5: number;
+  mg?: string; mc?: string;
+};
+
+const PAERID_BUDGET_SEEDS: BudgetSeed[] = [
+  // WP1 — Renforcement des compétences & structuration
+  { wp: "WP1", idx: 1, description: "Diagnostic & cartographie des TPE/PME rurales (3 régions)", category: "Consultants/Études", unit: "étude", qty: 3, unitCost: 8_000_000, y1: 24_000_000, y2: 0, y3: 0, y4: 0, y5: 0, mg: "●", mc: "○" },
+  { wp: "WP1", idx: 2, description: "Formations techniques & managériales (cohortes annuelles)", category: "Formation/Animation", unit: "session", qty: 60, unitCost: 1_500_000, y1: 18_000_000, y2: 22_500_000, y3: 22_500_000, y4: 18_000_000, y5: 9_000_000, mg: "●", mc: "◐" },
+  { wp: "WP1", idx: 3, description: "Coaching individuel & accompagnement post-formation", category: "Prestations-Experts", unit: "h coaching", qty: 2400, unitCost: 35_000, y1: 12_000_000, y2: 21_000_000, y3: 21_000_000, y4: 18_000_000, y5: 12_000_000, mg: "●", mc: "○" },
+  { wp: "WP1", idx: 4, description: "Structuration juridique & mise en conformité (appui)", category: "Appui Juridique", unit: "TPE/PME", qty: 200, unitCost: 250_000, y1: 10_000_000, y2: 15_000_000, y3: 15_000_000, y4: 7_500_000, y5: 2_500_000 },
+
+  // WP2 — Accès aux marchés & développement commercial
+  { wp: "WP2", idx: 1, description: "Études de marché sectorielles & veille commerciale", category: "Consultants/Études", unit: "étude", qty: 6, unitCost: 6_000_000, y1: 12_000_000, y2: 12_000_000, y3: 6_000_000, y4: 6_000_000, y5: 0 },
+  { wp: "WP2", idx: 2, description: "Foires, salons & missions commerciales (national/sous-régional)", category: "Événementiel", unit: "événement", qty: 15, unitCost: 8_000_000, y1: 16_000_000, y2: 24_000_000, y3: 32_000_000, y4: 24_000_000, y5: 24_000_000, mg: "◐", mc: "○" },
+  { wp: "WP2", idx: 3, description: "Plateforme e-commerce & outils digitaux B2B", category: "Infrastructure TIC", unit: "forfait", qty: 1, unitCost: 45_000_000, y1: 25_000_000, y2: 10_000_000, y3: 5_000_000, y4: 3_000_000, y5: 2_000_000, mc: "●" },
+  { wp: "WP2", idx: 4, description: "Certification qualité & normes (accompagnement)", category: "Certification/Normes", unit: "certification", qty: 80, unitCost: 800_000, y1: 8_000_000, y2: 16_000_000, y3: 20_000_000, y4: 12_000_000, y5: 8_000_000 },
+
+  // WP3 — Accès au financement & investissement
+  { wp: "WP3", idx: 1, description: "Fonds de garantie & instruments de financement adapté", category: "Subventions/Fonds", unit: "TPE/PME bénéf.", qty: 150, unitCost: 2_000_000, y1: 60_000_000, y2: 90_000_000, y3: 90_000_000, y4: 45_000_000, y5: 15_000_000, mg: "●" },
+  { wp: "WP3", idx: 2, description: "Préparation à l'investissement (investment readiness)", category: "Prestations-Experts", unit: "TPE/PME", qty: 100, unitCost: 1_200_000, y1: 12_000_000, y2: 24_000_000, y3: 30_000_000, y4: 30_000_000, y5: 24_000_000 },
+  { wp: "WP3", idx: 3, description: "Mise en relation investisseurs & forums financement", category: "Animation/Réseaux", unit: "événement", qty: 10, unitCost: 6_000_000, y1: 6_000_000, y2: 12_000_000, y3: 18_000_000, y4: 12_000_000, y5: 12_000_000 },
+  { wp: "WP3", idx: 4, description: "Renforcement IMF & coopératives d'épargne-crédit", category: "Appui Technique", unit: "IMF/coop.", qty: 12, unitCost: 4_000_000, y1: 8_000_000, y2: 12_000_000, y3: 12_000_000, y4: 12_000_000, y5: 4_000_000 },
+
+  // WP4 — Innovation, durabilité & écosystème
+  { wp: "WP4", idx: 1, description: "Labos d'innovation rurale & R&D appliquée (3 régions)", category: "R&D Appliquée", unit: "labo/an", qty: 15, unitCost: 5_000_000, y1: 15_000_000, y2: 15_000_000, y3: 15_000_000, y4: 15_000_000, y5: 15_000_000, mc: "●" },
+  { wp: "WP4", idx: 2, description: "Transition agroécologique & énergies renouvelables", category: "Appui Technique", unit: "TPE/PME", qty: 120, unitCost: 1_500_000, y1: 18_000_000, y2: 36_000_000, y3: 45_000_000, y4: 45_000_000, y5: 36_000_000, mc: "●" },
+  { wp: "WP4", idx: 3, description: "Genre & inclusion : programmes femmes & jeunes entrepreneurs", category: "Actions Genre", unit: "bénéficiaire", qty: 800, unitCost: 200_000, y1: 16_000_000, y2: 32_000_000, y3: 40_000_000, y4: 40_000_000, y5: 32_000_000, mg: "●" },
+  { wp: "WP4", idx: 4, description: "Plateforme écosystème & communauté de pratique", category: "Animation/Réseaux", unit: "forfait/an", qty: 5, unitCost: 8_000_000, y1: 8_000_000, y2: 8_000_000, y3: 8_000_000, y4: 8_000_000, y5: 8_000_000 },
+
+  // GC — Gouvernance & Coordination
+  { wp: "GC", idx: 1, description: "Chef de projet & équipe de coordination (5 ETP)", category: "Ressources Humaines", unit: "ETP/an", qty: 25, unitCost: 18_000_000, y1: 90_000_000, y2: 90_000_000, y3: 90_000_000, y4: 90_000_000, y5: 90_000_000 },
+  { wp: "GC", idx: 2, description: "Frais de fonctionnement & logistique bureaux", category: "Fonctionnement", unit: "forfait/an", qty: 5, unitCost: 25_000_000, y1: 25_000_000, y2: 25_000_000, y3: 25_000_000, y4: 25_000_000, y5: 25_000_000 },
+  { wp: "GC", idx: 3, description: "Déplacements & transport terrain (3 régions)", category: "Transport/Logistique", unit: "véhicule/an", qty: 5, unitCost: 12_000_000, y1: 12_000_000, y2: 12_000_000, y3: 12_000_000, y4: 12_000_000, y5: 12_000_000 },
+  { wp: "GC", idx: 4, description: "Communication & visibilité projet (multi-supports)", category: "Communication", unit: "forfait/an", qty: 5, unitCost: 8_000_000, y1: 8_000_000, y2: 8_000_000, y3: 8_000_000, y4: 8_000_000, y5: 8_000_000 },
+  { wp: "GC", idx: 5, description: "Audits financiers annuels (cabinet externe)", category: "Audit/Contrôle", unit: "audit/an", qty: 5, unitCost: 6_000_000, y1: 6_000_000, y2: 6_000_000, y3: 6_000_000, y4: 6_000_000, y5: 6_000_000 },
+
+  // SE — Suivi & Évaluation
+  { wp: "SE", idx: 1, description: "Système de suivi-évaluation (MEAL) & outils digitaux", category: "Consultants/Études", unit: "forfait", qty: 1, unitCost: 18_000_000, y1: 12_000_000, y2: 3_000_000, y3: 1_500_000, y4: 1_000_000, y5: 500_000 },
+  { wp: "SE", idx: 2, description: "Évaluation à mi-parcours (cabinet externe)", category: "Évaluation Externe", unit: "mission", qty: 1, unitCost: 18_000_000, y1: 0, y2: 0, y3: 18_000_000, y4: 0, y5: 0 },
+  { wp: "SE", idx: 3, description: "Évaluation finale & capitalisation", category: "Évaluation Externe", unit: "mission", qty: 1, unitCost: 25_000_000, y1: 0, y2: 0, y3: 0, y4: 0, y5: 25_000_000 },
+];
+
+function buildDefaultBudgetFromWps(_wps: WpDraft[]): BudgetActivity[] {
+  // Template PAERID complet : utilise les sous-postes officiels indépendamment du nombre de WPs définis
+  return PAERID_BUDGET_SEEDS.map(s => ({
+    code: s.wp.startsWith("WP") ? `A${s.wp.replace("WP","")}.${s.idx}` : `${s.wp}.${s.idx}`,
+    description: s.description,
+    category: s.category,
+    unit: s.unit,
+    qty: s.qty,
+    unitCost: s.unitCost,
+    year1: s.y1, year2: s.y2, year3: s.y3, year4: s.y4, year5: s.y5,
+    markerGender: s.mg || "○",
+    markerClimate: s.mc || "○",
+    notes: "",
+    wpCode: s.wp,
+  }));
 }
 
 const BUDGET_CATEGORIES = [
