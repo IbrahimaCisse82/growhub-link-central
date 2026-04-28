@@ -240,13 +240,15 @@ export async function exportBudgetToExcel({ projectId, projectName = "PAERID", c
     r1++;
 
     // Sub-postes for this WP
-    SUBPOSTES.filter(sp => sp.wp === wp).forEach(sp => {
+    const wpSubpostes = SUBPOSTES.filter(sp => sp.wp === wp);
+    const sequentialRows = wpRowsSequence[wp] || [];
+    wpSubpostes.forEach((sp, idx) => {
       setCell(ws1, XLSX.utils.encode_cell({ r: r1, c: 0 }), sp.code, cellStyle);
       setCell(ws1, XLSX.utils.encode_cell({ r: r1, c: 1 }), sp.label, cellStyle);
       setCell(ws1, XLSX.utils.encode_cell({ r: r1, c: 2 }), sp.category, cellStyle);
 
-      // Year columns: try to bind to the matching detail row in Feuille 2 by code prefix
-      const matchingRow = subPosteRowMap[sp.code];
+      // Year columns: try exact code match first, fallback to sequential index in WP
+      const matchingRow = subPosteRowMap[sp.code] ?? sequentialRows[idx];
       ["G", "H", "I", "J", "K"].forEach((col2col, i) => {
         if (matchingRow) {
           setCell(ws1, XLSX.utils.encode_cell({ r: r1, c: 3 + i }), 0, numStyle, `'2. Détail par WP'!${col2col}${matchingRow}`);
@@ -256,8 +258,6 @@ export async function exportBudgetToExcel({ projectId, projectName = "PAERID", c
       });
       const excelRow = r1 + 1;
       setCell(ws1, XLSX.utils.encode_cell({ r: r1, c: 8 }), 0, totalStyle, `SUM(D${excelRow}:H${excelRow})`);
-      // % budget — placeholder, will reference total general row computed later
-      // Use a formula referencing future total cell I{stRow+2} but we don't know yet → use INDIRECT later
       r1++;
     });
   });
