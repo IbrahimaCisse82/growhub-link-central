@@ -256,8 +256,10 @@ export async function exportProjectWord(data: ProjectWordData) {
   if (meta.resultats_attendus) children.push(...multiPara(nl(meta.resultats_attendus)));
   if (Array.isArray(logFrame?.expected_results)) {
     (logFrame.expected_results as string[]).forEach((r, i) => {
-      children.push(h3(`R${i + 1}`));
-      children.push(p(typeof r === "string" ? r : JSON.stringify(r)));
+      const text = typeof r === "string" ? r : JSON.stringify(r);
+      const prefix = `R${i + 1}`;
+      const display = text.trim().toUpperCase().startsWith(prefix.toUpperCase()) ? text : `${prefix} : ${text}`;
+      children.push(p([new TextRun({ text: display, font: "Arial", size: 22 })]));
     });
   }
   if (indicators.length) {
