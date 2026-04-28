@@ -1044,9 +1044,22 @@ export default function ProjectWizardPage() {
           {/* ── STEP 9: Budget prévisionnel (PAERID format) ── */}
           {step === 9 && (
             <div className="space-y-5">
-              <div>
-                <h2 className="text-lg font-display font-bold text-foreground">17. Budget prévisionnel</h2>
-                <p className={helpCls}>Récapitulatif par composante (Work Package) et par année — Montants en {currency}.</p>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h2 className="text-lg font-display font-bold text-foreground">17. Budget prévisionnel</h2>
+                  <p className={helpCls}>Récapitulatif par composante (Work Package) et par année — Montants en {currency}.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (budgetActivities.length > 0 && !confirm("Remplacer les lignes actuelles par le template PAERID complet (24 sous-postes) ?")) return;
+                    setBudgetActivities(buildDefaultBudgetFromWps(wps));
+                    toast.success("Template PAERID chargé : 24 sous-postes préremplis");
+                  }}
+                  className="text-xs font-semibold text-primary border border-primary/40 rounded-lg px-3 py-1.5 hover:bg-primary/10 transition-colors whitespace-nowrap"
+                >
+                  ⟳ Charger template PAERID
+                </button>
               </div>
 
               {/* Summary cards */}
