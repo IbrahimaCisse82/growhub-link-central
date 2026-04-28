@@ -562,6 +562,7 @@ export default function ProjectWizardPage() {
 
   const saveBudget = async (pid: string) => {
     await supabase.from("project_budget_lines").delete().eq("project_id", pid);
+    await supabase.from("project_budget_details").delete().eq("project_id", pid);
     const validBudget = budgetActivities.filter(b => b.description);
     if (validBudget.length > 0) {
       await supabase.from("project_budget_lines").insert(
@@ -573,6 +574,16 @@ export default function ProjectWizardPage() {
           marker_gender: b.markerGender, marker_climate: b.markerClimate,
           budget_category: b.category, notes: b.notes || null,
         } as any))
+      ).throwOnError();
+      // Mirror dans project_budget_details (utilisé par BudgetDetailTab et l'export Excel WP)
+      await supabase.from("project_budget_details").insert(
+        validBudget.map((b, i) => ({
+          project_id: pid, work_package: b.wpCode, code: b.code, activity: b.description,
+          category: b.category || null, unit: b.unit || null,
+          quantity: b.qty, unit_cost: b.unitCost,
+          year_1: b.year1, year_2: b.year2, year_3: b.year3, year_4: b.year4, year_5: b.year5,
+          total: activityTotal(b), sort_order: i,
+        }))
       ).throwOnError();
     }
     await supabase.from("projects").update({ budget: totalBudget }).eq("id", pid);
