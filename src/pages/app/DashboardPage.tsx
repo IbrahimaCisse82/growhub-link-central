@@ -50,12 +50,23 @@ function usePeriodComparison(items: any[] | undefined, dateField: string) {
   }, [items, dateField]);
 }
 
+import ProjectManagerDashboard from "@/components/dashboard/ProjectManagerDashboard";
+import FunderDashboard from "@/components/dashboard/FunderDashboard";
+import StaffDashboard from "@/components/dashboard/StaffDashboard";
+
 export default function DashboardPage() {
   const navigate = useNavigate();
-  const { roles, isAdmin, profile } = useAuth();
+  const { roles, isAdmin, profile, persona } = useAuth();
   const { t } = useTranslation();
-  const isMentor = roles.includes("mentor");
+  const isMentor = roles.includes("mentor") || roles.includes("consultant_expert") || roles.includes("consultant_coach");
   const isEntrepreneur = roles.includes("entrepreneur");
+
+  // Routing par persona : nouveaux layouts dédiés
+  if (!isAdmin) {
+    if (persona === "project_manager") return <ProjectManagerDashboard />;
+    if (persona === "funder") return <FunderDashboard />;
+    if (persona === "staff") return <StaffDashboard />;
+  }
 
   const { data: startupsCount, isLoading: loadingStartups } = useStartupsCount();
   const { data: projects, isLoading: loadingProjects } = useProjects();
