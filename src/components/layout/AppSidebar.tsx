@@ -211,19 +211,17 @@ export default function AppSidebar({ mobile, onNavigate }: AppSidebarProps) {
       <nav className="p-3 flex-1">
         {navGroups.map((group) => {
           if (group.adminOnly && !isAdmin) return null;
-          const isRestricted = roles.some(r => ["entrepreneur", "mentor"].includes(r)) && !isAdmin;
-          const allowedGroups = [
-            t("nav.overview"), t("nav.support"), t("nav.network"),
-            "Vue Générale", "Accompagnement", "Réseau", "Overview", "Support", "Network",
-            "نظرة عامة", "المرافقة", "الشبكة",
-          ];
-          if (isRestricted && !allowedGroups.includes(group.label)) return null;
+          // Filtrage par persona : on garde uniquement les items autorisés
+          const visibleItems = allowedPaths === null
+            ? group.items
+            : group.items.filter((it) => allowedPaths.includes(it.path));
+          if (visibleItems.length === 0) return null;
           return (
             <div key={group.label} className="mb-5">
               <div className="font-mono text-[9px] tracking-[0.2em] uppercase text-muted-foreground px-2 mb-1">
                 {group.label}
               </div>
-              {group.items.map((item) => {
+              {visibleItems.map((item) => {
                 const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + "/");
                 const badge = getBadge(item);
                 const Icon = item.icon;
