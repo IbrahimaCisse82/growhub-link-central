@@ -50,6 +50,7 @@ export type Database = {
           created_at: string | null
           evaluator_id: string
           id: string
+          is_demo: boolean
           notes: string | null
           recommendation: string | null
           round_id: string
@@ -63,6 +64,7 @@ export type Database = {
           created_at?: string | null
           evaluator_id: string
           id?: string
+          is_demo?: boolean
           notes?: string | null
           recommendation?: string | null
           round_id: string
@@ -76,6 +78,7 @@ export type Database = {
           created_at?: string | null
           evaluator_id?: string
           id?: string
+          is_demo?: boolean
           notes?: string | null
           recommendation?: string | null
           round_id?: string
@@ -108,6 +111,7 @@ export type Database = {
           ends_at: string | null
           id: string
           is_active: boolean | null
+          is_demo: boolean
           name: string
           program_id: string | null
           project_id: string | null
@@ -122,6 +126,7 @@ export type Database = {
           ends_at?: string | null
           id?: string
           is_active?: boolean | null
+          is_demo?: boolean
           name: string
           program_id?: string | null
           project_id?: string | null
@@ -136,6 +141,7 @@ export type Database = {
           ends_at?: string | null
           id?: string
           is_active?: boolean | null
+          is_demo?: boolean
           name?: string
           program_id?: string | null
           project_id?: string | null
@@ -170,6 +176,7 @@ export type Database = {
           evaluation_notes: string | null
           evaluator_id: string | null
           id: string
+          is_demo: boolean
           motivation: string | null
           program_id: string | null
           project_id: string | null
@@ -188,6 +195,7 @@ export type Database = {
           evaluation_notes?: string | null
           evaluator_id?: string | null
           id?: string
+          is_demo?: boolean
           motivation?: string | null
           program_id?: string | null
           project_id?: string | null
@@ -206,6 +214,7 @@ export type Database = {
           evaluation_notes?: string | null
           evaluator_id?: string | null
           id?: string
+          is_demo?: boolean
           motivation?: string | null
           program_id?: string | null
           project_id?: string | null
@@ -301,6 +310,7 @@ export type Database = {
           currency: string | null
           grant_id: string | null
           id: string
+          is_demo: boolean
           label: string
           nomenclature_code: string | null
           project_id: string | null
@@ -314,6 +324,7 @@ export type Database = {
           currency?: string | null
           grant_id?: string | null
           id?: string
+          is_demo?: boolean
           label: string
           nomenclature_code?: string | null
           project_id?: string | null
@@ -327,6 +338,7 @@ export type Database = {
           currency?: string | null
           grant_id?: string | null
           id?: string
+          is_demo?: boolean
           label?: string
           nomenclature_code?: string | null
           project_id?: string | null
@@ -529,6 +541,7 @@ export type Database = {
           content: string
           created_at: string | null
           id: string
+          is_demo: boolean
           is_private: boolean | null
           session_id: string
           updated_at: string | null
@@ -538,6 +551,7 @@ export type Database = {
           content: string
           created_at?: string | null
           id?: string
+          is_demo?: boolean
           is_private?: boolean | null
           session_id: string
           updated_at?: string | null
@@ -547,6 +561,7 @@ export type Database = {
           content?: string
           created_at?: string | null
           id?: string
+          is_demo?: boolean
           is_private?: boolean | null
           session_id?: string
           updated_at?: string | null
@@ -568,6 +583,7 @@ export type Database = {
           duration_minutes: number | null
           feedback: string | null
           id: string
+          is_demo: boolean
           meeting_url: string | null
           mentor_id: string
           notes: string | null
@@ -584,6 +600,7 @@ export type Database = {
           duration_minutes?: number | null
           feedback?: string | null
           id?: string
+          is_demo?: boolean
           meeting_url?: string | null
           mentor_id: string
           notes?: string | null
@@ -600,6 +617,7 @@ export type Database = {
           duration_minutes?: number | null
           feedback?: string | null
           id?: string
+          is_demo?: boolean
           meeting_url?: string | null
           mentor_id?: string
           notes?: string | null
@@ -677,6 +695,7 @@ export type Database = {
           description: string | null
           end_date: string | null
           id: string
+          is_demo: boolean
           max_startups: number | null
           name: string
           project_id: string | null
@@ -690,6 +709,7 @@ export type Database = {
           description?: string | null
           end_date?: string | null
           id?: string
+          is_demo?: boolean
           max_startups?: number | null
           name: string
           project_id?: string | null
@@ -703,6 +723,7 @@ export type Database = {
           description?: string | null
           end_date?: string | null
           id?: string
+          is_demo?: boolean
           max_startups?: number | null
           name?: string
           project_id?: string | null
@@ -776,6 +797,7 @@ export type Database = {
           course_id: string
           enrolled_at: string
           id: string
+          is_demo: boolean
           progress: number | null
           user_id: string
         }
@@ -784,6 +806,7 @@ export type Database = {
           course_id: string
           enrolled_at?: string
           id?: string
+          is_demo?: boolean
           progress?: number | null
           user_id: string
         }
@@ -792,6 +815,7 @@ export type Database = {
           course_id?: string
           enrolled_at?: string
           id?: string
+          is_demo?: boolean
           progress?: number | null
           user_id?: string
         }
@@ -812,6 +836,7 @@ export type Database = {
           created_at: string
           duration_minutes: number | null
           id: string
+          is_demo: boolean
           module_order: number
           module_type: string
           quiz_questions: Json | null
@@ -825,6 +850,7 @@ export type Database = {
           created_at?: string
           duration_minutes?: number | null
           id?: string
+          is_demo?: boolean
           module_order?: number
           module_type?: string
           quiz_questions?: Json | null
@@ -838,6 +864,7 @@ export type Database = {
           created_at?: string
           duration_minutes?: number | null
           id?: string
+          is_demo?: boolean
           module_order?: number
           module_type?: string
           quiz_questions?: Json | null
@@ -862,6 +889,7 @@ export type Database = {
           duration_hours: number | null
           id: string
           instructor_id: string | null
+          is_demo: boolean
           is_published: boolean | null
           level: string | null
           modules_count: number | null
@@ -876,6 +904,7 @@ export type Database = {
           duration_hours?: number | null
           id?: string
           instructor_id?: string | null
+          is_demo?: boolean
           is_published?: boolean | null
           level?: string | null
           modules_count?: number | null
@@ -890,6 +919,7 @@ export type Database = {
           duration_hours?: number | null
           id?: string
           instructor_id?: string | null
+          is_demo?: boolean
           is_published?: boolean | null
           level?: string | null
           modules_count?: number | null
@@ -922,6 +952,7 @@ export type Database = {
           id: string
           is_active: boolean | null
           is_client: boolean | null
+          is_demo: boolean
           is_funder: boolean | null
           is_supplier: boolean | null
           name: string
@@ -946,6 +977,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           is_client?: boolean | null
+          is_demo?: boolean
           is_funder?: boolean | null
           is_supplier?: boolean | null
           name: string
@@ -970,6 +1002,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           is_client?: boolean | null
+          is_demo?: boolean
           is_funder?: boolean | null
           is_supplier?: boolean | null
           name?: string
@@ -1050,6 +1083,7 @@ export type Database = {
           id: string
           invoice_number: string
           is_credit_note: boolean | null
+          is_demo: boolean
           issue_date: string
           last_reminder_at: string | null
           last_reminder_sent_at: string | null
@@ -1084,6 +1118,7 @@ export type Database = {
           id?: string
           invoice_number: string
           is_credit_note?: boolean | null
+          is_demo?: boolean
           issue_date?: string
           last_reminder_at?: string | null
           last_reminder_sent_at?: string | null
@@ -1118,6 +1153,7 @@ export type Database = {
           id?: string
           invoice_number?: string
           is_credit_note?: boolean | null
+          is_demo?: boolean
           issue_date?: string
           last_reminder_at?: string | null
           last_reminder_sent_at?: string | null
@@ -1183,6 +1219,7 @@ export type Database = {
           currency: string
           id: string
           invoice_id: string
+          is_demo: boolean
           notes: string | null
           payment_date: string
           payment_method: string | null
@@ -1195,6 +1232,7 @@ export type Database = {
           currency?: string
           id?: string
           invoice_id: string
+          is_demo?: boolean
           notes?: string | null
           payment_date?: string
           payment_method?: string | null
@@ -1207,6 +1245,7 @@ export type Database = {
           currency?: string
           id?: string
           invoice_id?: string
+          is_demo?: boolean
           notes?: string | null
           payment_date?: string
           payment_method?: string | null
@@ -1278,6 +1317,7 @@ export type Database = {
           currency: string
           grant_id: string | null
           id: string
+          is_demo: boolean
           issue_date: string
           notes: string | null
           payment_terms: string | null
@@ -1303,6 +1343,7 @@ export type Database = {
           currency?: string
           grant_id?: string | null
           id?: string
+          is_demo?: boolean
           issue_date?: string
           notes?: string | null
           payment_terms?: string | null
@@ -1328,6 +1369,7 @@ export type Database = {
           currency?: string
           grant_id?: string | null
           id?: string
+          is_demo?: boolean
           issue_date?: string
           notes?: string | null
           payment_terms?: string | null
@@ -1441,6 +1483,7 @@ export type Database = {
           end_date: string | null
           frequency: Database["public"]["Enums"]["crm_subscription_frequency"]
           id: string
+          is_demo: boolean
           name: string
           next_due_date: string
           notes: string | null
@@ -1460,6 +1503,7 @@ export type Database = {
           end_date?: string | null
           frequency?: Database["public"]["Enums"]["crm_subscription_frequency"]
           id?: string
+          is_demo?: boolean
           name: string
           next_due_date?: string
           notes?: string | null
@@ -1479,6 +1523,7 @@ export type Database = {
           end_date?: string | null
           frequency?: Database["public"]["Enums"]["crm_subscription_frequency"]
           id?: string
+          is_demo?: boolean
           name?: string
           next_due_date?: string
           notes?: string | null
@@ -1505,6 +1550,7 @@ export type Database = {
           frequency: string | null
           id: string
           is_active: boolean | null
+          is_demo: boolean
           program_id: string | null
           target_stages: string[] | null
           title: string
@@ -1518,6 +1564,7 @@ export type Database = {
           frequency?: string | null
           id?: string
           is_active?: boolean | null
+          is_demo?: boolean
           program_id?: string | null
           target_stages?: string[] | null
           title: string
@@ -1531,6 +1578,7 @@ export type Database = {
           frequency?: string | null
           id?: string
           is_active?: boolean | null
+          is_demo?: boolean
           program_id?: string | null
           target_stages?: string[] | null
           title?: string
@@ -1551,6 +1599,7 @@ export type Database = {
           created_at: string | null
           form_id: string
           id: string
+          is_demo: boolean
           period: string | null
           respondent_id: string
           responses: Json
@@ -1563,6 +1612,7 @@ export type Database = {
           created_at?: string | null
           form_id: string
           id?: string
+          is_demo?: boolean
           period?: string | null
           respondent_id: string
           responses?: Json
@@ -1575,6 +1625,7 @@ export type Database = {
           created_at?: string | null
           form_id?: string
           id?: string
+          is_demo?: boolean
           period?: string | null
           respondent_id?: string
           responses?: Json
@@ -1811,6 +1862,7 @@ export type Database = {
           created_at: string | null
           description: string | null
           id: string
+          is_demo: boolean
           max_score: number
           name: string
           round_id: string
@@ -1821,6 +1873,7 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           id?: string
+          is_demo?: boolean
           max_score?: number
           name: string
           round_id: string
@@ -1831,6 +1884,7 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           id?: string
+          is_demo?: boolean
           max_score?: number
           name?: string
           round_id?: string
@@ -1853,6 +1907,7 @@ export type Database = {
           checked_in_at: string | null
           event_id: string
           id: string
+          is_demo: boolean
           registered_at: string
           user_id: string
         }
@@ -1861,6 +1916,7 @@ export type Database = {
           checked_in_at?: string | null
           event_id: string
           id?: string
+          is_demo?: boolean
           registered_at?: string
           user_id: string
         }
@@ -1869,6 +1925,7 @@ export type Database = {
           checked_in_at?: string | null
           event_id?: string
           id?: string
+          is_demo?: boolean
           registered_at?: string
           user_id?: string
         }
@@ -1889,6 +1946,7 @@ export type Database = {
           end_at: string | null
           event_type: Database["public"]["Enums"]["event_type"]
           id: string
+          is_demo: boolean
           is_online: boolean | null
           location: string | null
           max_attendees: number | null
@@ -1905,6 +1963,7 @@ export type Database = {
           end_at?: string | null
           event_type?: Database["public"]["Enums"]["event_type"]
           id?: string
+          is_demo?: boolean
           is_online?: boolean | null
           location?: string | null
           max_attendees?: number | null
@@ -1921,6 +1980,7 @@ export type Database = {
           end_at?: string | null
           event_type?: Database["public"]["Enums"]["event_type"]
           id?: string
+          is_demo?: boolean
           is_online?: boolean | null
           location?: string | null
           max_attendees?: number | null
@@ -1949,6 +2009,7 @@ export type Database = {
           end_date: string | null
           grant_id: string
           id: string
+          is_demo: boolean
           priority: string | null
           progress: number | null
           responsible: string | null
@@ -1964,6 +2025,7 @@ export type Database = {
           end_date?: string | null
           grant_id: string
           id?: string
+          is_demo?: boolean
           priority?: string | null
           progress?: number | null
           responsible?: string | null
@@ -1979,6 +2041,7 @@ export type Database = {
           end_date?: string | null
           grant_id?: string
           id?: string
+          is_demo?: boolean
           priority?: string | null
           progress?: number | null
           responsible?: string | null
@@ -2121,6 +2184,7 @@ export type Database = {
           created_at: string
           grant_id: string
           id: string
+          is_demo: boolean
           justification: string | null
           label: string
           notes: string | null
@@ -2140,6 +2204,7 @@ export type Database = {
           created_at?: string
           grant_id: string
           id?: string
+          is_demo?: boolean
           justification?: string | null
           label: string
           notes?: string | null
@@ -2159,6 +2224,7 @@ export type Database = {
           created_at?: string
           grant_id?: string
           id?: string
+          is_demo?: boolean
           justification?: string | null
           label?: string
           notes?: string | null
@@ -2239,6 +2305,7 @@ export type Database = {
           frequency: string | null
           grant_id: string
           id: string
+          is_demo: boolean
           name: string
           notes: string | null
           responsible: string | null
@@ -2255,6 +2322,7 @@ export type Database = {
           frequency?: string | null
           grant_id: string
           id?: string
+          is_demo?: boolean
           name: string
           notes?: string | null
           responsible?: string | null
@@ -2271,6 +2339,7 @@ export type Database = {
           frequency?: string | null
           grant_id?: string
           id?: string
+          is_demo?: boolean
           name?: string
           notes?: string | null
           responsible?: string | null
@@ -2389,6 +2458,7 @@ export type Database = {
           exchange_rate: number | null
           grant_id: string
           id: string
+          is_demo: boolean
           label: string
           nomenclature_code: string | null
           receipt_url: string | null
@@ -2412,6 +2482,7 @@ export type Database = {
           exchange_rate?: number | null
           grant_id: string
           id?: string
+          is_demo?: boolean
           label: string
           nomenclature_code?: string | null
           receipt_url?: string | null
@@ -2435,6 +2506,7 @@ export type Database = {
           exchange_rate?: number | null
           grant_id?: string
           id?: string
+          is_demo?: boolean
           label?: string
           nomenclature_code?: string | null
           receipt_url?: string | null
@@ -2481,6 +2553,7 @@ export type Database = {
           end_date: string | null
           frais_structure_pct: number | null
           id: string
+          is_demo: boolean
           name: string
           org_type: string | null
           organization: string | null
@@ -2510,6 +2583,7 @@ export type Database = {
           end_date?: string | null
           frais_structure_pct?: number | null
           id?: string
+          is_demo?: boolean
           name: string
           org_type?: string | null
           organization?: string | null
@@ -2539,6 +2613,7 @@ export type Database = {
           end_date?: string | null
           frais_structure_pct?: number | null
           id?: string
+          is_demo?: boolean
           name?: string
           org_type?: string | null
           organization?: string | null
@@ -2619,6 +2694,7 @@ export type Database = {
           fonction: string | null
           id: string
           is_active: boolean
+          is_demo: boolean
           notes: string | null
           reference: string | null
           renewal_of: string | null
@@ -2638,6 +2714,7 @@ export type Database = {
           fonction?: string | null
           id?: string
           is_active?: boolean
+          is_demo?: boolean
           notes?: string | null
           reference?: string | null
           renewal_of?: string | null
@@ -2657,6 +2734,7 @@ export type Database = {
           fonction?: string | null
           id?: string
           is_active?: boolean
+          is_demo?: boolean
           notes?: string | null
           reference?: string | null
           renewal_of?: string | null
@@ -2719,6 +2797,7 @@ export type Database = {
           id: string
           ind_kilometrique: number | null
           is_active: boolean | null
+          is_demo: boolean
           lieu_naissance: string | null
           matricule: string
           nationalite: string | null
@@ -2763,6 +2842,7 @@ export type Database = {
           id?: string
           ind_kilometrique?: number | null
           is_active?: boolean | null
+          is_demo?: boolean
           lieu_naissance?: string | null
           matricule: string
           nationalite?: string | null
@@ -2807,6 +2887,7 @@ export type Database = {
           id?: string
           ind_kilometrique?: number | null
           is_active?: boolean | null
+          is_demo?: boolean
           lieu_naissance?: string | null
           matricule?: string
           nationalite?: string | null
@@ -2883,6 +2964,7 @@ export type Database = {
           currency: string
           employee_id: string
           id: string
+          is_demo: boolean
           notes: string | null
           period_end: string
           period_start: string
@@ -2905,6 +2987,7 @@ export type Database = {
           currency?: string
           employee_id: string
           id?: string
+          is_demo?: boolean
           notes?: string | null
           period_end: string
           period_start: string
@@ -2927,6 +3010,7 @@ export type Database = {
           currency?: string
           employee_id?: string
           id?: string
+          is_demo?: boolean
           notes?: string | null
           period_end?: string
           period_start?: string
@@ -3010,6 +3094,7 @@ export type Database = {
           employee_id: string
           end_date: string
           id: string
+          is_demo: boolean
           leave_type: Database["public"]["Enums"]["hr_leave_type"]
           reason: string | null
           rejection_reason: string | null
@@ -3027,6 +3112,7 @@ export type Database = {
           employee_id: string
           end_date: string
           id?: string
+          is_demo?: boolean
           leave_type?: Database["public"]["Enums"]["hr_leave_type"]
           reason?: string | null
           rejection_reason?: string | null
@@ -3044,6 +3130,7 @@ export type Database = {
           employee_id?: string
           end_date?: string
           id?: string
+          is_demo?: boolean
           leave_type?: Database["public"]["Enums"]["hr_leave_type"]
           reason?: string | null
           rejection_reason?: string | null
@@ -3303,6 +3390,7 @@ export type Database = {
           employer_charges: number
           gross_total: number
           id: string
+          is_demo: boolean
           issued_at: string
           mois: number
           net_total: number
@@ -3322,6 +3410,7 @@ export type Database = {
           employer_charges?: number
           gross_total?: number
           id?: string
+          is_demo?: boolean
           issued_at?: string
           mois: number
           net_total?: number
@@ -3341,6 +3430,7 @@ export type Database = {
           employer_charges?: number
           gross_total?: number
           id?: string
+          is_demo?: boolean
           issued_at?: string
           mois?: number
           net_total?: number
@@ -3574,6 +3664,7 @@ export type Database = {
           created_at: string
           expected_results: Json | null
           id: string
+          is_demo: boolean
           overall_objective: string | null
           pre_conditions: string | null
           project_id: string
@@ -3586,6 +3677,7 @@ export type Database = {
           created_at?: string
           expected_results?: Json | null
           id?: string
+          is_demo?: boolean
           overall_objective?: string | null
           pre_conditions?: string | null
           project_id: string
@@ -3598,6 +3690,7 @@ export type Database = {
           created_at?: string
           expected_results?: Json | null
           id?: string
+          is_demo?: boolean
           overall_objective?: string | null
           pre_conditions?: string | null
           project_id?: string
@@ -3711,6 +3804,7 @@ export type Database = {
           expertise_areas: string[] | null
           hourly_rate: number | null
           id: string
+          is_demo: boolean
           linkedin_url: string | null
           max_startups: number | null
           total_sessions: number | null
@@ -3725,6 +3819,7 @@ export type Database = {
           expertise_areas?: string[] | null
           hourly_rate?: number | null
           id?: string
+          is_demo?: boolean
           linkedin_url?: string | null
           max_startups?: number | null
           total_sessions?: number | null
@@ -3739,6 +3834,7 @@ export type Database = {
           expertise_areas?: string[] | null
           hourly_rate?: number | null
           id?: string
+          is_demo?: boolean
           linkedin_url?: string | null
           max_startups?: number | null
           total_sessions?: number | null
@@ -3889,6 +3985,7 @@ export type Database = {
           description: string | null
           due_date: string | null
           id: string
+          is_demo: boolean
           project_id: string
           status: string | null
           title: string
@@ -3900,6 +3997,7 @@ export type Database = {
           description?: string | null
           due_date?: string | null
           id?: string
+          is_demo?: boolean
           project_id: string
           status?: string | null
           title: string
@@ -3911,6 +4009,7 @@ export type Database = {
           description?: string | null
           due_date?: string | null
           id?: string
+          is_demo?: boolean
           project_id?: string
           status?: string | null
           title?: string
@@ -4100,6 +4199,7 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          is_demo: boolean
           name: string
           program_id: string | null
           sector: string | null
@@ -4116,6 +4216,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          is_demo?: boolean
           name: string
           program_id?: string | null
           sector?: string | null
@@ -4132,6 +4233,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          is_demo?: boolean
           name?: string
           program_id?: string | null
           sector?: string | null
@@ -4196,6 +4298,7 @@ export type Database = {
           description: string | null
           end_date: string | null
           id: string
+          is_demo: boolean
           name: string
           objectives: string | null
           owner_id: string | null
@@ -4209,6 +4312,7 @@ export type Database = {
           description?: string | null
           end_date?: string | null
           id?: string
+          is_demo?: boolean
           name: string
           objectives?: string | null
           owner_id?: string | null
@@ -4222,6 +4326,7 @@ export type Database = {
           description?: string | null
           end_date?: string | null
           id?: string
+          is_demo?: boolean
           name?: string
           objectives?: string | null
           owner_id?: string | null
@@ -4302,6 +4407,7 @@ export type Database = {
           end_date: string | null
           funder: string | null
           id: string
+          is_demo: boolean
           name: string
           portfolio_id: string | null
           project_count: number | null
@@ -4320,6 +4426,7 @@ export type Database = {
           end_date?: string | null
           funder?: string | null
           id?: string
+          is_demo?: boolean
           name: string
           portfolio_id?: string | null
           project_count?: number | null
@@ -4338,6 +4445,7 @@ export type Database = {
           end_date?: string | null
           funder?: string | null
           id?: string
+          is_demo?: boolean
           name?: string
           portfolio_id?: string | null
           project_count?: number | null
@@ -4413,6 +4521,7 @@ export type Database = {
           code: string
           created_at: string
           id: string
+          is_demo: boolean
           nomenclature_code: string | null
           project_id: string
           quantity: number | null
@@ -4434,6 +4543,7 @@ export type Database = {
           code: string
           created_at?: string
           id?: string
+          is_demo?: boolean
           nomenclature_code?: string | null
           project_id: string
           quantity?: number | null
@@ -4455,6 +4565,7 @@ export type Database = {
           code?: string
           created_at?: string
           id?: string
+          is_demo?: boolean
           nomenclature_code?: string | null
           project_id?: string
           quantity?: number | null
@@ -4497,6 +4608,7 @@ export type Database = {
           description: string | null
           funding_source: string | null
           id: string
+          is_demo: boolean
           label: string
           marker_climate: string | null
           marker_gender: string | null
@@ -4523,6 +4635,7 @@ export type Database = {
           description?: string | null
           funding_source?: string | null
           id?: string
+          is_demo?: boolean
           label: string
           marker_climate?: string | null
           marker_gender?: string | null
@@ -4549,6 +4662,7 @@ export type Database = {
           description?: string | null
           funding_source?: string | null
           id?: string
+          is_demo?: boolean
           label?: string
           marker_climate?: string | null
           marker_gender?: string | null
@@ -4585,6 +4699,7 @@ export type Database = {
           data_source: string | null
           frequency: string | null
           id: string
+          is_demo: boolean
           metadata: Json | null
           name: string
           project_id: string
@@ -4601,6 +4716,7 @@ export type Database = {
           data_source?: string | null
           frequency?: string | null
           id?: string
+          is_demo?: boolean
           metadata?: Json | null
           name: string
           project_id: string
@@ -4617,6 +4733,7 @@ export type Database = {
           data_source?: string | null
           frequency?: string | null
           id?: string
+          is_demo?: boolean
           metadata?: Json | null
           name?: string
           project_id?: string
@@ -4932,6 +5049,7 @@ export type Database = {
           end_date: string | null
           id: string
           is_archived: boolean
+          is_demo: boolean
           lessons_learned: string | null
           locations: string[] | null
           metadata: Json | null
@@ -4962,6 +5080,7 @@ export type Database = {
           end_date?: string | null
           id?: string
           is_archived?: boolean
+          is_demo?: boolean
           lessons_learned?: string | null
           locations?: string[] | null
           metadata?: Json | null
@@ -4992,6 +5111,7 @@ export type Database = {
           end_date?: string | null
           id?: string
           is_archived?: boolean
+          is_demo?: boolean
           lessons_learned?: string | null
           locations?: string[] | null
           metadata?: Json | null
@@ -5158,6 +5278,7 @@ export type Database = {
           grant_id: string | null
           id: string
           invoice_id: string | null
+          is_demo: boolean
           issue_date: string
           notes: string | null
           payment_terms: string | null
@@ -5185,6 +5306,7 @@ export type Database = {
           grant_id?: string | null
           id?: string
           invoice_id?: string | null
+          is_demo?: boolean
           issue_date?: string
           notes?: string | null
           payment_terms?: string | null
@@ -5212,6 +5334,7 @@ export type Database = {
           grant_id?: string | null
           id?: string
           invoice_id?: string | null
+          is_demo?: boolean
           issue_date?: string
           notes?: string | null
           payment_terms?: string | null
@@ -5266,6 +5389,7 @@ export type Database = {
           description: string | null
           file_url: string | null
           id: string
+          is_demo: boolean
           is_public: boolean | null
           program_id: string | null
           tags: string[] | null
@@ -5279,6 +5403,7 @@ export type Database = {
           description?: string | null
           file_url?: string | null
           id?: string
+          is_demo?: boolean
           is_public?: boolean | null
           program_id?: string | null
           tags?: string[] | null
@@ -5292,6 +5417,7 @@ export type Database = {
           description?: string | null
           file_url?: string | null
           id?: string
+          is_demo?: boolean
           is_public?: boolean | null
           program_id?: string | null
           tags?: string[] | null
@@ -5315,6 +5441,7 @@ export type Database = {
           description: string | null
           id: string
           impact: number | null
+          is_demo: boolean
           level: Database["public"]["Enums"]["risk_level"]
           mitigation: string | null
           owner_id: string | null
@@ -5329,6 +5456,7 @@ export type Database = {
           description?: string | null
           id?: string
           impact?: number | null
+          is_demo?: boolean
           level?: Database["public"]["Enums"]["risk_level"]
           mitigation?: string | null
           owner_id?: string | null
@@ -5343,6 +5471,7 @@ export type Database = {
           description?: string | null
           id?: string
           impact?: number | null
+          is_demo?: boolean
           level?: Database["public"]["Enums"]["risk_level"]
           mitigation?: string | null
           owner_id?: string | null
@@ -5395,6 +5524,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          is_demo: boolean
           metric_name: string
           metric_value: number
           notes: string | null
@@ -5407,6 +5537,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          is_demo?: boolean
           metric_name: string
           metric_value?: number
           notes?: string | null
@@ -5419,6 +5550,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          is_demo?: boolean
           metric_name?: string
           metric_value?: number
           notes?: string | null
@@ -5444,6 +5576,7 @@ export type Database = {
           email: string | null
           full_name: string
           id: string
+          is_demo: boolean
           role: string | null
           startup_id: string
           user_id: string | null
@@ -5453,6 +5586,7 @@ export type Database = {
           email?: string | null
           full_name: string
           id?: string
+          is_demo?: boolean
           role?: string | null
           startup_id: string
           user_id?: string | null
@@ -5462,6 +5596,7 @@ export type Database = {
           email?: string | null
           full_name?: string
           id?: string
+          is_demo?: boolean
           role?: string | null
           startup_id?: string
           user_id?: string | null
@@ -5492,6 +5627,7 @@ export type Database = {
           founder_id: string | null
           id: string
           is_alumni: boolean | null
+          is_demo: boolean
           logo_url: string | null
           name: string
           ninea: string | null
@@ -5521,6 +5657,7 @@ export type Database = {
           founder_id?: string | null
           id?: string
           is_alumni?: boolean | null
+          is_demo?: boolean
           logo_url?: string | null
           name: string
           ninea?: string | null
@@ -5550,6 +5687,7 @@ export type Database = {
           founder_id?: string | null
           id?: string
           is_alumni?: boolean | null
+          is_demo?: boolean
           logo_url?: string | null
           name?: string
           ninea?: string | null
@@ -5604,6 +5742,7 @@ export type Database = {
           created_at: string
           feedback: string | null
           id: string
+          is_demo: boolean
           rating: number | null
           respondent_id: string
           submitted_at: string
@@ -5614,6 +5753,7 @@ export type Database = {
           created_at?: string
           feedback?: string | null
           id?: string
+          is_demo?: boolean
           rating?: number | null
           respondent_id: string
           submitted_at?: string
@@ -5624,6 +5764,7 @@ export type Database = {
           created_at?: string
           feedback?: string | null
           id?: string
+          is_demo?: boolean
           rating?: number | null
           respondent_id?: string
           submitted_at?: string
@@ -5646,6 +5787,7 @@ export type Database = {
           description: string | null
           id: string
           is_active: boolean
+          is_demo: boolean
           program_id: string | null
           survey_type: string
           target_type: string | null
@@ -5658,6 +5800,7 @@ export type Database = {
           description?: string | null
           id?: string
           is_active?: boolean
+          is_demo?: boolean
           program_id?: string | null
           survey_type?: string
           target_type?: string | null
@@ -5670,6 +5813,7 @@ export type Database = {
           description?: string | null
           id?: string
           is_active?: boolean
+          is_demo?: boolean
           program_id?: string | null
           survey_type?: string
           target_type?: string | null
@@ -5693,6 +5837,7 @@ export type Database = {
           description: string | null
           due_date: string | null
           id: string
+          is_demo: boolean
           priority: Database["public"]["Enums"]["task_priority"]
           project_id: string | null
           status: Database["public"]["Enums"]["task_status"]
@@ -5706,6 +5851,7 @@ export type Database = {
           description?: string | null
           due_date?: string | null
           id?: string
+          is_demo?: boolean
           priority?: Database["public"]["Enums"]["task_priority"]
           project_id?: string | null
           status?: Database["public"]["Enums"]["task_status"]
@@ -5719,6 +5865,7 @@ export type Database = {
           description?: string | null
           due_date?: string | null
           id?: string
+          is_demo?: boolean
           priority?: Database["public"]["Enums"]["task_priority"]
           project_id?: string | null
           status?: Database["public"]["Enums"]["task_status"]
@@ -5744,6 +5891,7 @@ export type Database = {
           id: string
           impact: string | null
           inputs: Json | null
+          is_demo: boolean
           outcomes: Json | null
           outputs: Json | null
           project_id: string
@@ -5757,6 +5905,7 @@ export type Database = {
           id?: string
           impact?: string | null
           inputs?: Json | null
+          is_demo?: boolean
           outcomes?: Json | null
           outputs?: Json | null
           project_id: string
@@ -5770,6 +5919,7 @@ export type Database = {
           id?: string
           impact?: string | null
           inputs?: Json | null
+          is_demo?: boolean
           outcomes?: Json | null
           outputs?: Json | null
           project_id?: string
@@ -5880,6 +6030,7 @@ export type Database = {
           event_type: string
           id: string
           is_active: boolean | null
+          is_demo: boolean
           name: string
           updated_at: string | null
           url: string
@@ -5890,6 +6041,7 @@ export type Database = {
           event_type: string
           id?: string
           is_active?: boolean | null
+          is_demo?: boolean
           name: string
           updated_at?: string | null
           url: string
@@ -5900,6 +6052,7 @@ export type Database = {
           event_type?: string
           id?: string
           is_active?: boolean | null
+          is_demo?: boolean
           name?: string
           updated_at?: string | null
           url?: string
@@ -6074,6 +6227,7 @@ export type Database = {
         Args: { _conversation_id: string; _user_id: string }
         Returns: boolean
       }
+      is_demo_user: { Args: { _user_id?: string }; Returns: boolean }
       move_to_dlq: {
         Args: {
           dlq_name: string
