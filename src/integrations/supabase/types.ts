@@ -4341,18 +4341,23 @@ export type Database = {
           avatar_url: string | null
           bio: string | null
           created_at: string
+          department: string | null
           email: string | null
           full_name: string
           id: string
           is_approved: boolean
           is_suspended: boolean
+          job_title: string | null
+          language_pref: string | null
           last_active_at: string | null
           linkedin_url: string | null
           organization: string | null
           phone: string | null
           position: string | null
+          reports_to_id: string | null
           suspended_at: string | null
           suspension_reason: string | null
+          timezone: string | null
           updated_at: string
           user_id: string
         }
@@ -4360,18 +4365,23 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
+          department?: string | null
           email?: string | null
           full_name?: string
           id?: string
           is_approved?: boolean
           is_suspended?: boolean
+          job_title?: string | null
+          language_pref?: string | null
           last_active_at?: string | null
           linkedin_url?: string | null
           organization?: string | null
           phone?: string | null
           position?: string | null
+          reports_to_id?: string | null
           suspended_at?: string | null
           suspension_reason?: string | null
+          timezone?: string | null
           updated_at?: string
           user_id: string
         }
@@ -4379,22 +4389,42 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
+          department?: string | null
           email?: string | null
           full_name?: string
           id?: string
           is_approved?: boolean
           is_suspended?: boolean
+          job_title?: string | null
+          language_pref?: string | null
           last_active_at?: string | null
           linkedin_url?: string | null
           organization?: string | null
           phone?: string | null
           position?: string | null
+          reports_to_id?: string | null
           suspended_at?: string | null
           suspension_reason?: string | null
+          timezone?: string | null
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_reports_to_id_fkey"
+            columns: ["reports_to_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "profiles_reports_to_id_fkey"
+            columns: ["reports_to_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       programs: {
         Row: {
@@ -5491,6 +5521,45 @@ export type Database = {
           },
         ]
       }
+      role_assignments: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          granted_at: string
+          granted_by: string | null
+          id: string
+          notes: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          scope_id: string | null
+          scope_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          notes?: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          scope_id?: string | null
+          scope_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          notes?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          scope_id?: string | null
+          scope_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       round_judges: {
         Row: {
           assigned_at: string | null
@@ -6222,6 +6291,15 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_scoped_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _scope_id?: string
+          _scope_type?: string
+          _user_id: string
+        }
+        Returns: boolean
+      }
       is_admin_or_coordinator: { Args: { _user_id: string }; Returns: boolean }
       is_conversation_member: {
         Args: { _conversation_id: string; _user_id: string }
@@ -6265,6 +6343,18 @@ export type Database = {
         Args: { _other_user_id: string; _title?: string }
         Returns: string
       }
+      user_accessible_portfolios: {
+        Args: { _user_id: string }
+        Returns: string[]
+      }
+      user_accessible_programs: {
+        Args: { _user_id: string }
+        Returns: string[]
+      }
+      user_accessible_projects: {
+        Args: { _user_id: string }
+        Returns: string[]
+      }
       verify_invitation_token: {
         Args: { _token: string }
         Returns: {
@@ -6285,6 +6375,9 @@ export type Database = {
         | "funder"
         | "project_manager"
         | "demo_user"
+        | "staff"
+        | "consultant_expert"
+        | "consultant_coach"
       application_status:
         | "submitted"
         | "screening"
@@ -6510,6 +6603,9 @@ export const Constants = {
         "funder",
         "project_manager",
         "demo_user",
+        "staff",
+        "consultant_expert",
+        "consultant_coach",
       ],
       application_status: [
         "submitted",

@@ -132,15 +132,59 @@ interface AppSidebarProps {
   onNavigate?: () => void;
 }
 
+/** Chemins autorisés par persona (null = tout autorisé). */
+const PERSONA_ALLOWED_PATHS: Record<string, string[] | null> = {
+  super_admin: null,
+  coordinator: null,
+  project_manager: [
+    "/app/dashboard", "/app/activites",
+    "/app/portefeuilles", "/app/programmes", "/app/projets", "/app/jalons",
+    "/app/taches", "/app/gantt", "/app/risques",
+    "/app/budgets", "/app/grants", "/app/grants-analytics",
+    "/app/cohortes", "/app/entreprises", "/app/candidatures",
+    "/app/rdv", "/app/messagerie", "/app/ressources",
+    "/app/analytics", "/app/rapports",
+  ],
+  consultant: [
+    "/app/dashboard", "/app/activites",
+    "/app/coaching", "/app/rdv", "/app/mentors", "/app/matching",
+    "/app/entreprises", "/app/cohortes",
+    "/app/lms", "/app/ressources", "/app/messagerie",
+    "/app/evenements",
+  ],
+  entrepreneur: [
+    "/app/dashboard", "/app/activites",
+    "/app/entreprises", "/app/cohortes",
+    "/app/coaching", "/app/rdv", "/app/mentors",
+    "/app/lms", "/app/enquetes", "/app/ressources",
+    "/app/marketplace", "/app/evenements", "/app/messagerie",
+  ],
+  funder: [
+    "/app/dashboard",
+    "/app/portefeuilles", "/app/programmes", "/app/projets",
+    "/app/grants", "/app/grants-analytics", "/app/budgets",
+    "/app/analytics", "/app/rapports",
+    "/app/messagerie", "/app/ressources",
+  ],
+  staff: [
+    "/app/dashboard", "/app/activites",
+    "/app/rh", "/app/crm", "/app/bons-de-commande",
+    "/app/ressources", "/app/messagerie",
+    "/app/evenements", "/app/partenaires",
+  ],
+  user: ["/app/dashboard", "/app/profil"],
+};
+
 export default function AppSidebar({ mobile, onNavigate }: AppSidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { profile, roles, isAdmin, signOut } = useAuth();
+  const { profile, roles, isAdmin, persona, signOut } = useAuth();
   const { t } = useTranslation();
   const { data: counts } = useSidebarCounts();
   const navGroups = useNavGroups();
   const initials = profile?.full_name ? profile.full_name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "??";
-  const mainRole = roles[0] ?? "user";
+  const mainRole = profile?.job_title || roles[0] || persona;
+  const allowedPaths = PERSONA_ALLOWED_PATHS[persona] ?? null;
 
   const handleNav = (path: string) => {
     navigate(path);
@@ -167,19 +211,17 @@ export default function AppSidebar({ mobile, onNavigate }: AppSidebarProps) {
       <nav className="p-3 flex-1">
         {navGroups.map((group) => {
           if (group.adminOnly && !isAdmin) return null;
-          const isRestricted = roles.some(r => ["entrepreneur", "mentor"].includes(r)) && !isAdmin;
-          const allowedGroups = [
-            t("nav.overview"), t("nav.support"), t("nav.network"),
-            "Vue Générale", "Accompagnement", "Réseau", "Overview", "Support", "Network",
-            "نظرة عامة", "المرافقة", "الشبكة",
-          ];
-          if (isRestricted && !allowedGroups.includes(group.label)) return null;
+          // Filtrage par persona : on garde uniquement les items autorisés
+          const visibleItems = allowedPaths === null
+            ? group.items
+            : group.items.filter((it) => allowedPaths.includes(it.path));
+          if (visibleItems.length === 0) return null;
           return (
             <div key={group.label} className="mb-5">
               <div className="font-mono text-[9px] tracking-[0.2em] uppercase text-muted-foreground px-2 mb-1">
                 {group.label}
               </div>
-              {group.items.map((item) => {
+              {visibleItems.map((item) => {
                 const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + "/");
                 const badge = getBadge(item);
                 const Icon = item.icon;

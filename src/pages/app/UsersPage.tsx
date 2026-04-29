@@ -20,14 +20,22 @@ import { Copy, Mail, Trash2, UserX, UserCheck, Search } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 const roleLabels: Record<string, string> = {
-  super_admin: "Super Admin", coordinator: "Coordinateur", project_manager: "Chef de projet", mentor: "Mentor",
-  entrepreneur: "Entrepreneur", evaluator: "Évaluateur", investor: "Investisseur", funder: "Bailleur",
+  super_admin: "Super Admin", coordinator: "Coordinateur", project_manager: "Chef de projet",
+  mentor: "Mentor", consultant_expert: "Expert", consultant_coach: "Coach",
+  entrepreneur: "Entrepreneur", evaluator: "Évaluateur", investor: "Investisseur",
+  funder: "Bailleur", staff: "Staff Grow Hub",
 };
 const roleColors: Record<string, "green" | "blue" | "purple" | "amber" | "rose" | "gray"> = {
-  super_admin: "rose", coordinator: "purple", project_manager: "blue", mentor: "blue",
-  entrepreneur: "green", evaluator: "amber", investor: "blue", funder: "amber",
+  super_admin: "rose", coordinator: "purple", project_manager: "blue",
+  mentor: "blue", consultant_expert: "purple", consultant_coach: "purple",
+  entrepreneur: "green", evaluator: "amber", investor: "blue",
+  funder: "amber", staff: "gray",
 };
-const allRoles = ["super_admin", "coordinator", "project_manager", "mentor", "entrepreneur", "evaluator", "investor", "funder"];
+const allRoles = [
+  "super_admin", "coordinator", "project_manager",
+  "mentor", "consultant_expert", "consultant_coach",
+  "entrepreneur", "evaluator", "investor", "funder", "staff",
+];
 
 export default function UsersPage() {
   const { user } = useAuth();
