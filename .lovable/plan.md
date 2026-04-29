@@ -1,247 +1,240 @@
+# Plan d'amélioration général GrowHub — Synthèse complète
 
-## Ce qui existe déjà dans le module RH
+Consolidation des audits : modules (Portefeuilles → Webhooks), logique métier inter-modules, profils utilisateurs (7 personas), et environnement démo. Objectif : passer d'une plateforme fonctionnelle à une solution de référence pour accélérateurs en Afrique francophone.
 
-Le module RH actuel couvre une base solide :
+---
 
-- Tableau de bord RH avec effectif, brut, net, charges et masse salariale.
-- Fiche employé avec identité, contrat, salaire, catégorie, statut, avances, absences et heures supplémentaires.
-- Moteur de paie Sénégal dans `payroll.ts` : IR, TRIMF, IPRES, CSS, CFCE, transport, ancienneté, net à payer.
-- Génération d’un bulletin de paie en HTML imprimable.
-- Historique simple de clôture mensuelle.
-- Paramètres de cotisation éditables à l’écran.
-- Conventions collectives et grilles salariales affichées/modifiables dans l’interface.
-- Tables backend existantes : `hr_employees` et `hr_payroll_history`.
+## Vision cible
 
-## Ce qui manque pour que le module RH soit aligné avec le reste de la plateforme
+```text
+                    GROWHUB v2 — Plateforme intégrée
+   ┌─────────────────────────────────────────────────────────┐
+   │  STRATÉGIE   →  Portefeuilles · Programmes · Bailleurs  │
+   │  EXÉCUTION   →  Projets PAERID · Cohortes · Entreprises │
+   │  OPÉRATIONS  →  RH · Finance · CRM · Achats · Documents │
+   │  INTELLIGENCE → Analytics · IA · Rapports · Alertes     │
+   │  GOUVERNANCE →  Rôles scopés · Audit · Workflows        │
+   └─────────────────────────────────────────────────────────┘
+```
 
-### 1. Sécurité et confidentialité RH
+---
 
-Aujourd’hui, les données RH sont trop visibles : les employés RH sont consultables par tout utilisateur connecté. Comme les fiches contiennent des données personnelles et salariales, il faut renforcer l’accès.
+## AXE 1 — Sécurité, rôles & gouvernance (FONDATION)
 
-À ajouter :
+**Pourquoi en premier** : tout le reste dépend d'un modèle de permissions sain.
 
-- Restreindre la consultation RH aux rôles autorisés : `super_admin`, `coordinator`, éventuellement `project_manager` ou un futur rôle RH.
-- Prévoir un accès limité “employé” uniquement à son propre bulletin ou sa propre fiche si un compte utilisateur est lié.
-- Ajouter un lien optionnel entre `hr_employees` et un utilisateur de la plateforme.
-- Masquer les salaires et informations sensibles pour les profils non autorisés.
-- Remplacer les suppressions directes par une désactivation / archivage quand c’est sensible.
+### 1.1 Refonte du système de rôles
+- Enum `app_role` enrichi : ajouter `staff`, `consultant_expert`, `consultant_coach` (garder `mentor` rétrocompatible)
+- Hiérarchie : `profiles.reports_to_id`, `department`, `job_title`
+- Table `role_assignments` (scope_type : global/portfolio/program/project/cohort)
+- Fonctions SECURITY DEFINER : `has_scoped_role()`, `user_programs()`, `user_projects()`
 
-### 2. Persistance réelle des paramètres RH
+### 1.2 RLS contextualisée
+Réécrire les policies pour que :
+- Coordinateur voit uniquement ses programmes
+- Chef de projet voit uniquement ses projets
+- Consultant voit uniquement ses entreprises rattachées
+- Entreprise voit uniquement sa fiche + livrables
+- Bailleur : lecture seule sur ses grants/projets financés
+- Staff : périmètre fonctionnel (RH, finance, comm)
 
-Actuellement, certains éléments sont seulement gardés en état local dans la page :
+### 1.3 Audit & workflow
+- Étendre l'audit trail à toutes les tables sensibles (RH, finance, grants)
+- Workflow d'approbation centralisé : budgets > seuil, PO, contrats RH, validations paie
+- Notifications aux validateurs
 
-- paramètres de cotisation,
-- informations entreprise,
-- conventions collectives,
-- catégories et salaires minima.
+---
 
-À ajouter :
+## AXE 2 — Architecture métier & event bus
 
-- Table `hr_payroll_settings` pour versionner les taux de cotisations, plafonds, transport, IPM, BRS, etc.
-- Table `hr_collective_agreements` pour les conventions.
-- Table `hr_salary_categories` pour les catégories et salaires minima.
-- Historique des changements de paramètres, car un bulletin passé doit rester calculé avec les taux de sa période.
+**Problème identifié** : modules fortement couplés, pas de bus d'événements.
 
-### 3. Clôture de paie complète
+### 2.1 Event bus interne
+- Table `domain_events` (entity_type, entity_id, event_name, payload, occurred_at)
+- Triggers Postgres → publication d'événements (project.created, grant.disbursed, payroll.closed…)
+- Edge function `event-dispatcher` → routing vers webhooks externes + notifications internes
 
-La clôture actuelle sauvegarde uniquement des totaux globaux. Il manque une vraie paie mensuelle figée.
+### 2.2 Imputation analytique systématique
+- Forcer `project_id` sur : dépenses RH, factures CRM, bons de commande, transactions grants
+- Vue matérialisée `project_financial_consolidation` (budget vs réalisé tous canaux)
+- Réconciliation automatique mensuelle
 
-À ajouter :
+### 2.3 Webhooks bidirectionnels
+- Aujourd'hui : sortants uniquement
+- Ajouter : webhooks entrants signés (HMAC) pour intégrations bailleurs, banques, gouvernement
 
-- Table `hr_payroll_runs` : période, statut, date de clôture, validateur, totaux.
-- Table `hr_payslips` : un bulletin figé par employé et par mois.
-- Stockage du détail calculé en JSON pour garantir que le bulletin reste identique même si les taux changent plus tard.
-- Statuts : brouillon, calculé, validé, clôturé, annulé.
-- Bouton “Calculer la paie du mois”.
-- Bouton “Valider / clôturer la paie”.
-- Empêcher la modification silencieuse d’une paie clôturée.
+---
 
-### 4. Bulletins de paie au format plateforme
+## AXE 3 — Modules à compléter (priorisé par impact)
 
-Le bulletin actuel s’ouvre dans un nouvel onglet et demande `Ctrl+P`. Il n’utilise pas encore le même système PDF que les devis, factures et bons de commande.
+### 3.1 RH & Paie (priorité HAUTE)
+Voir plan détaillé `.lovable/plan.md` :
+- Sécuriser accès données salariales
+- Persister paramètres cotisations (versionnés)
+- Variables mensuelles séparées de la fiche employé
+- Vraie clôture de paie avec bulletins figés (JSONB)
+- PDF officiels via `growhubPdf` + org_settings
+- Congés/contrats avec workflow
+- Exports bancaires + états sociaux (IPRES, CSS, CFCE)
 
-À ajouter :
+### 3.2 Portefeuilles & Programmes
+- Vue financière consolidée (rollup budgets enfants)
+- Indicateurs de santé agrégés (RAG)
+- Comparaison inter-programmes
+- Templates de programme (réplication rapide)
 
-- Export PDF direct du bulletin.
-- Utilisation des paramètres organisation existants : logo, cachet, NINEA, RCCM, adresse, footer, signataire.
-- Archivage du bulletin généré.
-- Téléchargement individuel.
-- Téléchargement groupé des bulletins du mois.
-- Aperçu avant génération.
-- Numérotation ou référence du bulletin.
+### 3.3 Projets PAERID
+- Versioning des wizards (snapshots à chaque validation)
+- Comparaison versions
+- Génération automatique cadre logique
+- Export Word/PDF complet déjà OK → ajouter export bailleur (formats Enabel, AFD, UE)
 
-### 5. Variables de paie mensuelles séparées de la fiche employé
+### 3.4 Grants (GTS)
+- Réconciliation bancaire automatique
+- Multi-devise étendue (USD, GBP en plus EUR/XOF)
+- Génération rapports bailleurs auto (modèles préconfigurés)
+- Indicateurs IRIS+ pour bailleurs impact
 
-Aujourd’hui, les avances, absences, heures supplémentaires et indemnités sont stockées directement sur l’employé. Cela pose problème car ces éléments changent chaque mois.
+### 3.5 Entreprises & Cohortes
+- Scoring santé entreprise IA (basé KPIs + assiduité + livrables)
+- Alertes décrochage automatiques
+- Parcours alumni structuré (suivi N+1, N+2, N+3)
+- Réseau alumni-mentors
 
-À ajouter :
+### 3.6 Mentoring & Coaching
+- Algorithme matching v2 (intégrer feedback historique, langue, géolocalisation)
+- Agenda mentor avec sync Google/Outlook bidirectionnelle
+- Visioconférence intégrée (Jitsi/Daily.co)
+- Notes de session structurées + objectifs SMART
 
-- Table `hr_payroll_variables`.
-- Saisie par période : mois, année, employé.
-- Variables mensuelles :
-  - heures supplémentaires,
-  - absences,
-  - maladie,
-  - paniers,
-  - indemnités,
-  - avances,
-  - retenues,
-  - primes exceptionnelles.
-- Import CSV/Excel des variables.
-- Validation avant calcul de la paie.
+### 3.7 LMS
+- Parcours certifiants multi-cours
+- Badges & gamification
+- Génération IA de quiz depuis contenu
+- Tracking temps réel progression cohorte
 
-### 6. Congés et absences
+### 3.8 CRM & Facturation
+- Pipeline opportunités complet
+- Relances automatiques multi-canal
+- Intégration moyens de paiement (Wave, Orange Money, Stripe)
+- Recouvrement avec scoring risque client
 
-Le module ne gère pas encore un cycle RH complet d’absences.
+### 3.9 Analytics & Rapports
+- Dashboards personnalisables (drag & drop widgets)
+- Export programmé (rapports mensuels auto par email)
+- Comparaisons temporelles & benchmarks sectoriels
+- Prédictions IA (taux succès cohorte, risque décrochage)
 
-À ajouter :
+### 3.10 Messagerie
+- Threads & réactions (déjà partiel)
+- Recherche full-text avancée
+- Intégration notifications mobiles (PWA push déjà OK)
+- @mentions cross-projet
 
-- Table `hr_leave_requests`.
-- Types : congé annuel, maladie, absence autorisée, absence non autorisée, maternité, permission.
-- Workflow : demandé, approuvé, refusé, annulé.
-- Impact automatique ou assisté sur les variables de paie.
-- Solde de congés par employé.
-- Vue calendrier RH.
+### 3.11 Marketplace & Partenaires
+- Catalogue services partenaires structuré
+- Demandes/devis intégrés
+- Évaluations bidirectionnelles
+- Commission tracking
 
-### 7. Contrats et documents RH
+### 3.12 Webhooks & Intégrations
+- Bibliothèque de connecteurs préconfigurés (Slack, Teams, Zapier, Make)
+- Logs détaillés + replay
+- Rate limiting & retry policies
 
-La plateforme a déjà une logique de gestion documentaire, mais le module RH ne l’exploite pas encore.
+---
 
-À ajouter :
+## AXE 4 — Expérience utilisateur par persona
 
-- Table `hr_contracts`.
-- Type de contrat : CDI, CDD, stage, prestation.
-- Date début, date fin, période d’essai, renouvellement.
-- Alertes d’expiration de contrat.
-- Documents RH par employé :
-  - contrat,
-  - CNI/passeport,
-  - RIB,
-  - certificats,
-  - attestations,
-  - bulletins archivés.
-- Upload via le système documentaire existant.
+### 4.1 Sidebar dynamique avancée
+Filtrage `AppSidebar.tsx` selon rôle principal :
+- **Super-Admin / Coordinateur** : tout
+- **Chef de projet** : Projets, Jalons, Tâches, Risques, Budgets, Équipe, Rapports
+- **Consultant** : Coaching, RDV, Mes entreprises, Messagerie, Ressources, LMS
+- **Entreprise** : Mon entreprise, Mes tâches, Coaching, LMS, Ressources, Messagerie
+- **Bailleur** : Portefeuilles (R), Grants, Rapports, Analytics
+- **Staff** : selon département (RH, CRM, Achats, Documents)
 
-### 8. Workflow de validation RH
+### 4.2 Dashboards contextuels (6 layouts)
+Chaque persona a son propre Dashboard avec KPIs pertinents.
 
-Le reste de la plateforme utilise des workflows de validation. Le module RH devrait suivre la même logique.
+### 4.3 Onboarding wizard branché
+Étendre `OnboardingWizard.tsx` avec étapes conditionnelles selon rôle invité.
 
-À ajouter :
+### 4.4 Mobile-first sur parcours critiques
+- Saisie tâches/livrables entreprise
+- Validation managériale
+- Notifications push actionnables
 
-- Validation des fiches employés sensibles.
-- Validation des variables mensuelles.
-- Validation de la paie avant clôture.
-- Journalisation des actions RH.
-- Notifications aux validateurs.
-- Historique des changements de salaire et de statut.
+---
 
-### 9. Exports administratifs et financiers
+## AXE 5 — Internationalisation & Localisation
 
-Il manque les exports utiles pour l’exploitation RH réelle.
+- Compléter traductions FR/EN/AR (couverture actuelle ~70%)
+- Ajouter formats régionaux (dates, nombres) par pays
+- Templates emails localisés
+- Support multi-pays (Sénégal prioritaire, étendre Mali, Côte d'Ivoire, Bénin)
+- Paramètres fiscaux/sociaux par pays
 
-À ajouter :
+---
 
-- Export Excel de la paie mensuelle.
-- Export CSV bancaire pour virement des salaires.
-- État des charges patronales.
-- État des retenues salariales.
-- Résumé IPRES / CSS / CFCE / IR / TRIMF.
-- Livre de paie mensuel.
-- Rapport annuel de masse salariale.
-- Export du registre du personnel.
+## AXE 6 — Démo & Multi-tenant
 
-### 10. Intégration avec les fonctionnalités existantes de la plateforme
+### 6.1 Sandbox démo (déjà initié)
+- Compléter `is_demo` sur toutes les tables sensibles
+- Reset périodique automatique
+- Données seed réalistes (programme PAERID démo complet)
 
-Pour être cohérent avec la plateforme, le module RH devrait être relié à :
+### 6.2 Multi-organisation (long terme)
+- Préparer schéma `organizations` → permettre plusieurs Grow Hub
+- Isolation données par tenant
+- SSO entreprise (SAML/Azure AD)
 
-- Paramètres organisation : utiliser `org_settings` au lieu d’un bloc “Entreprise” séparé local.
-- Audit trail : tracer création, modification, suppression, validation, clôture.
-- Notifications : rappels contrat, validation paie, bulletins disponibles.
-- Documents : rattacher les fichiers RH aux employés.
-- Recherche globale : retrouver un employé, contrat, bulletin ou document.
-- Permissions : limiter l’accès selon les rôles.
-- Exports : harmoniser avec les autres modules PDF/Excel.
-- Tableau de bord global : inclure masse salariale, charges et alertes RH.
+---
 
-## Plan recommandé d’implémentation
+## AXE 7 — Différenciateurs (long terme)
 
-### Étape 1 — Sécuriser et stabiliser la base RH
+- **IA conversationnelle** : assistant intégré pour navigation et requêtes naturelles
+- **Signature électronique** : contrats RH, conventions partenaires, accords mentoring
+- **Visioconférence native** : sessions coaching/cours sans outil tiers
+- **Scoring santé IA** : prédiction succès entreprises
+- **Marketplace complet** : transactions B2B entre entreprises de l'écosystème
+- **Réseau alumni** : portail dédié + opportunités
 
-- Corriger les règles d’accès aux données RH.
-- Ajouter le lien optionnel entre un employé RH et un utilisateur de la plateforme.
-- Retirer l’accès global aux salaires pour tous les utilisateurs connectés.
-- Nettoyer le code RH pour respecter les règles TypeScript du projet, notamment éviter `as any`.
-- Remplacer les icônes texte/emoji par des icônes Lucide.
+---
 
-### Étape 2 — Persister les paramètres et conventions
+## Roadmap proposée (6 sprints)
 
-- Créer les tables :
-  - `hr_payroll_settings`,
-  - `hr_collective_agreements`,
-  - `hr_salary_categories`.
-- Migrer les paramètres actuellement locaux vers ces tables.
-- Charger les paramètres actifs depuis le backend.
-- Ajouter une notion de période d’effet pour les paramètres de paie.
+```text
+Sprint 1 (2 sem) │ AXE 1 — Rôles + RLS scopée + Audit étendu
+Sprint 2 (2 sem) │ AXE 4.1+4.2 — Sidebar/Dashboards par rôle + Onboarding
+Sprint 3 (3 sem) │ AXE 3.1 — RH/Paie complet (plan détaillé existant)
+Sprint 4 (2 sem) │ AXE 2 — Event bus + imputation analytique systématique
+Sprint 5 (2 sem) │ AXE 3.4+3.9 — Grants rapports auto + Analytics avancés
+Sprint 6 (2 sem) │ AXE 3.6+3.7 — Mentoring v2 + LMS certifiants
+```
 
-### Étape 3 — Ajouter les variables mensuelles
+Total : ~13 semaines pour atteindre la parité AcceleratorApp + différenciateurs locaux.
 
-- Créer `hr_payroll_variables`.
-- Déplacer les éléments mensuels hors de la fiche employé.
-- Ajouter une interface “Variables du mois”.
-- Permettre la saisie rapide par employé.
-- Ajouter import CSV/Excel.
+---
 
-### Étape 4 — Créer la vraie clôture de paie
+## Quick wins (< 1 jour chacun, parallélisables)
 
-- Créer :
-  - `hr_payroll_runs`,
-  - `hr_payslips`.
-- Ajouter un bouton “Calculer la paie”.
-- Ajouter une étape de validation.
-- Générer un bulletin figé par employé.
-- Bloquer les modifications d’une paie clôturée.
-- Conserver le détail des calculs dans chaque bulletin.
+1. Ajouter `staff` à l'enum `app_role`
+2. Filtrer sidebar pour rôle `entrepreneur` (déjà partiellement fait)
+3. Compléter traductions manquantes (i18n)
+4. Ajouter export PDF bulletins paie via `growhubPdf`
+5. Activer audit trail sur `hr_employees` et `grants`
+6. Vue `project_financial_consolidation` (SQL)
+7. Webhook signing HMAC
+8. Reset démo automatique (cron edge function)
 
-### Étape 5 — Moderniser les bulletins PDF
+---
 
-- Refactoriser la génération de bulletin dans un module dédié.
-- Utiliser les paramètres organisation existants : logo, cachet, NINEA, RCCM, footer, signataire.
-- Ajouter :
-  - aperçu bulletin,
-  - téléchargement PDF direct,
-  - téléchargement groupé,
-  - archivage du PDF,
-  - historique par employé.
+## Question
 
-### Étape 6 — Ajouter congés, absences et contrats
-
-- Créer :
-  - `hr_leave_requests`,
-  - `hr_contracts`.
-- Ajouter workflow d’approbation.
-- Ajouter alertes d’expiration.
-- Relier les absences validées aux variables de paie.
-- Ajouter une vue calendrier RH.
-
-### Étape 7 — Ajouter exports et reporting
-
-- Export Excel de paie.
-- Export bancaire.
-- Livre de paie.
-- États sociaux/fiscaux.
-- Rapports par période, statut, département ou contrat.
-- Indicateurs RH dans le dashboard.
-
-## Priorité conseillée
-
-Ordre recommandé :
-
-1. Sécurité et permissions RH.
-2. Persistance des paramètres/conventions.
-3. Variables mensuelles de paie.
-4. Vraie clôture avec bulletins figés.
-5. PDF officiel des bulletins.
-6. Congés, contrats et documents RH.
-7. Exports administratifs et reporting avancé.
-
-C’est la séquence la plus sûre, car elle évite de produire des bulletins ou exports sur une base de données encore trop permissive ou avec des paramètres non persistés.
+**Par où veux-tu commencer ?**
+- **(A)** AXE 1 complet (fondation rôles/RLS) — recommandé
+- **(B)** Quick wins en parallèle (impact rapide visible)
+- **(C)** AXE 3.1 RH (besoin métier urgent ?)
+- **(D)** Définir un sprint sur-mesure
