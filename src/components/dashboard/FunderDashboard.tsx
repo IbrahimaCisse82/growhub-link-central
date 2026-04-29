@@ -26,7 +26,7 @@ export default function FunderDashboard() {
   const myGrants = useMemo(() => {
     if (!grants) return [];
     if (!profile?.organization) return grants;
-    return grants.filter((g) => g.organization === profile.organization || g.funder === profile.organization);
+    return grants.filter((g) => g.organization === profile.organization);
   }, [grants, profile?.organization]);
 
   const totalCommitted = myGrants.reduce((s, g) => s + Number(g.amount_total ?? 0), 0);

@@ -41,7 +41,7 @@ export default function ProjectManagerDashboard() {
   ).length;
   const openTasks = myTasks.filter((t) => t.status !== "done").length;
   const criticalRisks = myRisks.filter((r) => r.level === "critical" || r.level === "high").length;
-  const totalBudget = myProjects.reduce((sum, p) => sum + Number(p.total_budget ?? 0), 0);
+  const totalBudget = myProjects.reduce((sum, p) => sum + Number(p.budget ?? 0), 0);
 
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
