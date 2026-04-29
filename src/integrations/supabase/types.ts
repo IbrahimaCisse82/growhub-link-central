@@ -6130,6 +6130,7 @@ export type Database = {
         | "investor"
         | "funder"
         | "project_manager"
+        | "demo_user"
       application_status:
         | "submitted"
         | "screening"
@@ -6354,6 +6355,7 @@ export const Constants = {
         "investor",
         "funder",
         "project_manager",
+        "demo_user",
       ],
       application_status: [
         "submitted",
