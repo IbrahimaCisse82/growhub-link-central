@@ -25,6 +25,7 @@ import { useStartupKpis } from "@/hooks/useStartupKpis";
 import { exportToCSV } from "@/lib/exportUtils";
 import { useMilestones } from "@/hooks/useMilestones";
 import DashboardAlerts from "@/components/dashboard/DashboardAlerts";
+import OnboardingBadge from "@/components/onboarding/OnboardingBadge";
 import { useHrEmployees } from "@/hooks/useHrEmployees";
 import { useHrContracts, useHrLeaveRequests } from "@/hooks/useHrLeaves";
 import { Briefcase, AlertTriangle as AlertTriangleIcon, CalendarClock } from "lucide-react";
@@ -136,6 +137,8 @@ export default function DashboardPage() {
           </>
         }
       />
+
+      <OnboardingBadge />
 
       {/* Alerts — all roles */}
       <DashboardAlerts milestones={milestones as any} grants={grants as any} sessions={sessions as any} events={events as any} />

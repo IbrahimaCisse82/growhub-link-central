@@ -1681,6 +1681,42 @@ export type Database = {
         }
         Relationships: []
       }
+      domain_events: {
+        Row: {
+          actor_user_id: string | null
+          aggregate_id: string | null
+          aggregate_type: string
+          event_name: string
+          id: string
+          occurred_at: string
+          payload: Json
+          processed_at: string | null
+          webhook_dispatched_at: string | null
+        }
+        Insert: {
+          actor_user_id?: string | null
+          aggregate_id?: string | null
+          aggregate_type: string
+          event_name: string
+          id?: string
+          occurred_at?: string
+          payload?: Json
+          processed_at?: string | null
+          webhook_dispatched_at?: string | null
+        }
+        Update: {
+          actor_user_id?: string | null
+          aggregate_id?: string | null
+          aggregate_type?: string
+          event_name?: string
+          id?: string
+          occurred_at?: string
+          payload?: Json
+          processed_at?: string | null
+          webhook_dispatched_at?: string | null
+        }
+        Relationships: []
+      }
       email_send_log: {
         Row: {
           created_at: string
@@ -2783,6 +2819,7 @@ export type Database = {
           created_by: string | null
           date_entree: string | null
           date_naissance: string | null
+          default_project_id: string | null
           email: string | null
           enfants: number | null
           femmes: number | null
@@ -2828,6 +2865,7 @@ export type Database = {
           created_by?: string | null
           date_entree?: string | null
           date_naissance?: string | null
+          default_project_id?: string | null
           email?: string | null
           enfants?: number | null
           femmes?: number | null
@@ -2873,6 +2911,7 @@ export type Database = {
           created_by?: string | null
           date_entree?: string | null
           date_naissance?: string | null
+          default_project_id?: string | null
           email?: string | null
           enfants?: number | null
           femmes?: number | null
@@ -2905,7 +2944,15 @@ export type Database = {
           updated_at?: string
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "hr_employees_default_project_id_fkey"
+            columns: ["default_project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       hr_expense_lines: {
         Row: {
@@ -2916,6 +2963,7 @@ export type Database = {
           description: string
           expense_date: string
           id: string
+          project_id: string | null
           receipt_url: string | null
           report_id: string
           sort_order: number | null
@@ -2929,6 +2977,7 @@ export type Database = {
           description: string
           expense_date: string
           id?: string
+          project_id?: string | null
           receipt_url?: string | null
           report_id: string
           sort_order?: number | null
@@ -2942,12 +2991,20 @@ export type Database = {
           description?: string
           expense_date?: string
           id?: string
+          project_id?: string | null
           receipt_url?: string | null
           report_id?: string
           sort_order?: number | null
           tax_rate?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "hr_expense_lines_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "hr_expense_lines_report_id_fkey"
             columns: ["report_id"]
@@ -3396,6 +3453,7 @@ export type Database = {
           net_total: number
           payroll_run_id: string
           pdf_url: string | null
+          project_id: string | null
           reference: string
           updated_at: string
           variables_snapshot: Json
@@ -3416,6 +3474,7 @@ export type Database = {
           net_total?: number
           payroll_run_id: string
           pdf_url?: string | null
+          project_id?: string | null
           reference: string
           updated_at?: string
           variables_snapshot?: Json
@@ -3436,6 +3495,7 @@ export type Database = {
           net_total?: number
           payroll_run_id?: string
           pdf_url?: string | null
+          project_id?: string | null
           reference?: string
           updated_at?: string
           variables_snapshot?: Json
@@ -3453,6 +3513,13 @@ export type Database = {
             columns: ["payroll_run_id"]
             isOneToOne: false
             referencedRelation: "hr_payroll_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hr_payslips_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]
@@ -4351,6 +4418,9 @@ export type Database = {
           language_pref: string | null
           last_active_at: string | null
           linkedin_url: string | null
+          onboarding_completed_at: string | null
+          onboarding_persona: string | null
+          onboarding_steps_done: Json
           organization: string | null
           phone: string | null
           position: string | null
@@ -4375,6 +4445,9 @@ export type Database = {
           language_pref?: string | null
           last_active_at?: string | null
           linkedin_url?: string | null
+          onboarding_completed_at?: string | null
+          onboarding_persona?: string | null
+          onboarding_steps_done?: Json
           organization?: string | null
           phone?: string | null
           position?: string | null
@@ -4399,6 +4472,9 @@ export type Database = {
           language_pref?: string | null
           last_active_at?: string | null
           linkedin_url?: string | null
+          onboarding_completed_at?: string | null
+          onboarding_persona?: string | null
+          onboarding_steps_done?: Json
           organization?: string | null
           phone?: string | null
           position?: string | null
@@ -6151,6 +6227,20 @@ export type Database = {
           },
         ]
       }
+      cost_imputation_consolidated: {
+        Row: {
+          amount: number | null
+          currency: string | null
+          month: number | null
+          occurred_on: string | null
+          project_id: string | null
+          source: string | null
+          source_id: string | null
+          subject_id: string | null
+          year: number | null
+        }
+        Relationships: []
+      }
       hr_contract_alerts: {
         Row: {
           alert_level: string | null
@@ -6280,9 +6370,26 @@ export type Database = {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
       }
+      emit_domain_event: {
+        Args: {
+          _aggregate_id: string
+          _aggregate_type: string
+          _event_name: string
+          _payload?: Json
+        }
+        Returns: string
+      }
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number
+      }
+      get_project_cost_breakdown: {
+        Args: { _from?: string; _project_id: string; _to?: string }
+        Returns: {
+          line_count: number
+          source: string
+          total_amount: number
+        }[]
       }
       has_role: {
         Args: {

@@ -22,6 +22,9 @@ interface Profile {
   job_title: string | null;
   timezone: string | null;
   language_pref: string | null;
+  onboarding_completed_at: string | null;
+  onboarding_persona: string | null;
+  onboarding_steps_done: unknown;
 }
 
 interface RoleAssignment {
@@ -96,7 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       supabase
         .from("profiles")
         .select(
-          "id, user_id, full_name, email, is_approved, phone, organization, position, bio, linkedin_url, avatar_url, reports_to_id, department, job_title, timezone, language_pref"
+          "id, user_id, full_name, email, is_approved, phone, organization, position, bio, linkedin_url, avatar_url, reports_to_id, department, job_title, timezone, language_pref, onboarding_completed_at, onboarding_persona, onboarding_steps_done"
         )
         .eq("user_id", userId)
         .single(),
