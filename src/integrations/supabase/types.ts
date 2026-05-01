@@ -1681,6 +1681,42 @@ export type Database = {
         }
         Relationships: []
       }
+      domain_events: {
+        Row: {
+          actor_user_id: string | null
+          aggregate_id: string | null
+          aggregate_type: string
+          event_name: string
+          id: string
+          occurred_at: string
+          payload: Json
+          processed_at: string | null
+          webhook_dispatched_at: string | null
+        }
+        Insert: {
+          actor_user_id?: string | null
+          aggregate_id?: string | null
+          aggregate_type: string
+          event_name: string
+          id?: string
+          occurred_at?: string
+          payload?: Json
+          processed_at?: string | null
+          webhook_dispatched_at?: string | null
+        }
+        Update: {
+          actor_user_id?: string | null
+          aggregate_id?: string | null
+          aggregate_type?: string
+          event_name?: string
+          id?: string
+          occurred_at?: string
+          payload?: Json
+          processed_at?: string | null
+          webhook_dispatched_at?: string | null
+        }
+        Relationships: []
+      }
       email_send_log: {
         Row: {
           created_at: string
@@ -6191,6 +6227,20 @@ export type Database = {
           },
         ]
       }
+      cost_imputation_consolidated: {
+        Row: {
+          amount: number | null
+          currency: string | null
+          month: number | null
+          occurred_on: string | null
+          project_id: string | null
+          source: string | null
+          source_id: string | null
+          subject_id: string | null
+          year: number | null
+        }
+        Relationships: []
+      }
       hr_contract_alerts: {
         Row: {
           alert_level: string | null
@@ -6320,9 +6370,26 @@ export type Database = {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
       }
+      emit_domain_event: {
+        Args: {
+          _aggregate_id: string
+          _aggregate_type: string
+          _event_name: string
+          _payload?: Json
+        }
+        Returns: string
+      }
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number
+      }
+      get_project_cost_breakdown: {
+        Args: { _from?: string; _project_id: string; _to?: string }
+        Returns: {
+          line_count: number
+          source: string
+          total_amount: number
+        }[]
       }
       has_role: {
         Args: {
