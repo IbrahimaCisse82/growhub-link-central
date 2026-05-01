@@ -2783,6 +2783,7 @@ export type Database = {
           created_by: string | null
           date_entree: string | null
           date_naissance: string | null
+          default_project_id: string | null
           email: string | null
           enfants: number | null
           femmes: number | null
@@ -2828,6 +2829,7 @@ export type Database = {
           created_by?: string | null
           date_entree?: string | null
           date_naissance?: string | null
+          default_project_id?: string | null
           email?: string | null
           enfants?: number | null
           femmes?: number | null
@@ -2873,6 +2875,7 @@ export type Database = {
           created_by?: string | null
           date_entree?: string | null
           date_naissance?: string | null
+          default_project_id?: string | null
           email?: string | null
           enfants?: number | null
           femmes?: number | null
@@ -2905,7 +2908,15 @@ export type Database = {
           updated_at?: string
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "hr_employees_default_project_id_fkey"
+            columns: ["default_project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       hr_expense_lines: {
         Row: {
@@ -2916,6 +2927,7 @@ export type Database = {
           description: string
           expense_date: string
           id: string
+          project_id: string | null
           receipt_url: string | null
           report_id: string
           sort_order: number | null
@@ -2929,6 +2941,7 @@ export type Database = {
           description: string
           expense_date: string
           id?: string
+          project_id?: string | null
           receipt_url?: string | null
           report_id: string
           sort_order?: number | null
@@ -2942,12 +2955,20 @@ export type Database = {
           description?: string
           expense_date?: string
           id?: string
+          project_id?: string | null
           receipt_url?: string | null
           report_id?: string
           sort_order?: number | null
           tax_rate?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "hr_expense_lines_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "hr_expense_lines_report_id_fkey"
             columns: ["report_id"]
@@ -3396,6 +3417,7 @@ export type Database = {
           net_total: number
           payroll_run_id: string
           pdf_url: string | null
+          project_id: string | null
           reference: string
           updated_at: string
           variables_snapshot: Json
@@ -3416,6 +3438,7 @@ export type Database = {
           net_total?: number
           payroll_run_id: string
           pdf_url?: string | null
+          project_id?: string | null
           reference: string
           updated_at?: string
           variables_snapshot?: Json
@@ -3436,6 +3459,7 @@ export type Database = {
           net_total?: number
           payroll_run_id?: string
           pdf_url?: string | null
+          project_id?: string | null
           reference?: string
           updated_at?: string
           variables_snapshot?: Json
@@ -3453,6 +3477,13 @@ export type Database = {
             columns: ["payroll_run_id"]
             isOneToOne: false
             referencedRelation: "hr_payroll_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hr_payslips_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]
