@@ -11,17 +11,18 @@ import { useAuth } from "@/hooks/useAuth";
 export default function AppLayout() {
   const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   useRealtimeNotifications();
 
   const storageKey = user ? `gh_onboarded_${user.id}` : null;
   const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
-    if (storageKey && !localStorage.getItem(storageKey)) {
-      setShowOnboarding(true);
-    }
-  }, [storageKey]);
+    if (!user || !profile) return;
+    const dbDone = !!profile.onboarding_completed_at;
+    const localDone = storageKey ? !!localStorage.getItem(storageKey) : false;
+    setShowOnboarding(!dbDone && !localDone);
+  }, [user, profile, storageKey]);
 
   const completeOnboarding = () => {
     if (storageKey) localStorage.setItem(storageKey, "1");
