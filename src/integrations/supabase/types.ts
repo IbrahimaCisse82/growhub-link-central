@@ -4351,6 +4351,9 @@ export type Database = {
           language_pref: string | null
           last_active_at: string | null
           linkedin_url: string | null
+          onboarding_completed_at: string | null
+          onboarding_persona: string | null
+          onboarding_steps_done: Json
           organization: string | null
           phone: string | null
           position: string | null
@@ -4375,6 +4378,9 @@ export type Database = {
           language_pref?: string | null
           last_active_at?: string | null
           linkedin_url?: string | null
+          onboarding_completed_at?: string | null
+          onboarding_persona?: string | null
+          onboarding_steps_done?: Json
           organization?: string | null
           phone?: string | null
           position?: string | null
@@ -4399,6 +4405,9 @@ export type Database = {
           language_pref?: string | null
           last_active_at?: string | null
           linkedin_url?: string | null
+          onboarding_completed_at?: string | null
+          onboarding_persona?: string | null
+          onboarding_steps_done?: Json
           organization?: string | null
           phone?: string | null
           position?: string | null
