@@ -467,17 +467,23 @@ function ExpenseLinesDialog({ reportId, report, onClose }: { reportId: string; r
                     <th className="py-2 px-2">Catégorie</th>
                     <th className="py-2 px-2">Description</th>
                     <th className="py-2 px-2 text-right">Montant</th>
+                    <th className="py-2 px-2">Projet</th>
                     <th className="py-2 px-2">Justif.</th>
                     {editable && <th className="py-2 px-2"></th>}
                   </tr>
                 </thead>
                 <tbody>
-                  {lines.map((l) => (
+                  {lines.map((l) => {
+                    const proj = projects.find((p: any) => p.id === l.project_id);
+                    return (
                     <tr key={l.id} className="border-b border-border/50">
                       <td className="py-1.5 px-2">{new Date(l.expense_date).toLocaleDateString("fr-FR")}</td>
                       <td className="py-1.5 px-2"><Badge variant="outline" className="text-[10px]">{l.category}</Badge></td>
                       <td className="py-1.5 px-2">{l.description}</td>
                       <td className="py-1.5 px-2 text-right font-medium">{fmtXOF(l.amount)}</td>
+                      <td className="py-1.5 px-2 text-[11px] text-muted-foreground">
+                        {proj ? <Badge variant="secondary" className="text-[10px]">{(proj as any).name}</Badge> : <span className="text-muted-foreground/60">—</span>}
+                      </td>
                       <td className="py-1.5 px-2">
                         {l.receipt_url ? (
                           <button onClick={() => viewReceipt(l.receipt_url!)} className="text-primary hover:underline inline-flex items-center gap-1">
@@ -495,7 +501,7 @@ function ExpenseLinesDialog({ reportId, report, onClose }: { reportId: string; r
                         </td>
                       )}
                     </tr>
-                  ))}
+                  );})}
                 </tbody>
               </table>
             </div>
