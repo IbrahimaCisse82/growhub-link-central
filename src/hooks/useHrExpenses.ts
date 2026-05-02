@@ -15,6 +15,7 @@ export interface HrExpenseLine {
   tax_rate?: number;
   receipt_url?: string | null;
   sort_order?: number;
+  project_id?: string | null;
 }
 
 export interface HrExpenseReport {
