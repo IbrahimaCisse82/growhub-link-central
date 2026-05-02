@@ -190,9 +190,23 @@ export function useHrPayrollRuns(enabled = true) {
   });
   const updateRunStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: "draft" | "calculated" | "validated" | "closed" | "cancelled" }) => {
+      const { data: { user } } = await supabase.auth.getUser();
       const patch: Record<string, unknown> = { status };
-      if (status === "closed") patch.closed_at = new Date().toISOString();
-      if (status === "validated") patch.validated_at = new Date().toISOString();
+      if (status === "closed") {
+        patch.closed_at = new Date().toISOString();
+        patch.closed_by = user?.id ?? null;
+      }
+      if (status === "validated") {
+        patch.validated_at = new Date().toISOString();
+        patch.validated_by = user?.id ?? null;
+      }
+      if (status === "draft" || status === "calculated") {
+        // Réouverture : on efface les marqueurs de clôture/validation pertinents
+        if (status === "draft") {
+          patch.validated_at = null; patch.validated_by = null;
+          patch.closed_at = null; patch.closed_by = null;
+        }
+      }
       const { error } = await supabase.from("hr_payroll_runs").update(patch as any).eq("id", id);
       if (error) throw error;
     },
