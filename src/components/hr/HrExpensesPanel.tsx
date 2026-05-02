@@ -533,7 +533,23 @@ function ExpenseLinesDialog({ reportId, report, onClose }: { reportId: string; r
                   <Input type="number" min={0} value={newLine.amount} onChange={(e) => setNewLine({ ...newLine, amount: Number(e.target.value) })} className="h-8 text-right" />
                 </div>
               </div>
-              <div className="flex items-center justify-between gap-2 mt-2">
+              <div className="grid grid-cols-12 gap-2 items-end mt-2">
+                <div className="col-span-12">
+                  <Label className="text-[10px]">Projet d'imputation analytique (optionnel)</Label>
+                  <Select
+                    value={newLine.project_id ?? "none"}
+                    onValueChange={(v) => setNewLine({ ...newLine, project_id: v === "none" ? null : v })}
+                  >
+                    <SelectTrigger className="h-8"><SelectValue placeholder="Aucun projet" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Aucun projet</SelectItem>
+                      {projects.map((p: any) => (
+                        <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
                 <label className="inline-flex items-center gap-2 text-[11px] cursor-pointer text-muted-foreground hover:text-foreground">
                   <input
                     type="file"
