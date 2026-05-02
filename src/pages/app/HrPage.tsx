@@ -26,6 +26,7 @@ import HrSelfServicePanel from "@/components/hr/HrSelfServicePanel";
 import HrExpensesPanel from "@/components/hr/HrExpensesPanel";
 import HrDeclarationsPanel from "@/components/hr/HrDeclarationsPanel";
 import HrAdvancedDashboard from "@/components/hr/HrAdvancedDashboard";
+import PayrollValidationPanel from "@/components/hr/PayrollValidationPanel";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Progress } from "@/components/ui/progress";
@@ -1294,6 +1295,11 @@ export default function HrPage() {
                 ))}
               </div>
             </GhCard>
+          )}
+
+          {/* Workflow validation paie */}
+          {canManageHr && (
+            <PayrollValidationPanel mois={payrollMonth} annee={payrollYear} canManageHr={canManageHr} />
           )}
 
           {/* Payroll History — filterable */}
