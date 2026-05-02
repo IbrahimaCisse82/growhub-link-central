@@ -550,6 +550,7 @@ function ExpenseLinesDialog({ reportId, report, onClose }: { reportId: string; r
                   </Select>
                 </div>
               </div>
+              <div className="flex items-center justify-between gap-2 mt-2">
                 <label className="inline-flex items-center gap-2 text-[11px] cursor-pointer text-muted-foreground hover:text-foreground">
                   <input
                     type="file"
