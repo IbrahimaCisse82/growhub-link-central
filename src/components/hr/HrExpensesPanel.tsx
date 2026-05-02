@@ -12,6 +12,7 @@ import { Plus, Send, Check, X, FileText, Trash2, Pencil, Upload, Eye, Receipt, C
 import { toast } from "sonner";
 import { useHrExpenseReports, useHrExpenseLines, uploadExpenseReceipt, getReceiptSignedUrl, EXPENSE_CATEGORIES, type HrExpenseReport, type HrExpenseStatus } from "@/hooks/useHrExpenses";
 import { useHrEmployees } from "@/hooks/useHrEmployees";
+import { useProjects } from "@/hooks/useProjects";
 import { fmtXOF, MOIS } from "@/lib/payroll";
 
 interface Props {
@@ -387,6 +388,7 @@ export default function HrExpensesPanel({ restrictedEmployeeId, canManageHr }: P
 /* ─────────────── Lignes dialog ─────────────── */
 function ExpenseLinesDialog({ reportId, report, onClose }: { reportId: string; report: any; onClose: () => void }) {
   const { lines, isLoading, upsertLine, removeLine } = useHrExpenseLines(reportId);
+  const { data: projects = [] } = useProjects();
   const editable = report?.status === "draft" || report?.status === "rejected";
   const [newLine, setNewLine] = useState({
     expense_date: new Date().toISOString().slice(0, 10),
@@ -395,6 +397,7 @@ function ExpenseLinesDialog({ reportId, report, onClose }: { reportId: string; r
     amount: 0,
     currency: "XOF",
     receipt_url: null as string | null,
+    project_id: null as string | null,
   });
   const [uploading, setUploading] = useState(false);
 
@@ -424,6 +427,7 @@ function ExpenseLinesDialog({ reportId, report, onClose }: { reportId: string; r
       amount: 0,
       currency: "XOF",
       receipt_url: null,
+      project_id: null,
     });
   };
 
