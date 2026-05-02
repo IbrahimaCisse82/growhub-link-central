@@ -1297,6 +1297,11 @@ export default function HrPage() {
             </GhCard>
           )}
 
+          {/* Workflow validation paie */}
+          {canManageHr && (
+            <PayrollValidationPanel mois={payrollMonth} annee={payrollYear} canManageHr={canManageHr} />
+          )}
+
           {/* Payroll History — filterable */}
           {canManageHr && (
             <GhCard title={<div className="flex items-center gap-2"><History size={14} /> Historique des paies</div> as any}>
