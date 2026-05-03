@@ -455,6 +455,10 @@ export default function ProjetDetailPage() {
           )}
           <EntityDocumentsTab entityType="project" entityId={project.id} label="Documents du projet" />
         </TabsContent>
+
+        <TabsContent value="couts" className="mt-4">
+          <ProjectCostBreakdownPanel projectId={project.id} />
+        </TabsContent>
       </Tabs>
 
       <EditProjectDialog open={editOpen} onOpenChange={setEditOpen} project={project} />
