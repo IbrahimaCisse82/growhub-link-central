@@ -14,6 +14,7 @@ import WorkPackageCard from "@/components/projects/WorkPackageCard";
 import InlineEditField from "@/components/projects/InlineEditField";
 import { buildWorkPackages } from "@/lib/workPackageUtils";
 import EntityDocumentsTab from "@/components/shared/EntityDocumentsTab";
+import ProjectCostBreakdownPanel from "@/components/projects/ProjectCostBreakdownPanel";
 import EntityCommentsPanel from "@/components/shared/EntityCommentsPanel";
 import AISuggestPanel from "@/components/ai/AISuggestPanel";
 import { useAuth } from "@/hooks/useAuth";
@@ -314,6 +315,7 @@ export default function ProjetDetailPage() {
           <TabsTrigger value="toc">Théorie du changement</TabsTrigger>
           <TabsTrigger value="budget">Budget ({budgetLines?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="bailleurs">Bailleurs ({projectGrants?.length ?? 0})</TabsTrigger>
+          <TabsTrigger value="couts">Coûts consolidés</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
           <TabsTrigger value="discussion">💬 Discussion & IA</TabsTrigger>
         </TabsList>
@@ -452,6 +454,10 @@ export default function ProjetDetailPage() {
             </div>
           )}
           <EntityDocumentsTab entityType="project" entityId={project.id} label="Documents du projet" />
+        </TabsContent>
+
+        <TabsContent value="couts" className="mt-4">
+          <ProjectCostBreakdownPanel projectId={project.id} />
         </TabsContent>
       </Tabs>
 
