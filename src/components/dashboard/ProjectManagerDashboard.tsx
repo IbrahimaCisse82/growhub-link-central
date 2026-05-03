@@ -12,6 +12,7 @@ import { useProjects } from "@/hooks/useProjects";
 import { useMilestones } from "@/hooks/useMilestones";
 import { useTasks } from "@/hooks/useTasks";
 import { useRisks } from "@/hooks/useRisks";
+import { useAccessibleProjectIds } from "@/hooks/useAccessibleProjects";
 
 const statusColor: Record<string, "green" | "blue" | "amber" | "gray"> = {
   active: "green", draft: "gray", paused: "amber", completed: "blue", cancelled: "gray",
