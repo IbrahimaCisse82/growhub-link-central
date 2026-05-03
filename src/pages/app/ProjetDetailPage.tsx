@@ -14,6 +14,7 @@ import WorkPackageCard from "@/components/projects/WorkPackageCard";
 import InlineEditField from "@/components/projects/InlineEditField";
 import { buildWorkPackages } from "@/lib/workPackageUtils";
 import EntityDocumentsTab from "@/components/shared/EntityDocumentsTab";
+import ProjectCostBreakdownPanel from "@/components/projects/ProjectCostBreakdownPanel";
 import EntityCommentsPanel from "@/components/shared/EntityCommentsPanel";
 import AISuggestPanel from "@/components/ai/AISuggestPanel";
 import { useAuth } from "@/hooks/useAuth";
