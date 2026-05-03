@@ -29,7 +29,24 @@ export default function EventsPage() {
   const [search, setSearch] = useState("");
   const [eventFilter, setEventFilter] = useState<string>("all");
   const [selected, setSelected] = useState<DomainEvent | null>(null);
+  const [dispatching, setDispatching] = useState(false);
+  const qc = useQueryClient();
   const { data: events = [], isLoading } = useDomainEvents({ limit: 500 });
+
+  const dispatchNow = async () => {
+    setDispatching(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("dispatch-domain-webhooks");
+      if (error) throw error;
+      const r = data as { processed: number; dispatched: number; skipped: number; failures: any[] };
+      toast.success(`${r.dispatched} dispatchés • ${r.skipped} sans abonné${r.failures.length ? ` • ${r.failures.length} échecs` : ""}`);
+      qc.invalidateQueries({ queryKey: ["domain_events"] });
+    } catch (e) {
+      toast.error("Erreur dispatch : " + (e as Error).message);
+    } finally {
+      setDispatching(false);
+    }
+  };
 
   const eventNames = useMemo(() => {
     const set = new Set<string>();
