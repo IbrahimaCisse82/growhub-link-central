@@ -10,6 +10,7 @@ import SectionHeader from "@/components/shared/SectionHeader";
 import { useAuth } from "@/hooks/useAuth";
 import { useGrants } from "@/hooks/useGrants";
 import { useProjects } from "@/hooks/useProjects";
+import { useAccessibleProjectIds } from "@/hooks/useAccessibleProjects";
 
 const statusColor: Record<string, "green" | "blue" | "amber" | "gray"> = {
   active: "green", disbursing: "green", draft: "gray", paused: "amber", completed: "blue", closed: "gray",
