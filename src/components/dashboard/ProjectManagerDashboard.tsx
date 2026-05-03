@@ -26,10 +26,12 @@ export default function ProjectManagerDashboard() {
   const { data: milestones } = useMilestones();
   const { data: tasks } = useTasks();
   const { data: risks } = useRisks();
+  const { data: accessibleIds } = useAccessibleProjectIds();
 
+  // Scope : owner direct + projets accessibles via role_assignments (PM scopé sur projet)
   const myProjects = useMemo(
-    () => (projects ?? []).filter((p) => p.owner_id === profile?.user_id),
-    [projects, profile?.user_id]
+    () => (projects ?? []).filter((p) => p.owner_id === profile?.user_id || accessibleIds?.has(p.id)),
+    [projects, profile?.user_id, accessibleIds]
   );
   const myProjectIds = new Set(myProjects.map((p) => p.id));
 
