@@ -79,6 +79,12 @@ export default function EventsPage() {
       <SectionHeader
         title="Bus d'événements"
         subtitle="Journal temps réel des événements métier émis par tous les modules (projets, grants, paie, achats, factures, jalons)"
+        actions={
+          <GhButton size="sm" onClick={dispatchNow} disabled={dispatching}>
+            <Send size={12} className="mr-1" />
+            {dispatching ? "Dispatch en cours…" : "Dispatcher maintenant"}
+          </GhButton>
+        }
       />
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
