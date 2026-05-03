@@ -315,6 +315,7 @@ export default function ProjetDetailPage() {
           <TabsTrigger value="toc">Théorie du changement</TabsTrigger>
           <TabsTrigger value="budget">Budget ({budgetLines?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="bailleurs">Bailleurs ({projectGrants?.length ?? 0})</TabsTrigger>
+          <TabsTrigger value="couts">Coûts consolidés</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
           <TabsTrigger value="discussion">💬 Discussion & IA</TabsTrigger>
         </TabsList>
