@@ -6176,7 +6176,10 @@ export type Database = {
           id: string
           is_active: boolean | null
           is_demo: boolean
+          last_dispatch_at: string | null
+          last_dispatch_status: string | null
           name: string
+          secret: string | null
           updated_at: string | null
           url: string
         }
@@ -6187,7 +6190,10 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           is_demo?: boolean
+          last_dispatch_at?: string | null
+          last_dispatch_status?: string | null
           name: string
+          secret?: string | null
           updated_at?: string | null
           url: string
         }
@@ -6198,7 +6204,10 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           is_demo?: boolean
+          last_dispatch_at?: string | null
+          last_dispatch_status?: string | null
           name?: string
+          secret?: string | null
           updated_at?: string | null
           url?: string
         }

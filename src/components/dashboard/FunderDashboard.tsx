@@ -10,6 +10,7 @@ import SectionHeader from "@/components/shared/SectionHeader";
 import { useAuth } from "@/hooks/useAuth";
 import { useGrants } from "@/hooks/useGrants";
 import { useProjects } from "@/hooks/useProjects";
+import { useAccessibleProjectIds } from "@/hooks/useAccessibleProjects";
 
 const statusColor: Record<string, "green" | "blue" | "amber" | "gray"> = {
   active: "green", disbursing: "green", draft: "gray", paused: "amber", completed: "blue", closed: "gray",
@@ -21,13 +22,17 @@ export default function FunderDashboard() {
   const { profile } = useAuth();
   const { data: grants } = useGrants();
   const { data: projects } = useProjects();
+  const { data: accessibleIds } = useAccessibleProjectIds();
 
-  // Filtre éventuel : grants liés à l'organisation du bailleur (heuristique sur funder/organization)
+  // Scope strict : grants liés à l'organisation OU à un projet accessible via role_assignments
   const myGrants = useMemo(() => {
     if (!grants) return [];
-    if (!profile?.organization) return grants;
-    return grants.filter((g) => g.organization === profile.organization);
-  }, [grants, profile?.organization]);
+    return grants.filter((g) => {
+      const orgMatch = profile?.organization && g.organization === profile.organization;
+      const projMatch = g.project_id && accessibleIds?.has(g.project_id);
+      return orgMatch || projMatch;
+    });
+  }, [grants, profile?.organization, accessibleIds]);
 
   const totalCommitted = myGrants.reduce((s, g) => s + Number(g.amount_total ?? 0), 0);
   const totalDisbursed = myGrants.reduce((s, g) => s + Number(g.amount_disbursed ?? 0), 0);
