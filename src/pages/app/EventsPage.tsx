@@ -7,8 +7,11 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Activity, Search, Eye, Radio, Clock, Hash } from "lucide-react";
+import { Activity, Search, Eye, Radio, Clock, Hash, Send } from "lucide-react";
 import { useDomainEvents, type DomainEvent } from "@/hooks/useDomainEvents";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 const EVENT_COLORS: Record<string, string> = {
   "project.created": "bg-gh-blue/15 text-gh-blue",
