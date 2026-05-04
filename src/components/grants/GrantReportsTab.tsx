@@ -55,7 +55,12 @@ export default function GrantReportsTab({ grantId, budgetTotal }: { grantId: str
 
       <div className="flex items-center justify-between">
         <span className="text-xs font-bold text-foreground">Rapports financiers</span>
-        <GhButton onClick={() => { setEditReport(null); setShowForm(true); }}>+ Nouveau rapport</GhButton>
+        <div className="flex items-center gap-2">
+          <GhButton variant="ghost" onClick={() => handleExportDonorReport()}>
+            <FileDown size={14} className="mr-1" /> Annexe 1b (PDF)
+          </GhButton>
+          <GhButton onClick={() => { setEditReport(null); setShowForm(true); }}>+ Nouveau rapport</GhButton>
+        </div>
       </div>
 
       {isLoading ? (
