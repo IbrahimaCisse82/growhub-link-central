@@ -3,7 +3,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
-import { useGrantReports, useGrantTransactions, useDeleteReport, type GrantReport, type GrantTransaction } from "@/hooks/useGrantDetail";
+import { useGrantReports, useGrantTransactions, useDeleteReport, useGrantDetailQuery, type GrantReport, type GrantTransaction } from "@/hooks/useGrantDetail";
+import { exportGrantDonorReportPdf } from "@/lib/grantDonorReportPdf";
+import { FileDown } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import GhButton from "@/components/shared/GhButton";
 import Pill from "@/components/shared/Pill";
@@ -25,6 +27,32 @@ export default function GrantReportsTab({ grantId, budgetTotal }: { grantId: str
   const deleteMutation = useDeleteReport(grantId);
   const { data: reports, isLoading } = useGrantReports(grantId);
   const { data: transactions } = useGrantTransactions(grantId);
+  const { data: grant } = useGrantDetailQuery(grantId);
+
+  const handleExportDonorReport = async () => {
+    if (!grant) { toast({ title: "Subvention non chargée", variant: "destructive" }); return; }
+    const dates = (reports ?? [])
+      .map(r => [r.start_date, r.end_date])
+      .flat()
+      .filter(Boolean) as string[];
+    const startDate = dates.length ? dates.sort()[0] : null;
+    const endDate = dates.length ? dates.sort().slice(-1)[0] : null;
+    const periodLabel = startDate && endDate
+      ? `${new Date(startDate).toLocaleDateString("fr-FR")} → ${new Date(endDate).toLocaleDateString("fr-FR")}`
+      : "Cumul à date";
+    try {
+      await exportGrantDonorReportPdf({
+        grant: grant as Parameters<typeof exportGrantDonorReportPdf>[0]["grant"],
+        periodLabel,
+        startDate,
+        endDate,
+        orgName: (grant as { organization?: string }).organization ?? undefined,
+      });
+      toast({ title: "Annexe 1b générée" });
+    } catch (e) {
+      toast({ title: "Échec génération PDF", description: (e as Error).message, variant: "destructive" });
+    }
+  };
   const [showForm, setShowForm] = useState(false);
   const [editReport, setEditReport] = useState<GrantReport | null>(null);
   const [deleteReport, setDeleteReport] = useState<GrantReport | null>(null);
@@ -53,7 +81,12 @@ export default function GrantReportsTab({ grantId, budgetTotal }: { grantId: str
 
       <div className="flex items-center justify-between">
         <span className="text-xs font-bold text-foreground">Rapports financiers</span>
-        <GhButton onClick={() => { setEditReport(null); setShowForm(true); }}>+ Nouveau rapport</GhButton>
+        <div className="flex items-center gap-2">
+          <GhButton variant="ghost" onClick={() => handleExportDonorReport()}>
+            <FileDown size={14} className="mr-1" /> Annexe 1b (PDF)
+          </GhButton>
+          <GhButton onClick={() => { setEditReport(null); setShowForm(true); }}>+ Nouveau rapport</GhButton>
+        </div>
       </div>
 
       {isLoading ? (
