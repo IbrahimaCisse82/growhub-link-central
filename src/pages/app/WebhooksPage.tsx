@@ -154,23 +154,40 @@ export default function WebhooksPage() {
           <EmptyState icon="🔗" title="Aucun webhook" description="Ajoutez votre premier webhook Zapier" />
         ) : (
           <div className="divide-y divide-border">
-            {webhooks.map(w => (
-              <div key={w.id} className="p-4 flex items-center justify-between gap-3">
-                <div className="flex-1 min-w-0">
-                  <div className="text-[12.5px] font-semibold text-foreground">{w.name}</div>
-                  <div className="text-[10px] text-muted-foreground font-mono truncate mt-0.5">{w.url}</div>
-                  <div className="flex gap-1.5 mt-1.5">
-                    <Pill color={w.is_active ? "green" : "gray"}>{w.is_active ? "Actif" : "Inactif"}</Pill>
-                    <Pill color="blue">{eventTypes.find(e => e.value === w.event_type)?.label ?? w.event_type}</Pill>
+            {webhooks.map((w: any) => (
+              <div key={w.id} className="p-4 flex flex-col gap-2">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[12.5px] font-semibold text-foreground">{w.name}</div>
+                    <div className="text-[10px] text-muted-foreground font-mono truncate mt-0.5">{w.url}</div>
+                    <div className="flex flex-wrap gap-1.5 mt-1.5 items-center">
+                      <Pill color={w.is_active ? "green" : "gray"}>{w.is_active ? "Actif" : "Désactivé"}</Pill>
+                      <Pill color="blue">{eventTypes.find(e => e.value === w.event_type)?.label ?? w.event_type}</Pill>
+                      {w.retry_count > 0 && <Pill color="amber">⏱ {w.retry_count} tentative(s)</Pill>}
+                      {w.last_success_at && <span className="text-[10px] text-muted-foreground">✓ {new Date(w.last_success_at).toLocaleString("fr-FR")}</span>}
+                      {w.next_retry_at && <span className="text-[10px] text-amber-500">↻ next {new Date(w.next_retry_at).toLocaleString("fr-FR")}</span>}
+                    </div>
+                  </div>
+                  <div className="flex gap-1 shrink-0">
+                    <GhButton variant="secondary" size="sm" onClick={() => testWebhook(w)}>🧪 Test</GhButton>
+                    <GhButton variant="ghost" size="sm" onClick={async () => {
+                      const { error } = await supabase.functions.invoke("dispatch-domain-webhooks", { body: {} });
+                      if (error) toast({ title: "Erreur", description: error.message, variant: "destructive" });
+                      else { toast({ title: "Dispatch lancé" }); qc.invalidateQueries({ queryKey: ["webhook-configs"] }); }
+                    }}>↻ Réessayer</GhButton>
+                    <GhButton variant="ghost" size="sm" onClick={() => toggleActive.mutate({ id: w.id, active: !w.is_active })}>
+                      {w.is_active ? "Désactiver" : "Activer"}
+                    </GhButton>
+                    <GhButton variant="ghost" size="sm" onClick={() => deleteWebhook.mutate(w.id)}>✕</GhButton>
                   </div>
                 </div>
-                <div className="flex gap-1">
-                  <GhButton variant="secondary" size="sm" onClick={() => testWebhook(w)}>🧪 Test</GhButton>
-                  <GhButton variant="ghost" size="sm" onClick={() => toggleActive.mutate({ id: w.id, active: !w.is_active })}>
-                    {w.is_active ? "Désactiver" : "Activer"}
-                  </GhButton>
-                  <GhButton variant="ghost" size="sm" onClick={() => deleteWebhook.mutate(w.id)}>✕</GhButton>
-                </div>
+                {w.last_error_body && (
+                  <details className="text-[10px] bg-destructive/5 border border-destructive/20 rounded px-2 py-1.5">
+                    <summary className="cursor-pointer text-destructive font-mono">Dernière erreur ({w.last_dispatch_status})</summary>
+                    <pre className="mt-1 whitespace-pre-wrap text-muted-foreground">{w.last_error_body}</pre>
+                    {w.disabled_reason && <div className="mt-1 text-destructive">{w.disabled_reason}</div>}
+                  </details>
+                )}
               </div>
             ))}
           </div>
