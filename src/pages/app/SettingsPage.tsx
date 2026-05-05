@@ -12,6 +12,7 @@ import { useNotificationPrefs } from "@/hooks/useNotificationPrefs";
 import { SHORTCUT_HINTS } from "@/hooks/useKeyboardShortcuts";
 import { Keyboard } from "lucide-react";
 import OrgSettingsCard from "@/components/settings/OrgSettingsCard";
+import BucketsSecurityCard from "@/components/settings/BucketsSecurityCard";
 import { useAuth as useAuthForOrg } from "@/hooks/useAuth";
 
 const notifTypes = [
@@ -216,6 +217,7 @@ export default function SettingsPage() {
         </GhCard>
 
         <NewNotifPrefsCard />
+        <BucketsAdminSection />
         <KeyboardShortcutsCard />
       </div>
     </motion.div>
@@ -310,4 +312,10 @@ function OrgSettingsSection() {
   const { isAdmin } = useAuthForOrg();
   if (!isAdmin) return null;
   return <div className="mb-4"><OrgSettingsCard /></div>;
+}
+
+function BucketsAdminSection() {
+  const { isAdmin } = useAuthForOrg();
+  if (!isAdmin) return null;
+  return <div className="mt-4"><BucketsSecurityCard /></div>;
 }

@@ -79,8 +79,8 @@ export function useDeleteEntityDocument(entityType: string, entityId: string) {
 export async function uploadEntityFile(entityType: string, entityId: string, file: File) {
   const ext = file.name.split(".").pop();
   const path = `${entityType}/${entityId}/${Date.now()}.${ext}`;
-  const { error } = await supabase.storage.from("entity-documents").upload(path, file);
+  const { error } = await supabase.storage.from("entity-documents").upload(path, file, { upsert: false });
   if (error) throw error;
-  const { data: urlData } = supabase.storage.from("entity-documents").getPublicUrl(path);
-  return { url: urlData.publicUrl, name: file.name, size: file.size };
+  // Bucket privé : on stocke le path, l'URL est signée à l'ouverture
+  return { url: path, name: file.name, size: file.size };
 }

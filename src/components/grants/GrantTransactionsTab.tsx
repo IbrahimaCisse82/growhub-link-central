@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import GhButton from "@/components/shared/GhButton";
 import NomenclatureSelect from "@/components/budgets/NomenclatureSelect";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import SignedDownloadLink from "@/components/shared/SignedDownloadLink";
 
 const fmt = (n: number) => new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 }).format(n);
 const inputCls = "flex h-10 w-full rounded-lg border border-input bg-surface-2 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-colors";
@@ -113,7 +114,7 @@ export default function GrantTransactionsTab({ grantId, grantCode }: GrantTransa
                     </td>
                     <td className="px-3 py-2.5 border-b border-border">
                       {tx.receipt_url ? (
-                        <a href={tx.receipt_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-[11px]">📎 Voir</a>
+                        <SignedDownloadLink bucket="receipts" pathOrUrl={tx.receipt_url} className="text-primary hover:underline text-[11px]">📎 Voir</SignedDownloadLink>
                       ) : <span className="text-muted-foreground text-[11px]">—</span>}
                     </td>
                     <td className="px-3 py-2.5 border-b border-border">
@@ -197,10 +198,9 @@ function TransactionFormDialog({ open, onOpenChange, grantId, grantCode, editDat
     try {
       const ext = file.name.split(".").pop();
       const path = `${grantId}/${Date.now()}.${ext}`;
-      const { error } = await supabase.storage.from("receipts").upload(path, file);
+      const { error } = await supabase.storage.from("receipts").upload(path, file, { upsert: false });
       if (error) throw error;
-      const { data: urlData } = supabase.storage.from("receipts").getPublicUrl(path);
-      setReceiptUrl(urlData.publicUrl);
+      setReceiptUrl(path);
       toast({ title: "Pièce jointe uploadée" });
     } catch (err) {
       toast({ title: "Erreur upload", description: (err as Error).message, variant: "destructive" });

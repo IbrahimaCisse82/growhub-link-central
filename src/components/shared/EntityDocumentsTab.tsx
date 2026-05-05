@@ -6,6 +6,7 @@ import Pill from "@/components/shared/Pill";
 import { useAuth } from "@/hooks/useAuth";
 import { useEntityDocuments, useCreateEntityDocument, useDeleteEntityDocument, uploadEntityFile, type EntityDocument } from "@/hooks/useEntityDocuments";
 import { toast } from "@/hooks/use-toast";
+import SignedDownloadLink from "@/components/shared/SignedDownloadLink";
 
 const inputCls = "flex h-10 w-full rounded-lg border border-input bg-secondary px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-colors";
 
@@ -81,9 +82,9 @@ export default function EntityDocumentsTab({ entityType, entityId, label = "Docu
                       </div>
                       <div className="flex gap-2 items-center opacity-0 group-hover:opacity-100 transition-opacity">
                         {d.file_url && (
-                          <a href={d.file_url} target="_blank" rel="noopener noreferrer" className="text-[11px] px-2 py-1 rounded bg-primary/10 text-primary hover:bg-primary/20 transition-colors font-medium">
+                          <SignedDownloadLink bucket="entity-documents" pathOrUrl={d.file_url} className="text-[11px] px-2 py-1 rounded bg-primary/10 text-primary hover:bg-primary/20 transition-colors font-medium">
                             ⤓ Télécharger
-                          </a>
+                          </SignedDownloadLink>
                         )}
                         <button onClick={() => setDeleteDoc(d)} className="text-[11px] text-muted-foreground hover:text-destructive">🗑</button>
                       </div>
