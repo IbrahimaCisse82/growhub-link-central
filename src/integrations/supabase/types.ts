@@ -1686,8 +1686,10 @@ export type Database = {
           actor_user_id: string | null
           aggregate_id: string | null
           aggregate_type: string
+          dispatch_attempts: number
           event_name: string
           id: string
+          last_dispatch_error: string | null
           occurred_at: string
           payload: Json
           processed_at: string | null
@@ -1697,8 +1699,10 @@ export type Database = {
           actor_user_id?: string | null
           aggregate_id?: string | null
           aggregate_type: string
+          dispatch_attempts?: number
           event_name: string
           id?: string
+          last_dispatch_error?: string | null
           occurred_at?: string
           payload?: Json
           processed_at?: string | null
@@ -1708,8 +1712,10 @@ export type Database = {
           actor_user_id?: string | null
           aggregate_id?: string | null
           aggregate_type?: string
+          dispatch_attempts?: number
           event_name?: string
           id?: string
+          last_dispatch_error?: string | null
           occurred_at?: string
           payload?: Json
           processed_at?: string | null
@@ -6172,13 +6178,18 @@ export type Database = {
         Row: {
           created_at: string | null
           created_by: string
+          disabled_reason: string | null
           event_type: string
           id: string
           is_active: boolean | null
           is_demo: boolean
           last_dispatch_at: string | null
           last_dispatch_status: string | null
+          last_error_body: string | null
+          last_success_at: string | null
           name: string
+          next_retry_at: string | null
+          retry_count: number
           secret: string | null
           updated_at: string | null
           url: string
@@ -6186,13 +6197,18 @@ export type Database = {
         Insert: {
           created_at?: string | null
           created_by: string
+          disabled_reason?: string | null
           event_type: string
           id?: string
           is_active?: boolean | null
           is_demo?: boolean
           last_dispatch_at?: string | null
           last_dispatch_status?: string | null
+          last_error_body?: string | null
+          last_success_at?: string | null
           name: string
+          next_retry_at?: string | null
+          retry_count?: number
           secret?: string | null
           updated_at?: string | null
           url: string
@@ -6200,13 +6216,18 @@ export type Database = {
         Update: {
           created_at?: string | null
           created_by?: string
+          disabled_reason?: string | null
           event_type?: string
           id?: string
           is_active?: boolean | null
           is_demo?: boolean
           last_dispatch_at?: string | null
           last_dispatch_status?: string | null
+          last_error_body?: string | null
+          last_success_at?: string | null
           name?: string
+          next_retry_at?: string | null
+          retry_count?: number
           secret?: string | null
           updated_at?: string | null
           url?: string
