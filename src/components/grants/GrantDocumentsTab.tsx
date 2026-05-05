@@ -7,6 +7,7 @@ import { useGrantDocuments, useDeleteDocument, type GrantDocument } from "@/hook
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import GhButton from "@/components/shared/GhButton";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import SignedDownloadLink from "@/components/shared/SignedDownloadLink";
 
 const inputCls = "flex h-10 w-full rounded-lg border border-input bg-surface-2 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-colors";
 
@@ -68,7 +69,7 @@ export default function GrantDocumentsTab({ grantId }: { grantId: string }) {
                         <div className="text-[10px] text-muted-foreground font-mono mt-1">{d.file_name ?? "—"} · {new Date(d.created_at).toLocaleDateString("fr-FR")}</div>
                       </div>
                       <div className="flex gap-2 items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        {d.file_url && <a href={d.file_url} target="_blank" rel="noopener noreferrer" className="text-[11px] px-2 py-1 rounded bg-primary/10 text-primary hover:bg-primary/20 transition-colors font-medium">⤓ Télécharger</a>}
+                        {d.file_url && <SignedDownloadLink bucket="grant-documents" pathOrUrl={d.file_url} className="text-[11px] px-2 py-1 rounded bg-primary/10 text-primary hover:bg-primary/20 transition-colors font-medium">⤓ Télécharger</SignedDownloadLink>}
                         <button onClick={() => setDeleteDoc(d)} className="text-[11px] text-muted-foreground hover:text-destructive">🗑</button>
                       </div>
                     </div>
