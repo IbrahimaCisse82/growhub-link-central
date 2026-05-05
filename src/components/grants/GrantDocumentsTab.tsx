@@ -117,10 +117,9 @@ function DocumentFormDialog({ open, onOpenChange, grantId, userId }: {
     try {
       const ext = file.name.split(".").pop();
       const path = `${grantId}/${Date.now()}.${ext}`;
-      const { error } = await supabase.storage.from("grant-documents").upload(path, file);
+      const { error } = await supabase.storage.from("grant-documents").upload(path, file, { upsert: false });
       if (error) throw error;
-      const { data: urlData } = supabase.storage.from("grant-documents").getPublicUrl(path);
-      setFileUrl(urlData.publicUrl); setFileName(file.name); setFileSize(file.size);
+      setFileUrl(path); setFileName(file.name); setFileSize(file.size);
       toast({ title: "Fichier uploadé" });
     } catch (err) {
       toast({ title: "Erreur upload", description: (err as Error).message, variant: "destructive" });

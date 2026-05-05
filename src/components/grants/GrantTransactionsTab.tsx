@@ -197,10 +197,9 @@ function TransactionFormDialog({ open, onOpenChange, grantId, grantCode, editDat
     try {
       const ext = file.name.split(".").pop();
       const path = `${grantId}/${Date.now()}.${ext}`;
-      const { error } = await supabase.storage.from("receipts").upload(path, file);
+      const { error } = await supabase.storage.from("receipts").upload(path, file, { upsert: false });
       if (error) throw error;
-      const { data: urlData } = supabase.storage.from("receipts").getPublicUrl(path);
-      setReceiptUrl(urlData.publicUrl);
+      setReceiptUrl(path);
       toast({ title: "Pièce jointe uploadée" });
     } catch (err) {
       toast({ title: "Erreur upload", description: (err as Error).message, variant: "destructive" });
