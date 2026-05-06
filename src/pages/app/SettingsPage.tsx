@@ -318,5 +318,10 @@ function OrgSettingsSection() {
 function BucketsAdminSection() {
   const { isAdmin } = useAuthForOrg();
   if (!isAdmin) return null;
-  return <div className="mt-4"><BucketsSecurityCard /></div>;
+  return (
+    <div className="mt-4 space-y-4">
+      <BucketsSecurityCard />
+      <ExpenseApprovalCard />
+    </div>
+  );
 }
