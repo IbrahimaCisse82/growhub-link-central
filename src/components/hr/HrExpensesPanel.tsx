@@ -24,6 +24,7 @@ interface Props {
 const STATUS_VARIANT: Record<HrExpenseStatus, "default" | "secondary" | "destructive" | "outline"> = {
   draft: "outline",
   submitted: "secondary",
+  approved_l1: "secondary",
   approved: "default",
   rejected: "destructive",
   reimbursed: "default",
@@ -32,6 +33,7 @@ const STATUS_VARIANT: Record<HrExpenseStatus, "default" | "secondary" | "destruc
 const STATUS_LABEL: Record<HrExpenseStatus, string> = {
   draft: "Brouillon",
   submitted: "Soumise",
+  approved_l1: "Validée N+1",
   approved: "Approuvée",
   rejected: "Rejetée",
   reimbursed: "Remboursée",
@@ -193,6 +195,9 @@ export default function HrExpensesPanel({ restrictedEmployeeId, canManageHr }: P
                         <Badge variant={STATUS_VARIANT[r.status as HrExpenseStatus]} className="text-[10px]">
                           {STATUS_LABEL[r.status as HrExpenseStatus]}
                         </Badge>
+                        {r.second_approval_required && r.status !== "approved" && r.status !== "reimbursed" && (
+                          <div className="text-[10px] text-amber-600 mt-0.5 font-medium">⚠ N+2 requis</div>
+                        )}
                         {r.reimbursement_mois && (
                           <div className="text-[10px] text-muted-foreground mt-0.5">
                             Paie {MOIS[r.reimbursement_mois]} {r.reimbursement_annee}
@@ -216,8 +221,18 @@ export default function HrExpensesPanel({ restrictedEmployeeId, canManageHr }: P
                           )}
                           {canManageHr && r.status === "submitted" && (
                             <>
-                              <GhButton size="sm" variant="ghost" onClick={() => approveReport.mutate(r.id)} title="Approuver">
+                              <GhButton size="sm" variant="ghost" onClick={() => approveReport.mutate(r.id)} title={r.second_approval_required ? "Approuver (N+1)" : "Approuver"}>
                                 <Check size={12} className="text-primary" />
+                              </GhButton>
+                              <GhButton size="sm" variant="ghost" onClick={() => { setRejectReason(""); setRejectOpen({ id: r.id }); }} title="Rejeter">
+                                <X size={12} className="text-destructive" />
+                              </GhButton>
+                            </>
+                          )}
+                          {canManageHr && r.status === "approved_l1" && (
+                            <>
+                              <GhButton size="sm" variant="ghost" onClick={() => approveReport.mutate(r.id)} title="Valider en N+2 (validateur ≠ N+1)">
+                                <CheckCircle2 size={12} className="text-amber-600" />
                               </GhButton>
                               <GhButton size="sm" variant="ghost" onClick={() => { setRejectReason(""); setRejectOpen({ id: r.id }); }} title="Rejeter">
                                 <X size={12} className="text-destructive" />

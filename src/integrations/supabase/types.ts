@@ -3038,6 +3038,10 @@ export type Database = {
           rejection_reason: string | null
           reviewed_at: string | null
           reviewed_by: string | null
+          second_approval_requested_at: string | null
+          second_approval_required: boolean
+          second_reviewed_at: string | null
+          second_reviewed_by: string | null
           status: Database["public"]["Enums"]["hr_expense_status"]
           submitted_at: string | null
           title: string
@@ -3061,6 +3065,10 @@ export type Database = {
           rejection_reason?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          second_approval_requested_at?: string | null
+          second_approval_required?: boolean
+          second_reviewed_at?: string | null
+          second_reviewed_by?: string | null
           status?: Database["public"]["Enums"]["hr_expense_status"]
           submitted_at?: string | null
           title: string
@@ -3084,6 +3092,10 @@ export type Database = {
           rejection_reason?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          second_approval_requested_at?: string | null
+          second_approval_required?: boolean
+          second_reviewed_at?: string | null
+          second_reviewed_by?: string | null
           status?: Database["public"]["Enums"]["hr_expense_status"]
           submitted_at?: string | null
           title?: string
@@ -4164,6 +4176,7 @@ export type Database = {
       org_settings: {
         Row: {
           address: string | null
+          approval_threshold_xof: number | null
           bank_details: string | null
           brand_accent_hex: string | null
           brand_primary_hex: string | null
@@ -4197,6 +4210,7 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          approval_threshold_xof?: number | null
           bank_details?: string | null
           brand_accent_hex?: string | null
           brand_primary_hex?: string | null
@@ -4230,6 +4244,7 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          approval_threshold_xof?: number | null
           bank_details?: string | null
           brand_accent_hex?: string | null
           brand_primary_hex?: string | null
@@ -6563,6 +6578,7 @@ export type Database = {
       hr_expense_status:
         | "draft"
         | "submitted"
+        | "approved_l1"
         | "approved"
         | "rejected"
         | "reimbursed"
@@ -6798,6 +6814,7 @@ export const Constants = {
       hr_expense_status: [
         "draft",
         "submitted",
+        "approved_l1",
         "approved",
         "rejected",
         "reimbursed",

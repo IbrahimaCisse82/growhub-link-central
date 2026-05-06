@@ -13,6 +13,7 @@ import { SHORTCUT_HINTS } from "@/hooks/useKeyboardShortcuts";
 import { Keyboard } from "lucide-react";
 import OrgSettingsCard from "@/components/settings/OrgSettingsCard";
 import BucketsSecurityCard from "@/components/settings/BucketsSecurityCard";
+import ExpenseApprovalCard from "@/components/settings/ExpenseApprovalCard";
 import { useAuth as useAuthForOrg } from "@/hooks/useAuth";
 
 const notifTypes = [
@@ -317,5 +318,10 @@ function OrgSettingsSection() {
 function BucketsAdminSection() {
   const { isAdmin } = useAuthForOrg();
   if (!isAdmin) return null;
-  return <div className="mt-4"><BucketsSecurityCard /></div>;
+  return (
+    <div className="mt-4 space-y-4">
+      <BucketsSecurityCard />
+      <ExpenseApprovalCard />
+    </div>
+  );
 }
