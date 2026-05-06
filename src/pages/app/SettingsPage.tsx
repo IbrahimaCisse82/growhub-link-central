@@ -13,6 +13,7 @@ import { SHORTCUT_HINTS } from "@/hooks/useKeyboardShortcuts";
 import { Keyboard } from "lucide-react";
 import OrgSettingsCard from "@/components/settings/OrgSettingsCard";
 import BucketsSecurityCard from "@/components/settings/BucketsSecurityCard";
+import ExpenseApprovalCard from "@/components/settings/ExpenseApprovalCard";
 import { useAuth as useAuthForOrg } from "@/hooks/useAuth";
 
 const notifTypes = [
