@@ -44,6 +44,135 @@ export type Database = {
         }
         Relationships: []
       }
+      alumni_kpis: {
+        Row: {
+          alumni_id: string
+          created_at: string
+          created_by: string | null
+          customers_count: number | null
+          exports_xof: number | null
+          funding_raised_xof: number | null
+          id: string
+          jobs_total: number | null
+          jobs_women: number | null
+          jobs_youth: number | null
+          notes: string | null
+          recorded_at: string
+          revenue_xof: number | null
+        }
+        Insert: {
+          alumni_id: string
+          created_at?: string
+          created_by?: string | null
+          customers_count?: number | null
+          exports_xof?: number | null
+          funding_raised_xof?: number | null
+          id?: string
+          jobs_total?: number | null
+          jobs_women?: number | null
+          jobs_youth?: number | null
+          notes?: string | null
+          recorded_at?: string
+          revenue_xof?: number | null
+        }
+        Update: {
+          alumni_id?: string
+          created_at?: string
+          created_by?: string | null
+          customers_count?: number | null
+          exports_xof?: number | null
+          funding_raised_xof?: number | null
+          id?: string
+          jobs_total?: number | null
+          jobs_women?: number | null
+          jobs_youth?: number | null
+          notes?: string | null
+          recorded_at?: string
+          revenue_xof?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alumni_kpis_alumni_id_fkey"
+            columns: ["alumni_id"]
+            isOneToOne: false
+            referencedRelation: "alumni_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      alumni_records: {
+        Row: {
+          cohort_id: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          created_by: string | null
+          graduation_date: string
+          id: string
+          impact_summary: string | null
+          notes: string | null
+          program_id: string | null
+          startup_id: string | null
+          status: string
+          updated_at: string
+          website_url: string | null
+        }
+        Insert: {
+          cohort_id?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          created_by?: string | null
+          graduation_date?: string
+          id?: string
+          impact_summary?: string | null
+          notes?: string | null
+          program_id?: string | null
+          startup_id?: string | null
+          status?: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Update: {
+          cohort_id?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          created_by?: string | null
+          graduation_date?: string
+          id?: string
+          impact_summary?: string | null
+          notes?: string | null
+          program_id?: string | null
+          startup_id?: string | null
+          status?: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alumni_records_cohort_id_fkey"
+            columns: ["cohort_id"]
+            isOneToOne: false
+            referencedRelation: "cohorts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alumni_records_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alumni_records_startup_id_fkey"
+            columns: ["startup_id"]
+            isOneToOne: false
+            referencedRelation: "startups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       application_evaluations: {
         Row: {
           application_id: string
