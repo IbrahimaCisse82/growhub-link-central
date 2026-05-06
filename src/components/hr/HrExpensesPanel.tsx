@@ -24,6 +24,7 @@ interface Props {
 const STATUS_VARIANT: Record<HrExpenseStatus, "default" | "secondary" | "destructive" | "outline"> = {
   draft: "outline",
   submitted: "secondary",
+  approved_l1: "secondary",
   approved: "default",
   rejected: "destructive",
   reimbursed: "default",
@@ -32,6 +33,7 @@ const STATUS_VARIANT: Record<HrExpenseStatus, "default" | "secondary" | "destruc
 const STATUS_LABEL: Record<HrExpenseStatus, string> = {
   draft: "Brouillon",
   submitted: "Soumise",
+  approved_l1: "Validée N+1",
   approved: "Approuvée",
   rejected: "Rejetée",
   reimbursed: "Remboursée",
