@@ -27,8 +27,8 @@ export default function AlumniPage() {
 
   const { isAdmin, roles } = useAuth();
   const canEdit = isAdmin || roles.includes("coordinator" as any) || roles.includes("project_manager" as any);
-  const { startups } = useStartups();
-  const { programs } = usePrograms();
+  const { data: startups = [] } = useStartups();
+  const { data: programs = [] } = usePrograms();
 
   // Add new alumni record dialog state
   const [newDlg, setNewDlg] = useState(false);
