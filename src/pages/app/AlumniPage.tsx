@@ -216,6 +216,8 @@ export default function AlumniPage() {
           <StatBox icon="⭐" label="Score moyen" value={filtered.filter(a => a.score).length ? (filtered.reduce((s, a) => s + (a.score ?? 0), 0) / filtered.filter(a => a.score).length).toFixed(0) + "/100" : "—"} />
         </div>
       )}
+        </TabsContent>
+      </Tabs>
     </motion.div>
   );
 }
