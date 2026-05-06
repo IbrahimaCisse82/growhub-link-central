@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-export type HrExpenseStatus = "draft" | "submitted" | "approved" | "rejected" | "reimbursed";
+export type HrExpenseStatus = "draft" | "submitted" | "approved_l1" | "approved" | "rejected" | "reimbursed";
 
 export interface HrExpenseLine {
   id?: string;
