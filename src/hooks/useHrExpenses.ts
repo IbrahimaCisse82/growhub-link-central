@@ -113,9 +113,28 @@ export function useHrExpenseReports(filters?: { employee_id?: string; status?: H
   const approveReport = useMutation({
     mutationFn: async (id: string) => {
       const { data: { user } } = await supabase.auth.getUser();
+      // Fetch current report to determine if N+2 needed
+      const { data: rep, error: e1 } = await supabase
+        .from("hr_expense_reports" as any)
+        .select("second_approval_required, reviewed_by, status")
+        .eq("id", id).single();
+      if (e1) throw e1;
+      const r: any = rep;
+      // L2 step (if already approved_l1)
+      if (r.status === "approved_l1") {
+        if (r.reviewed_by === user?.id) throw new Error("Le 2e validateur doit être différent du 1er");
+        const { error } = await supabase
+          .from("hr_expense_reports" as any)
+          .update({ status: "approved", second_reviewed_at: new Date().toISOString(), second_reviewed_by: user?.id ?? null } as any)
+          .eq("id", id);
+        if (error) throw error;
+        return;
+      }
+      // L1 step
+      const nextStatus = r.second_approval_required ? "approved_l1" : "approved";
       const { error } = await supabase
         .from("hr_expense_reports" as any)
-        .update({ status: "approved", reviewed_at: new Date().toISOString(), reviewed_by: user?.id ?? null, rejection_reason: null } as any)
+        .update({ status: nextStatus, reviewed_at: new Date().toISOString(), reviewed_by: user?.id ?? null, rejection_reason: null } as any)
         .eq("id", id);
       if (error) throw error;
     },
