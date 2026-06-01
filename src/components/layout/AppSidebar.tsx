@@ -8,7 +8,7 @@ import {
   AlertTriangle, FileText, Settings as SettingsIcon, Filter, Triangle, CircleDot, GraduationCap,
   Users, Link2, Headphones, CalendarDays, BookOpen, ClipboardList, BarChart3, DollarSign,
   PieChart, Wallet, Store, Handshake, Diamond, MessageCircle, FolderOpen, LineChart,
-  FileBarChart, Zap, LogOut, Globe, UserCog, Receipt, ShoppingCart, type LucideIcon
+  FileBarChart, Zap, LogOut, Globe, UserCog, Receipt, ShoppingCart, Target, type LucideIcon
 } from "lucide-react";
 
 interface NavItem {
@@ -99,6 +99,7 @@ function useNavGroups() {
       label: t("nav.insights"),
       items: [
         { label: t("nav.analytics"), icon: LineChart, path: "/app/analytics" },
+        { label: "Impact ODD", icon: Target, path: "/app/analytics/impact" },
       ],
     },
     {
@@ -144,7 +145,7 @@ const PERSONA_ALLOWED_PATHS: Record<string, string[] | null> = {
     "/app/budgets", "/app/grants", "/app/grants-analytics",
     "/app/cohortes", "/app/entreprises", "/app/candidatures",
     "/app/rdv", "/app/messagerie", "/app/ressources",
-    "/app/analytics", "/app/rapports",
+    "/app/analytics", "/app/analytics/impact", "/app/rapports",
   ],
   consultant: [
     "/app/dashboard", "/app/activites",
@@ -164,7 +165,7 @@ const PERSONA_ALLOWED_PATHS: Record<string, string[] | null> = {
     "/app/dashboard",
     "/app/portefeuilles", "/app/programmes", "/app/projets",
     "/app/grants", "/app/grants-analytics", "/app/budgets",
-    "/app/analytics", "/app/rapports",
+    "/app/analytics", "/app/analytics/impact", "/app/rapports",
     "/app/messagerie", "/app/ressources",
   ],
   staff: [

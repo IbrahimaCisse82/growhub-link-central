@@ -3753,6 +3753,72 @@ export type Database = {
           },
         ]
       }
+      impact_indicators: {
+        Row: {
+          actual_value: number | null
+          created_at: string
+          created_by: string | null
+          id: string
+          indicator_name: string
+          notes: string | null
+          period_end: string | null
+          period_start: string | null
+          program_id: string | null
+          project_id: string | null
+          sdg_number: number
+          target_value: number | null
+          unit: string | null
+          updated_at: string
+        }
+        Insert: {
+          actual_value?: number | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          indicator_name: string
+          notes?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          program_id?: string | null
+          project_id?: string | null
+          sdg_number: number
+          target_value?: number | null
+          unit?: string | null
+          updated_at?: string
+        }
+        Update: {
+          actual_value?: number | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          indicator_name?: string
+          notes?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          program_id?: string | null
+          project_id?: string | null
+          sdg_number?: number
+          target_value?: number | null
+          unit?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "impact_indicators_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "impact_indicators_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invitation_reminders: {
         Row: {
           id: string
