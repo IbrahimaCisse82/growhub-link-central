@@ -105,7 +105,7 @@ export default function ImpactPage() {
       <SectionHeader
         title="Impact ODD"
         subtitle="Suivi des indicateurs liés aux 17 Objectifs de Développement Durable"
-        action={
+        actions={
           <div className="flex gap-2">
             <GhButton variant="ghost" onClick={handleExportPdf} disabled={indicators.length === 0}>
               <FileDown size={14} /> Exporter PDF
