@@ -145,7 +145,7 @@ const PERSONA_ALLOWED_PATHS: Record<string, string[] | null> = {
     "/app/budgets", "/app/grants", "/app/grants-analytics",
     "/app/cohortes", "/app/entreprises", "/app/candidatures",
     "/app/rdv", "/app/messagerie", "/app/ressources",
-    "/app/analytics", "/app/rapports",
+    "/app/analytics", "/app/analytics/impact", "/app/rapports",
   ],
   consultant: [
     "/app/dashboard", "/app/activites",
@@ -165,7 +165,7 @@ const PERSONA_ALLOWED_PATHS: Record<string, string[] | null> = {
     "/app/dashboard",
     "/app/portefeuilles", "/app/programmes", "/app/projets",
     "/app/grants", "/app/grants-analytics", "/app/budgets",
-    "/app/analytics", "/app/rapports",
+    "/app/analytics", "/app/analytics/impact", "/app/rapports",
     "/app/messagerie", "/app/ressources",
   ],
   staff: [
