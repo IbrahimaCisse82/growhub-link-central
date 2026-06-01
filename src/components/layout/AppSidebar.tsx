@@ -8,7 +8,7 @@ import {
   AlertTriangle, FileText, Settings as SettingsIcon, Filter, Triangle, CircleDot, GraduationCap,
   Users, Link2, Headphones, CalendarDays, BookOpen, ClipboardList, BarChart3, DollarSign,
   PieChart, Wallet, Store, Handshake, Diamond, MessageCircle, FolderOpen, LineChart,
-  FileBarChart, Zap, LogOut, Globe, UserCog, Receipt, ShoppingCart, type LucideIcon
+  FileBarChart, Zap, LogOut, Globe, UserCog, Receipt, ShoppingCart, Target, type LucideIcon
 } from "lucide-react";
 
 interface NavItem {
@@ -99,6 +99,7 @@ function useNavGroups() {
       label: t("nav.insights"),
       items: [
         { label: t("nav.analytics"), icon: LineChart, path: "/app/analytics" },
+        { label: "Impact ODD", icon: Target, path: "/app/analytics/impact" },
       ],
     },
     {
