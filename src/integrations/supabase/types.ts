@@ -966,10 +966,14 @@ export type Database = {
           duration_minutes: number | null
           id: string
           is_demo: boolean
+          max_attempts: number
           module_order: number
           module_type: string
+          passing_score: number
           quiz_questions: Json | null
           resources: Json | null
+          shuffle_questions: boolean
+          time_limit_minutes: number | null
           title: string
           updated_at: string
         }
@@ -980,10 +984,14 @@ export type Database = {
           duration_minutes?: number | null
           id?: string
           is_demo?: boolean
+          max_attempts?: number
           module_order?: number
           module_type?: string
+          passing_score?: number
           quiz_questions?: Json | null
           resources?: Json | null
+          shuffle_questions?: boolean
+          time_limit_minutes?: number | null
           title: string
           updated_at?: string
         }
@@ -994,10 +1002,14 @@ export type Database = {
           duration_minutes?: number | null
           id?: string
           is_demo?: boolean
+          max_attempts?: number
           module_order?: number
           module_type?: string
+          passing_score?: number
           quiz_questions?: Json | null
           resources?: Json | null
+          shuffle_questions?: boolean
+          time_limit_minutes?: number | null
           title?: string
           updated_at?: string
         }
@@ -4082,12 +4094,56 @@ export type Database = {
           },
         ]
       }
+      mentor_blacklists: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          mentor_id: string
+          reason: string | null
+          startup_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          mentor_id: string
+          reason?: string | null
+          startup_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          mentor_id?: string
+          reason?: string | null
+          startup_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentor_blacklists_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "mentor_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentor_blacklists_startup_id_fkey"
+            columns: ["startup_id"]
+            isOneToOne: false
+            referencedRelation: "startups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mentor_matches: {
         Row: {
           id: string
           match_score: number | null
           matched_at: string
           mentor_id: string
+          rejected_at: string | null
+          rejection_reason: string | null
           startup_id: string
           status: string | null
         }
@@ -4096,6 +4152,8 @@ export type Database = {
           match_score?: number | null
           matched_at?: string
           mentor_id: string
+          rejected_at?: string | null
+          rejection_reason?: string | null
           startup_id: string
           status?: string | null
         }
@@ -4104,6 +4162,8 @@ export type Database = {
           match_score?: number | null
           matched_at?: string
           mentor_id?: string
+          rejected_at?: string | null
+          rejection_reason?: string | null
           startup_id?: string
           status?: string | null
         }
@@ -5742,6 +5802,53 @@ export type Database = {
             columns: ["supplier_id"]
             isOneToOne: false
             referencedRelation: "crm_contreparties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quiz_attempts: {
+        Row: {
+          answers: Json
+          created_at: string
+          duration_seconds: number | null
+          id: string
+          module_id: string
+          passed: boolean
+          percentage: number
+          score: number
+          total_questions: number
+          user_id: string
+        }
+        Insert: {
+          answers?: Json
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          module_id: string
+          passed?: boolean
+          percentage?: number
+          score?: number
+          total_questions?: number
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          module_id?: string
+          passed?: boolean
+          percentage?: number
+          score?: number
+          total_questions?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_attempts_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "course_modules"
             referencedColumns: ["id"]
           },
         ]
