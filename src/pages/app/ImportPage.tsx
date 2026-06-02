@@ -108,9 +108,9 @@ const TABS: TabConfig[] = [
 ];
 
 function StatusPill({ status }: { status: string }) {
-  if (status === "completed") return <Pill tone="green"><CheckCircle2 size={10} /> Réussi</Pill>;
-  if (status === "partial") return <Pill tone="amber"><AlertTriangle size={10} /> Partiel</Pill>;
-  return <Pill tone="rose"><XCircle size={10} /> Échec</Pill>;
+  if (status === "completed") return <Pill color="green"><CheckCircle2 size={10} /> Réussi</Pill>;
+  if (status === "partial") return <Pill color="amber"><AlertTriangle size={10} /> Partiel</Pill>;
+  return <Pill color="rose"><XCircle size={10} /> Échec</Pill>;
 }
 
 export default function ImportPage() {
