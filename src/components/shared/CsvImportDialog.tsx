@@ -68,6 +68,7 @@ export default function CsvImportDialog({ tableName, label, requiredColumns, onS
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setFileName(file.name);
     const reader = new FileReader();
     reader.onload = (evt) => {
       const text = evt.target?.result as string;
