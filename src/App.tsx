@@ -61,6 +61,7 @@ const WebhooksPage = lazy(() => import("@/pages/app/WebhooksPage"));
 const MarketplacePage = lazy(() => import("@/pages/app/MarketplacePage"));
 const SchedulingPage = lazy(() => import("@/pages/app/SchedulingPage"));
 const SettingsPage = lazy(() => import("@/pages/app/SettingsPage"));
+const ImportPage = lazy(() => import("@/pages/app/ImportPage"));
 const MatchingPage = lazy(() => import("@/pages/app/MatchingPage"));
 const EventDetailPage = lazy(() => import("@/pages/app/EventDetailPage"));
 const FunnelBuilderPage = lazy(() => import("@/pages/app/FunnelBuilderPage"));
