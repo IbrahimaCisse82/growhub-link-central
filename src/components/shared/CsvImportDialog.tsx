@@ -136,6 +136,7 @@ export default function CsvImportDialog({ tableName, label, requiredColumns, onS
     setStep("result");
     setImporting(false);
     if (success > 0) onSuccess?.();
+    onComplete?.({ fileName, total: csvData.rows.length, success, errors });
   };
 
   const downloadTemplate = () => {
