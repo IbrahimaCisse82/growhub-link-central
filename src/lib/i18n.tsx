@@ -545,11 +545,15 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     return (saved as Locale) || "fr";
   });
 
+  // Sync <html dir/lang> on mount AND on every locale change (handles reloads).
+  useEffect(() => {
+    document.documentElement.dir = locale === "ar" ? "rtl" : "ltr";
+    document.documentElement.lang = locale;
+  }, [locale]);
+
   const setLocale = useCallback((l: Locale) => {
     setLocaleState(l);
     localStorage.setItem("gh-locale", l);
-    document.documentElement.dir = l === "ar" ? "rtl" : "ltr";
-    document.documentElement.lang = l;
   }, []);
 
   const t = useCallback((key: string): string => {
