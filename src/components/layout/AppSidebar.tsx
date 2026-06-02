@@ -117,6 +117,7 @@ function useNavGroups() {
         { label: t("nav.users"), icon: Users, path: "/app/utilisateurs", badgeType: "alert" },
         { label: t("nav.webhooks"), icon: Zap, path: "/app/webhooks" },
         { label: "Bus d'événements", icon: Activity, path: "/app/events" },
+        { label: "Import de données", icon: Upload, path: "/app/parametres/import" },
       ],
     },
   ];
