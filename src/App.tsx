@@ -158,6 +158,7 @@ const App = () => (
                 <Route path="utilisateurs" element={<AdminRoute><UsersPage /></AdminRoute>} />
                 <Route path="profil" element={<ProfilePage />} />
                 <Route path="parametres" element={<SettingsPage />} />
+                <Route path="parametres/import" element={<AdminRoute><ImportPage /></AdminRoute>} />
                 <Route path="rh" element={<HrPage />} />
                 <Route path="crm" element={<CrmPage />} />
                 <Route path="bons-de-commande" element={<PurchaseOrdersPage />} />
