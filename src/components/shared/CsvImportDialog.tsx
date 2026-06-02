@@ -55,6 +55,7 @@ export default function CsvImportDialog({ tableName, label, requiredColumns, onS
   const [mappings, setMappings] = useState<ColumnMapping[]>([]);
   const [importing, setImporting] = useState(false);
   const [result, setResult] = useState<{ success: number; errors: string[] }>({ success: 0, errors: [] });
+  const [fileName, setFileName] = useState<string>("");
   const fileRef = useRef<HTMLInputElement>(null);
 
   const reset = () => {
