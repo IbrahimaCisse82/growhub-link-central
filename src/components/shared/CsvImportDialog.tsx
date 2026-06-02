@@ -48,7 +48,7 @@ function parseCsv(text: string): { headers: string[]; rows: Record<string, strin
   return { headers, rows };
 }
 
-export default function CsvImportDialog({ tableName, label, requiredColumns, onSuccess, transformRow }: CsvImportDialogProps) {
+export default function CsvImportDialog({ tableName, label, requiredColumns, onSuccess, onComplete, transformRow }: CsvImportDialogProps) {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<"upload" | "mapping" | "preview" | "result">("upload");
   const [csvData, setCsvData] = useState<{ headers: string[]; rows: Record<string, string>[] }>({ headers: [], rows: [] });
