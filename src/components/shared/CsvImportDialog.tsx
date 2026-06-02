@@ -16,6 +16,7 @@ interface CsvImportDialogProps {
   label: string;
   requiredColumns: { key: string; label: string; required?: boolean }[];
   onSuccess?: () => void;
+  onComplete?: (result: { fileName: string; total: number; success: number; errors: string[] }) => void;
   transformRow?: (row: Record<string, string>) => Record<string, any>;
 }
 
