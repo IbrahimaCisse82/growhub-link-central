@@ -3819,6 +3819,48 @@ export type Database = {
           },
         ]
       }
+      import_logs: {
+        Row: {
+          created_at: string
+          error_rows: number
+          errors: Json | null
+          file_name: string
+          id: string
+          import_type: string
+          imported_by: string | null
+          mapping: Json | null
+          status: string
+          success_rows: number
+          total_rows: number
+        }
+        Insert: {
+          created_at?: string
+          error_rows?: number
+          errors?: Json | null
+          file_name: string
+          id?: string
+          import_type: string
+          imported_by?: string | null
+          mapping?: Json | null
+          status?: string
+          success_rows?: number
+          total_rows?: number
+        }
+        Update: {
+          created_at?: string
+          error_rows?: number
+          errors?: Json | null
+          file_name?: string
+          id?: string
+          import_type?: string
+          imported_by?: string | null
+          mapping?: Json | null
+          status?: string
+          success_rows?: number
+          total_rows?: number
+        }
+        Relationships: []
+      }
       invitation_reminders: {
         Row: {
           id: string

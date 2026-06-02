@@ -8,7 +8,7 @@ import {
   AlertTriangle, FileText, Settings as SettingsIcon, Filter, Triangle, CircleDot, GraduationCap,
   Users, Link2, Headphones, CalendarDays, BookOpen, ClipboardList, BarChart3, DollarSign,
   PieChart, Wallet, Store, Handshake, Diamond, MessageCircle, FolderOpen, LineChart,
-  FileBarChart, Zap, LogOut, Globe, UserCog, Receipt, ShoppingCart, Target, type LucideIcon
+  FileBarChart, Zap, LogOut, Globe, UserCog, Receipt, ShoppingCart, Target, Upload, type LucideIcon
 } from "lucide-react";
 
 interface NavItem {
@@ -117,6 +117,7 @@ function useNavGroups() {
         { label: t("nav.users"), icon: Users, path: "/app/utilisateurs", badgeType: "alert" },
         { label: t("nav.webhooks"), icon: Zap, path: "/app/webhooks" },
         { label: "Bus d'événements", icon: Activity, path: "/app/events" },
+        { label: "Import de données", icon: Upload, path: "/app/parametres/import" },
       ],
     },
   ];

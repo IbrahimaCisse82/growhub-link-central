@@ -16,6 +16,7 @@ interface CsvImportDialogProps {
   label: string;
   requiredColumns: { key: string; label: string; required?: boolean }[];
   onSuccess?: () => void;
+  onComplete?: (result: { fileName: string; total: number; success: number; errors: string[] }) => void;
   transformRow?: (row: Record<string, string>) => Record<string, any>;
 }
 
@@ -47,13 +48,14 @@ function parseCsv(text: string): { headers: string[]; rows: Record<string, strin
   return { headers, rows };
 }
 
-export default function CsvImportDialog({ tableName, label, requiredColumns, onSuccess, transformRow }: CsvImportDialogProps) {
+export default function CsvImportDialog({ tableName, label, requiredColumns, onSuccess, onComplete, transformRow }: CsvImportDialogProps) {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<"upload" | "mapping" | "preview" | "result">("upload");
   const [csvData, setCsvData] = useState<{ headers: string[]; rows: Record<string, string>[] }>({ headers: [], rows: [] });
   const [mappings, setMappings] = useState<ColumnMapping[]>([]);
   const [importing, setImporting] = useState(false);
   const [result, setResult] = useState<{ success: number; errors: string[] }>({ success: 0, errors: [] });
+  const [fileName, setFileName] = useState<string>("");
   const fileRef = useRef<HTMLInputElement>(null);
 
   const reset = () => {
@@ -66,6 +68,7 @@ export default function CsvImportDialog({ tableName, label, requiredColumns, onS
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setFileName(file.name);
     const reader = new FileReader();
     reader.onload = (evt) => {
       const text = evt.target?.result as string;
@@ -133,6 +136,7 @@ export default function CsvImportDialog({ tableName, label, requiredColumns, onS
     setStep("result");
     setImporting(false);
     if (success > 0) onSuccess?.();
+    onComplete?.({ fileName, total: csvData.rows.length, success, errors });
   };
 
   const downloadTemplate = () => {
