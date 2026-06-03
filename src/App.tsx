@@ -181,6 +181,7 @@ const App = () => (
             </Routes>
           </Suspense>
           </KeyboardShortcutsProvider>
+          </CookieConsentProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
