@@ -155,6 +155,7 @@ const PERSONA_ALLOWED_PATHS: Record<string, string[] | null> = {
     "/app/cohortes", "/app/entreprises", "/app/candidatures",
     "/app/rdv", "/app/messagerie", "/app/ressources",
     "/app/analytics", "/app/analytics/impact", "/app/rapports",
+    "/app/parametres/securite",
   ],
   consultant: [
     "/app/dashboard", "/app/activites",
@@ -162,6 +163,7 @@ const PERSONA_ALLOWED_PATHS: Record<string, string[] | null> = {
     "/app/entreprises", "/app/cohortes",
     "/app/lms", "/app/ressources", "/app/messagerie",
     "/app/evenements",
+    "/app/parametres/securite",
   ],
   entrepreneur: [
     "/app/dashboard", "/app/activites",
@@ -169,6 +171,7 @@ const PERSONA_ALLOWED_PATHS: Record<string, string[] | null> = {
     "/app/coaching", "/app/rdv", "/app/mentors",
     "/app/lms", "/app/enquetes", "/app/ressources",
     "/app/marketplace", "/app/evenements", "/app/messagerie",
+    "/app/parametres/securite",
   ],
   funder: [
     "/app/dashboard",
@@ -176,14 +179,16 @@ const PERSONA_ALLOWED_PATHS: Record<string, string[] | null> = {
     "/app/grants", "/app/grants-analytics", "/app/budgets",
     "/app/analytics", "/app/analytics/impact", "/app/rapports",
     "/app/messagerie", "/app/ressources",
+    "/app/parametres/securite",
   ],
   staff: [
     "/app/dashboard", "/app/activites",
     "/app/rh", "/app/crm", "/app/bons-de-commande",
     "/app/ressources", "/app/messagerie",
     "/app/evenements", "/app/partenaires",
+    "/app/parametres/securite",
   ],
-  user: ["/app/dashboard", "/app/profil"],
+  user: ["/app/dashboard", "/app/profil", "/app/parametres/securite"],
 };
 
 export default function AppSidebar({ mobile, onNavigate }: AppSidebarProps) {
