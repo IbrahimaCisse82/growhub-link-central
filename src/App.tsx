@@ -107,8 +107,10 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
+          <CookieConsentProvider>
           <KeyboardShortcutsProvider>
             <PWAInstallPrompt />
+            <CookieConsentBanner />
             <Suspense fallback={<PageLoader />}>
               <Routes>
               <Route path="/" element={<Navigate to="/app/dashboard" replace />} />
@@ -116,6 +118,8 @@ const App = () => (
               <Route path="/signup" element={<Navigate to="/login" replace />} />
               <Route path="/postuler" element={<PublicApplicationPage />} />
               <Route path="/unsubscribe" element={<UnsubscribePage />} />
+              <Route path="/politique-confidentialite" element={<PrivacyPolicyPage />} />
+              <Route path="/mentions-legales" element={<LegalNoticePage />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/app" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
@@ -166,6 +170,9 @@ const App = () => (
                 <Route path="profil" element={<ProfilePage />} />
                 <Route path="parametres" element={<SettingsPage />} />
                 <Route path="parametres/import" element={<AdminRoute><ImportPage /></AdminRoute>} />
+                <Route path="parametres/securite" element={<SecurityPage />} />
+                <Route path="parametres/conformite" element={<AdminRoute><CompliancePage /></AdminRoute>} />
+                <Route path="parametres/audit-pii" element={<AdminRoute><PiiAuditPage /></AdminRoute>} />
                 <Route path="rh" element={<HrPage />} />
                 <Route path="crm" element={<CrmPage />} />
                 <Route path="bons-de-commande" element={<PurchaseOrdersPage />} />
