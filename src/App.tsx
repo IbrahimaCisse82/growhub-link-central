@@ -10,6 +10,8 @@ import AdminRoute from "@/components/auth/AdminRoute";
 import AppLayout from "@/components/layout/AppLayout";
 import PWAInstallPrompt from "@/components/shared/PWAInstallPrompt";
 import KeyboardShortcutsProvider from "@/components/shared/KeyboardShortcutsProvider";
+import { CookieConsentProvider } from "@/hooks/useCookieConsent";
+import CookieConsentBanner from "@/components/security/CookieConsentBanner";
 import { lazy, Suspense } from "react";
 
 // Auth pages (small, loaded eagerly)
@@ -62,6 +64,9 @@ const MarketplacePage = lazy(() => import("@/pages/app/MarketplacePage"));
 const SchedulingPage = lazy(() => import("@/pages/app/SchedulingPage"));
 const SettingsPage = lazy(() => import("@/pages/app/SettingsPage"));
 const ImportPage = lazy(() => import("@/pages/app/ImportPage"));
+const SecurityPage = lazy(() => import("@/pages/app/SecurityPage"));
+const CompliancePage = lazy(() => import("@/pages/app/CompliancePage"));
+const PiiAuditPage = lazy(() => import("@/pages/app/PiiAuditPage"));
 const MatchingPage = lazy(() => import("@/pages/app/MatchingPage"));
 const EventDetailPage = lazy(() => import("@/pages/app/EventDetailPage"));
 const FunnelBuilderPage = lazy(() => import("@/pages/app/FunnelBuilderPage"));
@@ -71,6 +76,8 @@ const PurchaseOrdersPage = lazy(() => import("@/pages/app/PurchaseOrdersPage"));
 const EventsPage = lazy(() => import("@/pages/app/EventsPage"));
 const PublicApplicationPage = lazy(() => import("@/pages/public/PublicApplicationPage"));
 const UnsubscribePage = lazy(() => import("@/pages/public/UnsubscribePage"));
+const PrivacyPolicyPage = lazy(() => import("@/pages/public/PrivacyPolicyPage"));
+const LegalNoticePage = lazy(() => import("@/pages/public/LegalNoticePage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
@@ -100,8 +107,10 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
+          <CookieConsentProvider>
           <KeyboardShortcutsProvider>
             <PWAInstallPrompt />
+            <CookieConsentBanner />
             <Suspense fallback={<PageLoader />}>
               <Routes>
               <Route path="/" element={<Navigate to="/app/dashboard" replace />} />
@@ -109,6 +118,8 @@ const App = () => (
               <Route path="/signup" element={<Navigate to="/login" replace />} />
               <Route path="/postuler" element={<PublicApplicationPage />} />
               <Route path="/unsubscribe" element={<UnsubscribePage />} />
+              <Route path="/politique-confidentialite" element={<PrivacyPolicyPage />} />
+              <Route path="/mentions-legales" element={<LegalNoticePage />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/app" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
@@ -159,6 +170,9 @@ const App = () => (
                 <Route path="profil" element={<ProfilePage />} />
                 <Route path="parametres" element={<SettingsPage />} />
                 <Route path="parametres/import" element={<AdminRoute><ImportPage /></AdminRoute>} />
+                <Route path="parametres/securite" element={<SecurityPage />} />
+                <Route path="parametres/conformite" element={<AdminRoute><CompliancePage /></AdminRoute>} />
+                <Route path="parametres/audit-pii" element={<AdminRoute><PiiAuditPage /></AdminRoute>} />
                 <Route path="rh" element={<HrPage />} />
                 <Route path="crm" element={<CrmPage />} />
                 <Route path="bons-de-commande" element={<PurchaseOrdersPage />} />
@@ -167,6 +181,7 @@ const App = () => (
             </Routes>
           </Suspense>
           </KeyboardShortcutsProvider>
+          </CookieConsentProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>

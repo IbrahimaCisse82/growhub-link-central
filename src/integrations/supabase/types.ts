@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      account_deletion_requests: {
+        Row: {
+          cancelled_at: string | null
+          completed_at: string | null
+          created_at: string
+          id: string
+          reason: string | null
+          requested_at: string
+          scheduled_for: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cancelled_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          reason?: string | null
+          requested_at?: string
+          scheduled_for?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cancelled_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          reason?: string | null
+          requested_at?: string
+          scheduled_for?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       activity_log: {
         Row: {
           action: string
@@ -920,6 +959,51 @@ export type Database = {
         }
         Relationships: []
       }
+      cookie_consents: {
+        Row: {
+          analytics: boolean
+          created_at: string
+          given_at: string
+          id: string
+          ip_hash: string | null
+          marketing: boolean
+          necessary: boolean
+          revoked_at: string | null
+          session_token: string | null
+          updated_at: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          analytics?: boolean
+          created_at?: string
+          given_at?: string
+          id?: string
+          ip_hash?: string | null
+          marketing?: boolean
+          necessary?: boolean
+          revoked_at?: string | null
+          session_token?: string | null
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          analytics?: boolean
+          created_at?: string
+          given_at?: string
+          id?: string
+          ip_hash?: string | null
+          marketing?: boolean
+          necessary?: boolean
+          revoked_at?: string | null
+          session_token?: string | null
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       course_enrollments: {
         Row: {
           completed_at: string | null
@@ -1791,6 +1875,99 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      data_export_requests: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          error_message: string | null
+          expires_at: string | null
+          file_path: string | null
+          id: string
+          requested_at: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          expires_at?: string | null
+          file_path?: string | null
+          id?: string
+          requested_at?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          expires_at?: string | null
+          file_path?: string | null
+          id?: string
+          requested_at?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      data_processing_register: {
+        Row: {
+          created_at: string
+          cross_border_transfer: boolean
+          data_categories: string[]
+          data_controller: string | null
+          dpo_contact: string | null
+          id: string
+          is_active: boolean
+          legal_basis: string
+          purpose: string
+          recipients: string[]
+          retention_period_days: number | null
+          security_measures: string | null
+          transfer_countries: string[] | null
+          treatment_name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          cross_border_transfer?: boolean
+          data_categories?: string[]
+          data_controller?: string | null
+          dpo_contact?: string | null
+          id?: string
+          is_active?: boolean
+          legal_basis: string
+          purpose: string
+          recipients?: string[]
+          retention_period_days?: number | null
+          security_measures?: string | null
+          transfer_countries?: string[] | null
+          treatment_name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          cross_border_transfer?: boolean
+          data_categories?: string[]
+          data_controller?: string | null
+          dpo_contact?: string | null
+          id?: string
+          is_active?: boolean
+          legal_basis?: string
+          purpose?: string
+          recipients?: string[]
+          retention_period_days?: number | null
+          security_measures?: string | null
+          transfer_countries?: string[] | null
+          treatment_name?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       digest_email_log: {
         Row: {
@@ -2981,6 +3158,7 @@ export type Database = {
           id: string
           ind_kilometrique: number | null
           is_active: boolean | null
+          is_anonymized: boolean
           is_demo: boolean
           lieu_naissance: string | null
           matricule: string
@@ -3027,6 +3205,7 @@ export type Database = {
           id?: string
           ind_kilometrique?: number | null
           is_active?: boolean | null
+          is_anonymized?: boolean
           is_demo?: boolean
           lieu_naissance?: string | null
           matricule: string
@@ -3073,6 +3252,7 @@ export type Database = {
           id?: string
           ind_kilometrique?: number | null
           is_active?: boolean | null
+          is_anonymized?: boolean
           is_demo?: boolean
           lieu_naissance?: string | null
           matricule?: string
@@ -4637,6 +4817,42 @@ export type Database = {
           },
         ]
       }
+      pii_access_log: {
+        Row: {
+          accessed_at: string
+          accessed_entity_id: string | null
+          accessed_entity_type: string
+          accessed_fields: string[]
+          id: string
+          ip_address: string | null
+          purpose: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          accessed_at?: string
+          accessed_entity_id?: string | null
+          accessed_entity_type: string
+          accessed_fields?: string[]
+          id?: string
+          ip_address?: string | null
+          purpose?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          accessed_at?: string
+          accessed_entity_id?: string | null
+          accessed_entity_type?: string
+          accessed_fields?: string[]
+          id?: string
+          ip_address?: string | null
+          purpose?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       pinned_messages: {
         Row: {
           channel_id: string
@@ -4730,6 +4946,7 @@ export type Database = {
           email: string | null
           full_name: string
           id: string
+          is_anonymized: boolean
           is_approved: boolean
           is_suspended: boolean
           job_title: string | null
@@ -4757,6 +4974,7 @@ export type Database = {
           email?: string | null
           full_name?: string
           id?: string
+          is_anonymized?: boolean
           is_approved?: boolean
           is_suspended?: boolean
           job_title?: string | null
@@ -4784,6 +5002,7 @@ export type Database = {
           email?: string | null
           full_name?: string
           id?: string
+          is_anonymized?: boolean
           is_approved?: boolean
           is_suspended?: boolean
           job_title?: string | null
@@ -6741,6 +6960,7 @@ export type Database = {
       }
     }
     Functions: {
+      anonymize_user_data: { Args: { _user_id: string }; Returns: undefined }
       compute_startup_health_score: {
         Args: { p_startup_id: string }
         Returns: number

@@ -8,7 +8,7 @@ import {
   AlertTriangle, FileText, Settings as SettingsIcon, Filter, Triangle, CircleDot, GraduationCap,
   Users, Link2, Headphones, CalendarDays, BookOpen, ClipboardList, BarChart3, DollarSign,
   PieChart, Wallet, Store, Handshake, Diamond, MessageCircle, FolderOpen, LineChart,
-  FileBarChart, Zap, LogOut, Globe, UserCog, Receipt, ShoppingCart, Target, Upload, type LucideIcon
+  FileBarChart, Zap, LogOut, Globe, UserCog, Receipt, ShoppingCart, Target, Upload, ShieldCheck, FileLock2, Eye, type LucideIcon
 } from "lucide-react";
 
 interface NavItem {
@@ -118,6 +118,14 @@ function useNavGroups() {
         { label: t("nav.webhooks"), icon: Zap, path: "/app/webhooks" },
         { label: "Bus d'événements", icon: Activity, path: "/app/events" },
         { label: "Import de données", icon: Upload, path: "/app/parametres/import" },
+        { label: "Registre RGPD", icon: FileLock2, path: "/app/parametres/conformite" },
+        { label: "Audit PII", icon: Eye, path: "/app/parametres/audit-pii" },
+      ],
+    },
+    {
+      label: "Compte",
+      items: [
+        { label: "Sécurité (2FA)", icon: ShieldCheck, path: "/app/parametres/securite" },
       ],
     },
   ];
@@ -147,6 +155,7 @@ const PERSONA_ALLOWED_PATHS: Record<string, string[] | null> = {
     "/app/cohortes", "/app/entreprises", "/app/candidatures",
     "/app/rdv", "/app/messagerie", "/app/ressources",
     "/app/analytics", "/app/analytics/impact", "/app/rapports",
+    "/app/parametres/securite",
   ],
   consultant: [
     "/app/dashboard", "/app/activites",
@@ -154,6 +163,7 @@ const PERSONA_ALLOWED_PATHS: Record<string, string[] | null> = {
     "/app/entreprises", "/app/cohortes",
     "/app/lms", "/app/ressources", "/app/messagerie",
     "/app/evenements",
+    "/app/parametres/securite",
   ],
   entrepreneur: [
     "/app/dashboard", "/app/activites",
@@ -161,6 +171,7 @@ const PERSONA_ALLOWED_PATHS: Record<string, string[] | null> = {
     "/app/coaching", "/app/rdv", "/app/mentors",
     "/app/lms", "/app/enquetes", "/app/ressources",
     "/app/marketplace", "/app/evenements", "/app/messagerie",
+    "/app/parametres/securite",
   ],
   funder: [
     "/app/dashboard",
@@ -168,14 +179,16 @@ const PERSONA_ALLOWED_PATHS: Record<string, string[] | null> = {
     "/app/grants", "/app/grants-analytics", "/app/budgets",
     "/app/analytics", "/app/analytics/impact", "/app/rapports",
     "/app/messagerie", "/app/ressources",
+    "/app/parametres/securite",
   ],
   staff: [
     "/app/dashboard", "/app/activites",
     "/app/rh", "/app/crm", "/app/bons-de-commande",
     "/app/ressources", "/app/messagerie",
     "/app/evenements", "/app/partenaires",
+    "/app/parametres/securite",
   ],
-  user: ["/app/dashboard", "/app/profil"],
+  user: ["/app/dashboard", "/app/profil", "/app/parametres/securite"],
 };
 
 export default function AppSidebar({ mobile, onNavigate }: AppSidebarProps) {
