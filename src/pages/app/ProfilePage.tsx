@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import SectionHeader from "@/components/shared/SectionHeader";
 import GhButton from "@/components/shared/GhButton";
 import Pill from "@/components/shared/Pill";
+import GdprDataPanel from "@/components/profile/GdprDataPanel";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -159,6 +160,11 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="mt-8">
+        <h3 className="font-display font-bold text-foreground mb-4">Mes données personnelles (RGPD)</h3>
+        <GdprDataPanel />
       </div>
     </motion.div>
   );
