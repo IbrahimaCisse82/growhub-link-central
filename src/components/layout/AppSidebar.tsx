@@ -8,7 +8,7 @@ import {
   AlertTriangle, FileText, Settings as SettingsIcon, Filter, Triangle, CircleDot, GraduationCap,
   Users, Link2, Headphones, CalendarDays, BookOpen, ClipboardList, BarChart3, DollarSign,
   PieChart, Wallet, Store, Handshake, Diamond, MessageCircle, FolderOpen, LineChart,
-  FileBarChart, Zap, LogOut, Globe, UserCog, Receipt, ShoppingCart, Target, Upload, type LucideIcon
+  FileBarChart, Zap, LogOut, Globe, UserCog, Receipt, ShoppingCart, Target, Upload, ShieldCheck, FileLock2, Eye, type LucideIcon
 } from "lucide-react";
 
 interface NavItem {
@@ -118,6 +118,14 @@ function useNavGroups() {
         { label: t("nav.webhooks"), icon: Zap, path: "/app/webhooks" },
         { label: "Bus d'événements", icon: Activity, path: "/app/events" },
         { label: "Import de données", icon: Upload, path: "/app/parametres/import" },
+        { label: "Registre RGPD", icon: FileLock2, path: "/app/parametres/conformite" },
+        { label: "Audit PII", icon: Eye, path: "/app/parametres/audit-pii" },
+      ],
+    },
+    {
+      label: "Compte",
+      items: [
+        { label: "Sécurité (2FA)", icon: ShieldCheck, path: "/app/parametres/securite" },
       ],
     },
   ];
