@@ -87,6 +87,12 @@ export default function LoginPage() {
           L'accès se fait sur invitation ou via un{" "}
           <Link to="/postuler" className="text-primary hover:underline font-medium">appel à candidature →</Link>
         </p>
+
+        <div className="text-center text-[10px] text-muted-foreground space-x-3 pt-2 border-t border-border">
+          <Link to="/politique-confidentialite" className="hover:text-foreground">Politique de confidentialité</Link>
+          <span>·</span>
+          <Link to="/mentions-legales" className="hover:text-foreground">Mentions légales</Link>
+        </div>
       </div>
     </div>
   );
