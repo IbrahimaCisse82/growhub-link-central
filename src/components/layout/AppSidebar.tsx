@@ -75,6 +75,8 @@ function useNavGroups() {
         { label: t("nav.grants"), icon: DollarSign, path: "/app/grants" },
         { label: t("nav.grantsAnalytics"), icon: PieChart, path: "/app/grants-analytics" },
         { label: t("nav.budgets"), icon: Wallet, path: "/app/budgets" },
+        { label: "Trésorerie", icon: LineChart, path: "/app/finance/tresorerie" },
+        { label: "Cap Table", icon: PieChart, path: "/app/finance/cap-table" },
       ],
     },
     {
