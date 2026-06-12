@@ -136,7 +136,7 @@ export default function TreasuryPage() {
                     <td className={`py-2 pr-4 text-right font-mono font-medium ${r.direction === "in" ? "text-gh-green" : "text-gh-rose"}`}>
                       {r.direction === "in" ? "+" : "−"} {fmtXof(Number(r.amount_xof))}
                     </td>
-                    <td className="py-2"><Pill color={r.status === "realized" ? "green" : r.status === "partial" ? "blue" : "neutral"}>{r.status}</Pill></td>
+                    <td className="py-2"><Pill color={r.status === "realized" ? "green" : r.status === "partial" ? "blue" : "gray"}>{r.status}</Pill></td>
                   </tr>
                 ))}
               </tbody>
