@@ -536,6 +536,75 @@ export type Database = {
           },
         ]
       }
+      cap_table_entries: {
+        Row: {
+          cliff_months: number | null
+          created_at: string
+          holder_email: string | null
+          holder_name: string
+          holder_type: string
+          id: string
+          investment_id: string | null
+          notes: string | null
+          ownership_pct: number | null
+          share_class: string
+          shares: number
+          startup_id: string
+          updated_at: string
+          vesting_months: number | null
+          vesting_start: string | null
+        }
+        Insert: {
+          cliff_months?: number | null
+          created_at?: string
+          holder_email?: string | null
+          holder_name: string
+          holder_type: string
+          id?: string
+          investment_id?: string | null
+          notes?: string | null
+          ownership_pct?: number | null
+          share_class?: string
+          shares?: number
+          startup_id: string
+          updated_at?: string
+          vesting_months?: number | null
+          vesting_start?: string | null
+        }
+        Update: {
+          cliff_months?: number | null
+          created_at?: string
+          holder_email?: string | null
+          holder_name?: string
+          holder_type?: string
+          id?: string
+          investment_id?: string | null
+          notes?: string | null
+          ownership_pct?: number | null
+          share_class?: string
+          shares?: number
+          startup_id?: string
+          updated_at?: string
+          vesting_months?: number | null
+          vesting_start?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cap_table_entries_investment_id_fkey"
+            columns: ["investment_id"]
+            isOneToOne: false
+            referencedRelation: "startup_investments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cap_table_entries_startup_id_fkey"
+            columns: ["startup_id"]
+            isOneToOne: false
+            referencedRelation: "startups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       channel_members: {
         Row: {
           channel_id: string
@@ -6249,6 +6318,74 @@ export type Database = {
           },
         ]
       }
+      startup_investments: {
+        Row: {
+          amount_currency: string
+          amount_xof: number
+          closed_at: string
+          created_at: string
+          created_by: string | null
+          document_url: string | null
+          id: string
+          investors: Json
+          lead_investor: string | null
+          notes: string | null
+          post_money_valuation_xof: number | null
+          pre_money_valuation_xof: number | null
+          round_name: string | null
+          round_type: string
+          startup_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount_currency?: string
+          amount_xof?: number
+          closed_at?: string
+          created_at?: string
+          created_by?: string | null
+          document_url?: string | null
+          id?: string
+          investors?: Json
+          lead_investor?: string | null
+          notes?: string | null
+          post_money_valuation_xof?: number | null
+          pre_money_valuation_xof?: number | null
+          round_name?: string | null
+          round_type: string
+          startup_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount_currency?: string
+          amount_xof?: number
+          closed_at?: string
+          created_at?: string
+          created_by?: string | null
+          document_url?: string | null
+          id?: string
+          investors?: Json
+          lead_investor?: string | null
+          notes?: string | null
+          post_money_valuation_xof?: number | null
+          pre_money_valuation_xof?: number | null
+          round_name?: string | null
+          round_type?: string
+          startup_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "startup_investments_startup_id_fkey"
+            columns: ["startup_id"]
+            isOneToOne: false
+            referencedRelation: "startups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       startup_kpis: {
         Row: {
           created_at: string
@@ -6612,6 +6749,68 @@ export type Database = {
           },
         ]
       }
+      term_sheets: {
+        Row: {
+          amount_xof: number
+          created_at: string
+          created_by: string | null
+          document_url: string | null
+          expires_at: string | null
+          id: string
+          investor_name: string
+          notes: string | null
+          sent_at: string | null
+          signed_at: string | null
+          startup_id: string
+          status: string
+          terms: Json
+          updated_at: string
+          valuation_xof: number | null
+        }
+        Insert: {
+          amount_xof?: number
+          created_at?: string
+          created_by?: string | null
+          document_url?: string | null
+          expires_at?: string | null
+          id?: string
+          investor_name: string
+          notes?: string | null
+          sent_at?: string | null
+          signed_at?: string | null
+          startup_id: string
+          status?: string
+          terms?: Json
+          updated_at?: string
+          valuation_xof?: number | null
+        }
+        Update: {
+          amount_xof?: number
+          created_at?: string
+          created_by?: string | null
+          document_url?: string | null
+          expires_at?: string | null
+          id?: string
+          investor_name?: string
+          notes?: string | null
+          sent_at?: string | null
+          signed_at?: string | null
+          startup_id?: string
+          status?: string
+          terms?: Json
+          updated_at?: string
+          valuation_xof?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "term_sheets_startup_id_fkey"
+            columns: ["startup_id"]
+            isOneToOne: false
+            referencedRelation: "startups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       theory_of_change: {
         Row: {
           activities: Json | null
@@ -6958,6 +7157,20 @@ export type Database = {
           },
         ]
       }
+      treasury_consolidated: {
+        Row: {
+          amount_xof: number | null
+          direction: string | null
+          label: string | null
+          occurred_on: string | null
+          program_id: string | null
+          project_id: string | null
+          source: string | null
+          source_id: string | null
+          status: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       anonymize_user_data: { Args: { _user_id: string }; Returns: undefined }
@@ -6991,6 +7204,16 @@ export type Database = {
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number
+      }
+      get_cashflow_summary: {
+        Args: { _from?: string; _to?: string }
+        Returns: {
+          cumulative_xof: number
+          inflow_xof: number
+          month_start: string
+          net_xof: number
+          outflow_xof: number
+        }[]
       }
       get_project_cost_breakdown: {
         Args: { _from?: string; _project_id: string; _to?: string }
@@ -7038,6 +7261,10 @@ export type Database = {
           msg_id: number
           read_ct: number
         }[]
+      }
+      recalc_cap_table_pct: {
+        Args: { _startup_id: string }
+        Returns: undefined
       }
       search_messages: {
         Args: { _channel_id?: string; _query: string }
