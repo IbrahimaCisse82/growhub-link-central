@@ -65,6 +65,8 @@ const SchedulingPage = lazy(() => import("@/pages/app/SchedulingPage"));
 const SettingsPage = lazy(() => import("@/pages/app/SettingsPage"));
 const ImportPage = lazy(() => import("@/pages/app/ImportPage"));
 const SecurityPage = lazy(() => import("@/pages/app/SecurityPage"));
+const TreasuryPage = lazy(() => import("@/pages/app/TreasuryPage"));
+const CapTablePage = lazy(() => import("@/pages/app/CapTablePage"));
 const CompliancePage = lazy(() => import("@/pages/app/CompliancePage"));
 const PiiAuditPage = lazy(() => import("@/pages/app/PiiAuditPage"));
 const MatchingPage = lazy(() => import("@/pages/app/MatchingPage"));
@@ -176,6 +178,8 @@ const App = () => (
                 <Route path="rh" element={<HrPage />} />
                 <Route path="crm" element={<CrmPage />} />
                 <Route path="bons-de-commande" element={<PurchaseOrdersPage />} />
+                <Route path="finance/tresorerie" element={<AdminRoute><TreasuryPage /></AdminRoute>} />
+                <Route path="finance/cap-table" element={<CapTablePage />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
