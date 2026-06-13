@@ -4290,6 +4290,184 @@ export type Database = {
           },
         ]
       }
+      me_measurements: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          evidence_doc_url: string | null
+          grant_id: string | null
+          grant_indicator_id: string | null
+          id: string
+          measured_at: string
+          measured_value: number
+          methodology: string | null
+          notes: string | null
+          phase: Database["public"]["Enums"]["me_phase"]
+          project_id: string | null
+          project_indicator_id: string | null
+          sample_size: number | null
+          updated_at: string
+          validated_at: string | null
+          validated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          evidence_doc_url?: string | null
+          grant_id?: string | null
+          grant_indicator_id?: string | null
+          id?: string
+          measured_at?: string
+          measured_value: number
+          methodology?: string | null
+          notes?: string | null
+          phase?: Database["public"]["Enums"]["me_phase"]
+          project_id?: string | null
+          project_indicator_id?: string | null
+          sample_size?: number | null
+          updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          evidence_doc_url?: string | null
+          grant_id?: string | null
+          grant_indicator_id?: string | null
+          id?: string
+          measured_at?: string
+          measured_value?: number
+          methodology?: string | null
+          notes?: string | null
+          phase?: Database["public"]["Enums"]["me_phase"]
+          project_id?: string | null
+          project_indicator_id?: string | null
+          sample_size?: number | null
+          updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "me_measurements_grant_id_fkey"
+            columns: ["grant_id"]
+            isOneToOne: false
+            referencedRelation: "grants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "me_measurements_grant_indicator_id_fkey"
+            columns: ["grant_indicator_id"]
+            isOneToOne: false
+            referencedRelation: "grant_indicators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "me_measurements_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "me_measurements_project_indicator_id_fkey"
+            columns: ["project_indicator_id"]
+            isOneToOne: false
+            referencedRelation: "project_indicators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      me_monitoring_plans: {
+        Row: {
+          collection_frequency: string
+          collection_method: string | null
+          created_at: string
+          created_by: string | null
+          data_source: string
+          disaggregation: Json | null
+          grant_id: string | null
+          grant_indicator_id: string | null
+          id: string
+          next_measurement_due: string | null
+          notes: string | null
+          project_id: string | null
+          project_indicator_id: string | null
+          quality_assurance: string | null
+          responsible_user_id: string | null
+          target_phases: Json
+          updated_at: string
+        }
+        Insert: {
+          collection_frequency?: string
+          collection_method?: string | null
+          created_at?: string
+          created_by?: string | null
+          data_source: string
+          disaggregation?: Json | null
+          grant_id?: string | null
+          grant_indicator_id?: string | null
+          id?: string
+          next_measurement_due?: string | null
+          notes?: string | null
+          project_id?: string | null
+          project_indicator_id?: string | null
+          quality_assurance?: string | null
+          responsible_user_id?: string | null
+          target_phases?: Json
+          updated_at?: string
+        }
+        Update: {
+          collection_frequency?: string
+          collection_method?: string | null
+          created_at?: string
+          created_by?: string | null
+          data_source?: string
+          disaggregation?: Json | null
+          grant_id?: string | null
+          grant_indicator_id?: string | null
+          id?: string
+          next_measurement_due?: string | null
+          notes?: string | null
+          project_id?: string | null
+          project_indicator_id?: string | null
+          quality_assurance?: string | null
+          responsible_user_id?: string | null
+          target_phases?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "me_monitoring_plans_grant_id_fkey"
+            columns: ["grant_id"]
+            isOneToOne: false
+            referencedRelation: "grants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "me_monitoring_plans_grant_indicator_id_fkey"
+            columns: ["grant_indicator_id"]
+            isOneToOne: false
+            referencedRelation: "grant_indicators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "me_monitoring_plans_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "me_monitoring_plans_project_indicator_id_fkey"
+            columns: ["project_indicator_id"]
+            isOneToOne: false
+            referencedRelation: "project_indicators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mentor_availability_slots: {
         Row: {
           booked_at: string | null
@@ -7071,6 +7249,27 @@ export type Database = {
           },
         ]
       }
+      me_indicator_progress: {
+        Row: {
+          achievement_pct: number | null
+          baseline_measured: number | null
+          baseline_value: number | null
+          current_value: number | null
+          endline_date: string | null
+          endline_measured: number | null
+          grant_id: string | null
+          indicator_id: string | null
+          measurement_count: number | null
+          midline_measured: number | null
+          name: string | null
+          project_id: string | null
+          source: string | null
+          target_value: number | null
+          unit: string | null
+          variation_vs_baseline_pct: number | null
+        }
+        Relationships: []
+      }
       profiles_safe: {
         Row: {
           avatar_url: string | null
@@ -7393,6 +7592,7 @@ export type Database = {
         | "validated"
         | "closed"
         | "cancelled"
+      me_phase: "baseline" | "midline" | "endline" | "adhoc"
       project_status: "draft" | "active" | "paused" | "completed" | "cancelled"
       purchase_order_status:
         | "brouillon"
@@ -7633,6 +7833,7 @@ export const Constants = {
         "closed",
         "cancelled",
       ],
+      me_phase: ["baseline", "midline", "endline", "adhoc"],
       project_status: ["draft", "active", "paused", "completed", "cancelled"],
       purchase_order_status: [
         "brouillon",
