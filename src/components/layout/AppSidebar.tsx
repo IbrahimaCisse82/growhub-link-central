@@ -102,6 +102,7 @@ function useNavGroups() {
       items: [
         { label: t("nav.analytics"), icon: LineChart, path: "/app/analytics" },
         { label: "Impact ODD", icon: Target, path: "/app/analytics/impact" },
+        { label: "Suivi-Évaluation", icon: Activity, path: "/app/me" },
       ],
     },
     {
@@ -109,6 +110,7 @@ function useNavGroups() {
       adminOnly: true,
       items: [
         { label: t("nav.reports"), icon: FileBarChart, path: "/app/rapports" },
+        { label: "Rapports bailleurs", icon: FileBarChart, path: "/app/rapports/bailleurs" },
         { label: "AfriDataHub", icon: Globe, path: "/app/afridatahub" },
       ],
     },
@@ -156,7 +158,7 @@ const PERSONA_ALLOWED_PATHS: Record<string, string[] | null> = {
     "/app/budgets", "/app/grants", "/app/grants-analytics",
     "/app/cohortes", "/app/entreprises", "/app/candidatures",
     "/app/rdv", "/app/messagerie", "/app/ressources",
-    "/app/analytics", "/app/analytics/impact", "/app/rapports",
+    "/app/analytics", "/app/analytics/impact", "/app/rapports", "/app/me",
     "/app/parametres/securite",
   ],
   consultant: [
@@ -179,7 +181,7 @@ const PERSONA_ALLOWED_PATHS: Record<string, string[] | null> = {
     "/app/dashboard",
     "/app/portefeuilles", "/app/programmes", "/app/projets",
     "/app/grants", "/app/grants-analytics", "/app/budgets",
-    "/app/analytics", "/app/analytics/impact", "/app/rapports",
+    "/app/analytics", "/app/analytics/impact", "/app/rapports", "/app/rapports/bailleurs", "/app/me",
     "/app/messagerie", "/app/ressources",
     "/app/parametres/securite",
   ],
