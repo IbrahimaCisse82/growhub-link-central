@@ -30,7 +30,7 @@ const PHASE_COLOR: Record<MePhase, string> = {
 };
 
 export default function MePage() {
-  const { projects } = useProjects();
+  const { data: projects = [] } = useProjects();
   const [projectId, setProjectId] = useState<string>("");
   const { measurements, progress, upsert, remove, validate } = useMeMeasurements({ project_id: projectId || undefined });
   const { plans, upsert: upsertPlan, remove: removePlan } = useMonitoringPlans({ project_id: projectId || undefined });

@@ -13,8 +13,8 @@ import { useOrgSettings } from "@/hooks/useOrgSettings";
 import { toast } from "sonner";
 
 export default function DonorReportsPage() {
-  const { grants } = useGrants();
-  const { settings } = useOrgSettings();
+  const { data: grants = [] } = useGrants();
+  const { data: settings } = useOrgSettings();
   const [grantId, setGrantId] = useState<string>("");
   const [template, setTemplate] = useState<DonorTemplate>("eu_intpa");
   const [startDate, setStartDate] = useState("");
