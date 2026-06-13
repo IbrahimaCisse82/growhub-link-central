@@ -39,7 +39,7 @@ export default function DonorReportsPage() {
         periodLabel,
         startDate: startDate || null,
         endDate: endDate || null,
-        orgName: settings?.organization_name ?? undefined,
+        orgName: settings?.company_name ?? undefined,
         narrative: { progress, challenges, nextSteps, lessons },
       });
       toast.success("Rapport généré");
