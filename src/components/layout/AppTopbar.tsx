@@ -8,6 +8,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useTranslation, LOCALE_LABELS, LOCALE_FLAGS, type Locale } from "@/lib/i18n";
+import OfflineIndicator from "@/components/shared/OfflineIndicator";
 
 const pageTitles: Record<string, string> = {
   "/app/dashboard": "Dashboard",
@@ -92,6 +93,9 @@ export default function AppTopbar({ onToggleSidebar, showMenuButton }: AppTopbar
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
+
+          {/* Offline / sync indicator */}
+          <OfflineIndicator />
 
           {/* Theme toggle */}
           <button onClick={toggleTheme} className="bg-secondary border border-border text-muted-foreground p-[7px] w-[34px] h-[34px] rounded-lg flex items-center justify-center hover:bg-muted hover:text-foreground transition-colors text-sm">
