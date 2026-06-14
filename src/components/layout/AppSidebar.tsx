@@ -8,7 +8,7 @@ import {
   AlertTriangle, FileText, Settings as SettingsIcon, Filter, Triangle, CircleDot, GraduationCap,
   Users, Link2, Headphones, CalendarDays, BookOpen, ClipboardList, BarChart3, DollarSign,
   PieChart, Wallet, Store, Handshake, Diamond, MessageCircle, FolderOpen, LineChart,
-  FileBarChart, Zap, LogOut, Globe, UserCog, Receipt, ShoppingCart, Target, Upload, ShieldCheck, FileLock2, Eye, type LucideIcon
+  FileBarChart, Zap, LogOut, Globe, UserCog, Receipt, ShoppingCart, Target, Upload, ShieldCheck, FileLock2, Eye, Smartphone, type LucideIcon
 } from "lucide-react";
 
 interface NavItem {
@@ -103,6 +103,7 @@ function useNavGroups() {
         { label: t("nav.analytics"), icon: LineChart, path: "/app/analytics" },
         { label: "Impact ODD", icon: Target, path: "/app/analytics/impact" },
         { label: "Suivi-Évaluation", icon: Activity, path: "/app/me" },
+        { label: "Collecte terrain", icon: Smartphone, path: "/app/terrain" },
       ],
     },
     {
@@ -158,7 +159,7 @@ const PERSONA_ALLOWED_PATHS: Record<string, string[] | null> = {
     "/app/budgets", "/app/grants", "/app/grants-analytics",
     "/app/cohortes", "/app/entreprises", "/app/candidatures",
     "/app/rdv", "/app/messagerie", "/app/ressources",
-    "/app/analytics", "/app/analytics/impact", "/app/rapports", "/app/me",
+    "/app/analytics", "/app/analytics/impact", "/app/rapports", "/app/me", "/app/terrain",
     "/app/parametres/securite",
   ],
   consultant: [
@@ -181,7 +182,7 @@ const PERSONA_ALLOWED_PATHS: Record<string, string[] | null> = {
     "/app/dashboard",
     "/app/portefeuilles", "/app/programmes", "/app/projets",
     "/app/grants", "/app/grants-analytics", "/app/budgets",
-    "/app/analytics", "/app/analytics/impact", "/app/rapports", "/app/rapports/bailleurs", "/app/me",
+    "/app/analytics", "/app/analytics/impact", "/app/rapports", "/app/rapports/bailleurs", "/app/me", "/app/terrain",
     "/app/messagerie", "/app/ressources",
     "/app/parametres/securite",
   ],
