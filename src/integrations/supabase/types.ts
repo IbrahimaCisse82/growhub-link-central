@@ -772,6 +772,45 @@ export type Database = {
           },
         ]
       }
+      client_error_log: {
+        Row: {
+          context: Json | null
+          created_at: string
+          id: string
+          message: string
+          route: string | null
+          severity: string
+          stack: string | null
+          url: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          context?: Json | null
+          created_at?: string
+          id?: string
+          message: string
+          route?: string | null
+          severity?: string
+          stack?: string | null
+          url?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          context?: Json | null
+          created_at?: string
+          id?: string
+          message?: string
+          route?: string | null
+          severity?: string
+          stack?: string | null
+          url?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       coaching_notes: {
         Row: {
           author_id: string
@@ -6874,6 +6913,42 @@ export type Database = {
           },
         ]
       }
+      system_health_snapshots: {
+        Row: {
+          active_users_24h: number | null
+          avg_query_ms: number | null
+          captured_at: string
+          domain_events_24h: number | null
+          emails_sent_24h: number | null
+          errors_24h: number | null
+          extra: Json | null
+          id: string
+          webhook_failures_24h: number | null
+        }
+        Insert: {
+          active_users_24h?: number | null
+          avg_query_ms?: number | null
+          captured_at?: string
+          domain_events_24h?: number | null
+          emails_sent_24h?: number | null
+          errors_24h?: number | null
+          extra?: Json | null
+          id?: string
+          webhook_failures_24h?: number | null
+        }
+        Update: {
+          active_users_24h?: number | null
+          avg_query_ms?: number | null
+          captured_at?: string
+          domain_events_24h?: number | null
+          emails_sent_24h?: number | null
+          errors_24h?: number | null
+          extra?: Json | null
+          id?: string
+          webhook_failures_24h?: number | null
+        }
+        Relationships: []
+      }
       tasks: {
         Row: {
           assignee_id: string | null
@@ -7355,6 +7430,21 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      system_health_overview: {
+        Row: {
+          active_users_24h: number | null
+          activity_24h: number | null
+          critical_errors_24h: number | null
+          domain_events_1h: number | null
+          domain_events_24h: number | null
+          emails_sent_24h: number | null
+          errors_24h: number | null
+          generated_at: string | null
+          total_projects: number | null
+          total_users: number | null
+        }
+        Relationships: []
       }
       treasury_consolidated: {
         Row: {
