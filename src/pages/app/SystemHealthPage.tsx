@@ -2,13 +2,13 @@ import { useSystemHealthOverview, useClientErrors, useHealthSnapshots, useCaptur
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Activity, AlertTriangle, Users, Mail, Zap, RefreshCw, Camera } from "lucide-react";
+import { Activity, AlertTriangle, Users, Mail, Zap, RefreshCw, Camera, type LucideIcon } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 
 function Metric({ label, value, icon: Icon, tone = "default" }: {
-  label: string; value: number | string; icon: React.ComponentType<{ size?: number; className?: string }>;
+  label: string; value: number | string; icon: LucideIcon;
   tone?: "default" | "warning" | "danger" | "success";
 }) {
   const toneClass = {

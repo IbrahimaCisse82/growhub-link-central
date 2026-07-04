@@ -72,6 +72,7 @@ const PiiAuditPage = lazy(() => import("@/pages/app/PiiAuditPage"));
 const MePage = lazy(() => import("@/pages/app/MePage"));
 const DonorReportsPage = lazy(() => import("@/pages/app/DonorReportsPage"));
 const FieldCollectionPage = lazy(() => import("@/pages/app/FieldCollectionPage"));
+const SystemHealthPage = lazy(() => import("@/pages/app/SystemHealthPage"));
 const MatchingPage = lazy(() => import("@/pages/app/MatchingPage"));
 const EventDetailPage = lazy(() => import("@/pages/app/EventDetailPage"));
 const FunnelBuilderPage = lazy(() => import("@/pages/app/FunnelBuilderPage"));
@@ -186,6 +187,7 @@ const App = () => (
                 <Route path="me" element={<MePage />} />
                 <Route path="rapports/bailleurs" element={<DonorReportsPage />} />
                 <Route path="terrain" element={<FieldCollectionPage />} />
+                <Route path="admin/system-health" element={<AdminRoute><SystemHealthPage /></AdminRoute>} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
