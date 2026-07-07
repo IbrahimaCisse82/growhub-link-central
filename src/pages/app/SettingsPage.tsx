@@ -14,6 +14,7 @@ import { Keyboard } from "lucide-react";
 import OrgSettingsCard from "@/components/settings/OrgSettingsCard";
 import BucketsSecurityCard from "@/components/settings/BucketsSecurityCard";
 import ExpenseApprovalCard from "@/components/settings/ExpenseApprovalCard";
+import PushNotificationsCard from "@/components/settings/PushNotificationsCard";
 import { useAuth as useAuthForOrg } from "@/hooks/useAuth";
 
 const notifTypes = [
@@ -140,6 +141,7 @@ export default function SettingsPage() {
 
       <div className="max-w-2xl">
         <OrgSettingsSection />
+        <PushNotificationsCard />
         <GhCard title="🔔 Préférences de notification">
           <div className="space-y-3">
             {notifTypes.map(n => (
