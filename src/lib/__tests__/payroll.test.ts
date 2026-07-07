@@ -26,7 +26,7 @@ const baseEmp = (overrides: Partial<HrEmployee> = {}): HrEmployee => ({
   categorie: "5A",
   statut: "employes",
   contrat: "CDI",
-  date_entree: "2024-01-01",
+  date_entree: "2025-06-01",
   salaire_base: 300000,
   sursalaire: 0,
   heures_absence: 0,
