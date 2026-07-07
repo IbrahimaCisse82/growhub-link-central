@@ -6311,6 +6311,39 @@ export type Database = {
           },
         ]
       }
+      push_subscriptions: {
+        Row: {
+          auth_key: string
+          created_at: string
+          endpoint: string
+          id: string
+          last_used_at: string | null
+          p256dh: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          auth_key: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          last_used_at?: string | null
+          p256dh: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          auth_key?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          last_used_at?: string | null
+          p256dh?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       quiz_attempts: {
         Row: {
           answers: Json
@@ -7126,6 +7159,7 @@ export type Database = {
           email_digest_frequency: string
           message_notifications: boolean
           milestone_notifications: boolean
+          push_enabled: boolean
           risk_notifications: boolean
           task_notifications: boolean
           updated_at: string
@@ -7139,6 +7173,7 @@ export type Database = {
           email_digest_frequency?: string
           message_notifications?: boolean
           milestone_notifications?: boolean
+          push_enabled?: boolean
           risk_notifications?: boolean
           task_notifications?: boolean
           updated_at?: string
@@ -7152,6 +7187,7 @@ export type Database = {
           email_digest_frequency?: string
           message_notifications?: boolean
           milestone_notifications?: boolean
+          push_enabled?: boolean
           risk_notifications?: boolean
           task_notifications?: boolean
           updated_at?: string
