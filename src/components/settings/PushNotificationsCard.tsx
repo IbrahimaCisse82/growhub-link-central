@@ -9,7 +9,7 @@ export default function PushNotificationsCard() {
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-      <GhCard>
+      <GhCard title="Notifications push">
         <div className="p-6 space-y-4">
           <div className="flex items-start justify-between gap-4">
             <div>

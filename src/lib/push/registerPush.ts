@@ -56,7 +56,7 @@ export async function subscribeToPush(userId: string): Promise<{ ok: boolean; er
   const existing = await reg.pushManager.getSubscription();
   const sub = existing ?? (await reg.pushManager.subscribe({
     userVisibleOnly: true,
-    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY).buffer as ArrayBuffer,
   }));
 
   const p256dh = bufferToBase64Url(sub.getKey("p256dh"));
