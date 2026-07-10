@@ -69,17 +69,33 @@ Deno.serve(async (req) => {
 
       let okStatus: string | null = null;
       let errMsg: string | null = null;
+      let httpStatus: number | null = null;
+      let responseBody: string | null = null;
+      const started = Date.now();
       try {
         const res = await fetch(hook.url, { method: "POST", headers, body });
-        if (!res.ok) {
-          const txt = await res.text().catch(() => "");
-          throw new Error(`HTTP ${res.status} ${txt.slice(0, 500)}`);
-        }
+        httpStatus = res.status;
+        const txt = await res.text().catch(() => "");
+        responseBody = txt.slice(0, 1000);
+        if (!res.ok) throw new Error(`HTTP ${res.status} ${txt.slice(0, 500)}`);
         okStatus = "ok";
       } catch (e) {
         errMsg = (e as Error).message;
         failures.push({ event_id: ev.id, hook: hook.name, error: errMsg });
       }
+      const duration = Date.now() - started;
+      await supabase.from("webhook_deliveries").insert({
+        webhook_config_id: hook.id,
+        event_id: ev.id,
+        event_name: ev.event_name,
+        attempt: (hook.retry_count ?? 0) + 1,
+        status: okStatus ? "success" : "failed",
+        http_status: httpStatus,
+        response_body: responseBody,
+        duration_ms: duration,
+        error: errMsg,
+      });
+
 
       if (okStatus) {
         await supabase.from("webhook_configs").update({
