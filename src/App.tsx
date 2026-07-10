@@ -190,6 +190,8 @@ const App = () => (
                 <Route path="rapports/bailleurs" element={<DonorReportsPage />} />
                 <Route path="terrain" element={<FieldCollectionPage />} />
                 <Route path="admin/system-health" element={<AdminRoute><SystemHealthPage /></AdminRoute>} />
+                <Route path="admin/api-keys" element={<ApiKeysPage />} />
+
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
