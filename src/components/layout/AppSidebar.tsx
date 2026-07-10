@@ -126,6 +126,8 @@ function useNavGroups() {
         { label: "Registre RGPD", icon: FileLock2, path: "/app/parametres/conformite" },
         { label: "Audit PII", icon: Eye, path: "/app/parametres/audit-pii" },
         { label: "Santé système", icon: HeartPulse, path: "/app/admin/system-health" },
+        { label: "Clés API", icon: KeyRound, path: "/app/admin/api-keys" },
+
       ],
     },
     {
