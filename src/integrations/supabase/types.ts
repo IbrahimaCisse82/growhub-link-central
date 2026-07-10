@@ -212,6 +212,48 @@ export type Database = {
           },
         ]
       }
+      api_keys: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          key_hash: string
+          key_prefix: string
+          last_used_at: string | null
+          name: string
+          revoked_at: string | null
+          scopes: string[]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          key_hash: string
+          key_prefix: string
+          last_used_at?: string | null
+          name: string
+          revoked_at?: string | null
+          scopes?: string[]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          key_hash?: string
+          key_prefix?: string
+          last_used_at?: string | null
+          name?: string
+          revoked_at?: string | null
+          scopes?: string[]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       application_evaluations: {
         Row: {
           application_id: string
@@ -7300,6 +7342,63 @@ export type Database = {
         }
         Relationships: []
       }
+      webhook_deliveries: {
+        Row: {
+          attempt: number
+          delivered_at: string
+          duration_ms: number | null
+          error: string | null
+          event_id: string | null
+          event_name: string
+          http_status: number | null
+          id: string
+          response_body: string | null
+          status: string
+          webhook_config_id: string | null
+        }
+        Insert: {
+          attempt?: number
+          delivered_at?: string
+          duration_ms?: number | null
+          error?: string | null
+          event_id?: string | null
+          event_name: string
+          http_status?: number | null
+          id?: string
+          response_body?: string | null
+          status: string
+          webhook_config_id?: string | null
+        }
+        Update: {
+          attempt?: number
+          delivered_at?: string
+          duration_ms?: number | null
+          error?: string | null
+          event_id?: string | null
+          event_name?: string
+          http_status?: number | null
+          id?: string
+          response_body?: string | null
+          status?: string
+          webhook_config_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webhook_deliveries_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "domain_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "webhook_deliveries_webhook_config_id_fkey"
+            columns: ["webhook_config_id"]
+            isOneToOne: false
+            referencedRelation: "webhook_configs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       budget_vs_actual: {
@@ -7570,6 +7669,7 @@ export type Database = {
         Returns: boolean
       }
       is_demo_user: { Args: { _user_id?: string }; Returns: boolean }
+      log_api_key_usage: { Args: { _id: string }; Returns: undefined }
       move_to_dlq: {
         Args: {
           dlq_name: string
@@ -7622,6 +7722,14 @@ export type Database = {
       user_accessible_projects: {
         Args: { _user_id: string }
         Returns: string[]
+      }
+      verify_api_key: {
+        Args: { _hash: string; _prefix: string }
+        Returns: {
+          api_key_id: string
+          scopes: string[]
+          user_id: string
+        }[]
       }
       verify_invitation_token: {
         Args: { _token: string }
