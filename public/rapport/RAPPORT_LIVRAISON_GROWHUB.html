@@ -49,15 +49,15 @@
 <!-- COVER PAGE -->
 <div class="cover">
   <h1>📦 Rapport de Livraison</h1>
-  <p class="subtitle">Grow Hub Management System Platform — v1.0</p>
+  <p class="subtitle">Grow Hub Management System Platform — v2.0</p>
 </div>
 
 <div class="meta">
   <div class="meta-item"><span class="meta-label">Client</span><span class="meta-value">GrowHub Sénégal</span></div>
   <div class="meta-item"><span class="meta-label">Plateforme</span><span class="meta-value">Grow Hub Management System</span></div>
-  <div class="meta-item"><span class="meta-label">Version</span><span class="meta-value">1.0.0</span></div>
-  <div class="meta-item"><span class="meta-label">Date de livraison</span><span class="meta-value">16 mars 2026</span></div>
-  <div class="meta-item"><span class="meta-label">Stack technique</span><span class="meta-value">React + TypeScript + Supabase</span></div>
+  <div class="meta-item"><span class="meta-label">Version</span><span class="meta-value">2.0.0</span></div>
+  <div class="meta-item"><span class="meta-label">Date de livraison</span><span class="meta-value">10 juillet 2026</span></div>
+  <div class="meta-item"><span class="meta-label">Stack technique</span><span class="meta-value">React + TypeScript + Supabase + PWA</span></div>
 </div>
 
 <!-- TABLE OF CONTENTS -->
@@ -72,7 +72,9 @@
   <li><a href="#rls">7. Politiques de sécurité (RLS)</a></li>
   <li><a href="#features">8. Fonctionnalités avancées</a></li>
   <li><a href="#deployment">9. Déploiement & infrastructure</a></li>
+  <li><a href="#blocs">10. Blocs livrés (v1.1 → v2.0)</a></li>
 </ol>
+
 
 <!-- 1. ARCHITECTURE -->
 <h2 id="architecture">1. Architecture technique</h2>
@@ -432,11 +434,57 @@ src/
   </ul>
 </div>
 
+<!-- 10. BLOCS -->
+<h2 id="blocs">10. Blocs livrés (v1.1 → v2.0)</h2>
+<div class="card">
+  <p style="margin-bottom:12px;">Depuis la v1.0, 13 blocs ont été livrés pour amener la plateforme au niveau attendu par les bailleurs (Enabel, UE, coopération suisse) et aligner l'outil aux standards SaaS modernes.</p>
+  <table>
+    <tr><th>Bloc</th><th>Livraison</th><th>Points clés</th></tr>
+    <tr><td><strong>Bloc 1</strong> — Hiérarchie PAERID & Wizard projet</td><td><span class="badge badge-green">Livré</span></td><td>Wizard 11 étapes, budgets 5 ans, 20 catégories OCDE, contingence 7%</td></tr>
+    <tr><td><strong>Bloc 2</strong> — GTS v3.3 & Annexe 1b</td><td><span class="badge badge-green">Livré</span></td><td>Dual EUR/FCFA (655,957), rapports bailleurs PDF, nomenclature Enabel A32</td></tr>
+    <tr><td><strong>Bloc 3</strong> — Personas & scopes v2</td><td><span class="badge badge-green">Livré</span></td><td>7 personas, role_assignments scopés (portfolio/programme/projet), 6 dashboards</td></tr>
+    <tr><td><strong>Bloc 4</strong> — CRM, factures & devis</td><td><span class="badge badge-green">Livré</span></td><td>Contreparties, devis, factures multi-TVA, paiements, rappels automatiques, abonnements récurrents</td></tr>
+    <tr><td><strong>Bloc 5</strong> — RH & Paie Sénégal</td><td><span class="badge badge-green">Livré</span></td><td>IPRES 40/60, CSS 1%, transport 26 000 FCFA, conventions collectives, congés, notes de frais</td></tr>
+    <tr><td><strong>Bloc 6</strong> — MFA, RGPD & audit PII</td><td><span class="badge badge-green">Livré</span></td><td>TOTP + HIBP, export/suppression RGPD, registre traitements, cookies consent, audit PII</td></tr>
+    <tr><td><strong>Bloc 7</strong> — Event bus & imputation</td><td><span class="badge badge-green">Livré</span></td><td><code>domain_events</code>, triggers cross-modules, vue <code>cost_imputation_consolidated</code>, RPC breakdown</td></tr>
+    <tr><td><strong>Bloc 8</strong> — Onboarding persistant</td><td><span class="badge badge-green">Livré</span></td><td>Wizard par persona, checkpoint DB, badge dashboard</td></tr>
+    <tr><td><strong>Bloc 9</strong> — Mobile PWA & offline</td><td><span class="badge badge-green">Livré</span></td><td>vite-plugin-pwa, IndexedDB (Dexie), page /app/terrain, sync auto, indicateur online/offline</td></tr>
+    <tr><td><strong>Bloc 10</strong> — Observabilité & SRE</td><td><span class="badge badge-green">Livré</span></td><td><code>client_error_log</code>, <code>system_health_snapshots</code>, GlobalErrorBoundary, page /app/admin/system-health</td></tr>
+    <tr><td><strong>Bloc 11</strong> — Tests & CI/CD</td><td><span class="badge badge-green">Livré</span></td><td>Vitest (payroll, work packages, CRM formatters), GitHub Actions lint→typecheck→tests→build</td></tr>
+    <tr><td><strong>Bloc 12</strong> — Notifications avancées</td><td><span class="badge badge-green">Livré</span></td><td>Web push VAPID, daily/weekly digest, préférences fines par catégorie</td></tr>
+    <tr><td><strong>Bloc 13</strong> — API publique & Webhooks v2</td><td><span class="badge badge-green">Livré</span></td><td>Clés API scopées <code>lv_&lt;prefix&gt;_&lt;secret&gt;</code>, endpoint <code>/v1</code>, HMAC-SHA256, journal <code>webhook_deliveries</code></td></tr>
+  </table>
+
+  <h3>Nouvelles capacités transverses</h3>
+  <ul>
+    <li><strong>Multi-bailleurs</strong> : gestion simultanée de plusieurs subventions par projet avec imputation consolidée.</li>
+    <li><strong>Finance exécutive</strong> : trésorerie consolidée, cap-table, cashflow prévisionnel (RPC <code>get_cashflow_summary</code>).</li>
+    <li><strong>M&E</strong> : plans de suivi-évaluation, mesures terrain, cadre logique, théorie du changement.</li>
+    <li><strong>Alumni</strong> : suivi post-programme avec KPI (revenus, emplois, levées de fonds).</li>
+    <li><strong>Bons de commande</strong> : workflow d'approbation double signature > seuil paramétrable.</li>
+    <li><strong>Marketplace & Matching</strong> : appariement algorithmique mentors/entreprises (secteur 35%, stade 25%, dispo 20%, capacité 20%).</li>
+    <li><strong>Emails transactionnels</strong> : Resend + templates React Email, désabonnement, suppression list-management.</li>
+    <li><strong>i18n</strong> : FR/EN/AR (RTL), formatage XOF natif.</li>
+  </ul>
+
+  <h3>Chiffres clés v2.0</h3>
+  <table>
+    <tr><th>Indicateur</th><th>v1.0</th><th>v2.0</th></tr>
+    <tr><td>Tables Supabase</td><td>27</td><td>120+</td></tr>
+    <tr><td>Pages applicatives</td><td>30</td><td>75+</td></tr>
+    <tr><td>Edge functions</td><td>1</td><td>20+</td></tr>
+    <tr><td>Hooks personnalisés</td><td>28</td><td>70+</td></tr>
+    <tr><td>Rôles / personas</td><td>6</td><td>7 (avec scopes)</td></tr>
+    <tr><td>Tests unitaires</td><td>0</td><td>73</td></tr>
+  </table>
+</div>
+
 <!-- FOOTER -->
 <div style="text-align: center; padding: 48px 0 24px; color: var(--muted); font-size: 0.8rem; border-top: 1px solid var(--border); margin-top: 48px;">
-  <p>© 2026 Grow Hub Management System — Rapport de livraison v1.0</p>
-  <p>Généré automatiquement le 16/03/2026</p>
+  <p>© 2026 Grow Hub Management System — Rapport de livraison v2.0</p>
+  <p>Généré automatiquement le 10/07/2026</p>
 </div>
+
 
 </div>
 </body>
