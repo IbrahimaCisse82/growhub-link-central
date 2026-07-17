@@ -1,5 +1,5 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import SectionHeader from "@/components/shared/SectionHeader";
 import GhCard from "@/components/shared/GhCard";
 import StatCard from "@/components/shared/StatCard";
@@ -11,6 +11,10 @@ import { useRisks } from "@/hooks/useRisks";
 import CreateRiskDialog from "@/components/dialogs/CreateRiskDialog";
 import RiskMatrix from "@/components/risks/RiskMatrix";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 
 const levelMap: Record<string, { label: string; color: "green" | "amber" | "rose" | "gray" }> = {
   low: { label: "Faible", color: "green" }, medium: { label: "Moyen", color: "amber" },
