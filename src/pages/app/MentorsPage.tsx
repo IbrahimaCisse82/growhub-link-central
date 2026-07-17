@@ -1,10 +1,13 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import SectionHeader from "@/components/shared/SectionHeader";
 import GhButton from "@/components/shared/GhButton";
 import Pill from "@/components/shared/Pill";
 import EmptyState from "@/components/shared/EmptyState";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useMentors } from "@/hooks/useMentors";
+import { useMentors, type MentorWithProfile } from "@/hooks/useMentors";
+import InviteUserDialog from "@/components/dialogs/InviteUserDialog";
+import MentorDetailSheet from "@/components/mentors/MentorDetailSheet";
 
 const availabilityMap: Record<string, { label: string; color: "green" | "amber" | "rose" }> = {
   available: { label: "Disponible", color: "green" },
@@ -20,13 +23,15 @@ const gradients = [
 
 export default function MentorsPage() {
   const { data: mentors, isLoading } = useMentors();
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [selected, setSelected] = useState<MentorWithProfile | null>(null);
 
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
       <SectionHeader
         title="Mentors"
         subtitle="Réseau d'experts et matching avec les entreprises"
-        actions={<GhButton>+ Inviter mentor</GhButton>}
+        actions={<GhButton onClick={() => setInviteOpen(true)}>+ Inviter mentor</GhButton>}
       />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {isLoading ? (
@@ -35,7 +40,7 @@ export default function MentorsPage() {
           ))
         ) : mentors?.length === 0 ? (
           <div className="col-span-full">
-            <EmptyState icon="🧑‍🏫" title="Aucun mentor" description="Invitez des experts pour accompagner vos entreprises" actionLabel="+ Inviter" />
+            <EmptyState icon="🧑‍🏫" title="Aucun mentor" description="Invitez des experts pour accompagner vos entreprises" actionLabel="+ Inviter" onAction={() => setInviteOpen(true)} />
           </div>
         ) : (
           mentors?.map((m, idx) => {
@@ -43,7 +48,7 @@ export default function MentorsPage() {
             const initials = mentorName.split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase();
             const avail = availabilityMap[m.availability ?? "available"] ?? availabilityMap.available;
             return (
-              <div key={m.id} className="bg-card border border-border rounded-xl p-[18px] hover:border-primary/30 transition-colors cursor-pointer">
+              <div key={m.id} className="bg-card border border-border rounded-xl p-[18px] hover:border-primary/30 transition-colors">
                 <div className="flex items-center gap-3 mb-3.5">
                   <div className={`w-[42px] h-[42px] rounded-full bg-gradient-to-br ${gradients[idx % gradients.length]} flex items-center justify-center text-sm font-bold text-white flex-shrink-0`}>
                     {initials}
@@ -65,13 +70,16 @@ export default function MentorsPage() {
                 </div>
                 <div className="mt-3 flex justify-between items-center">
                   <Pill color={avail.color}>● {avail.label}</Pill>
-                  <GhButton variant="accent" disabled={avail.color === "rose"}>Voir profil →</GhButton>
+                  <GhButton variant="accent" onClick={() => setSelected(m)}>Voir profil →</GhButton>
                 </div>
               </div>
             );
           })
         )}
       </div>
+
+      <InviteUserDialog open={inviteOpen} onOpenChange={setInviteOpen} />
+      <MentorDetailSheet mentor={selected} open={!!selected} onOpenChange={(o) => !o && setSelected(null)} />
     </motion.div>
   );
 }

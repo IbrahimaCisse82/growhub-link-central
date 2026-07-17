@@ -1,5 +1,5 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import SectionHeader from "@/components/shared/SectionHeader";
 import GhCard from "@/components/shared/GhCard";
 import StatCard from "@/components/shared/StatCard";
@@ -11,6 +11,10 @@ import { useRisks } from "@/hooks/useRisks";
 import CreateRiskDialog from "@/components/dialogs/CreateRiskDialog";
 import RiskMatrix from "@/components/risks/RiskMatrix";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 
 const levelMap: Record<string, { label: string; color: "green" | "amber" | "rose" | "gray" }> = {
   low: { label: "Faible", color: "green" }, medium: { label: "Moyen", color: "amber" },
@@ -19,8 +23,23 @@ const levelMap: Record<string, { label: string; color: "green" | "amber" | "rose
 
 export default function RisquesPage() {
   const { data: risks, isLoading } = useRisks();
+  const qc = useQueryClient();
   const open = risks?.filter(r => r.status === "open").length ?? 0;
   const critical = risks?.filter(r => r.level === "critical" || r.level === "high").length ?? 0;
+
+  const updateStatus = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      const { error } = await supabase.from("risks").update({ status } as any).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["risks"] });
+      toast({ title: "✓ Statut mis à jour" });
+    },
+    onError: (e) => toast({ title: "Erreur", description: (e as Error).message, variant: "destructive" }),
+  });
+
+
 
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
@@ -52,12 +71,13 @@ export default function RisquesPage() {
           <GhCard title="Registre des risques" badge={String(risks?.length ?? 0)} noPadding>
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-[12.5px]">
-                <thead><tr className="bg-secondary">{["Risque", "Projet", "Impact", "Probabilité", "Niveau", "Statut", "Mitigation"].map(h => <th key={h} className="px-3.5 py-2.5 font-mono text-[10px] font-semibold text-muted-foreground uppercase tracking-wider border-b border-border text-left">{h}</th>)}</tr></thead>
+                <thead><tr className="bg-secondary">{["Risque", "Projet", "Impact", "Probabilité", "Niveau", "Statut", "Mitigation", "Actions"].map(h => <th key={h} className="px-3.5 py-2.5 font-mono text-[10px] font-semibold text-muted-foreground uppercase tracking-wider border-b border-border text-left">{h}</th>)}</tr></thead>
                 <tbody>
-                  {isLoading ? Array.from({ length: 4 }).map((_, i) => <tr key={i}>{Array.from({ length: 7 }).map((_, j) => <td key={j} className="px-3.5 py-2.5 border-b border-border"><Skeleton className="h-4 w-16" /></td>)}</tr>) : !risks || risks.length === 0 ? (
-                    <tr><td colSpan={7}><EmptyState icon="⚠️" title="Aucun risque" description="Le registre des risques est vide" /></td></tr>
+                  {isLoading ? Array.from({ length: 4 }).map((_, i) => <tr key={i}>{Array.from({ length: 8 }).map((_, j) => <td key={j} className="px-3.5 py-2.5 border-b border-border"><Skeleton className="h-4 w-16" /></td>)}</tr>) : !risks || risks.length === 0 ? (
+                    <tr><td colSpan={8}><EmptyState icon="⚠️" title="Aucun risque" description="Le registre des risques est vide" /></td></tr>
                   ) : risks.map(r => {
                     const lv = levelMap[r.level] ?? levelMap.medium;
+                    const statusColor = r.status === "open" ? "amber" : r.status === "mitigated" ? "blue" : "green";
                     return (
                       <tr key={r.id} className="hover:bg-secondary transition-colors">
                         <td className="px-3.5 py-2.5 border-b border-border font-semibold text-foreground">{r.title}</td>
@@ -65,11 +85,23 @@ export default function RisquesPage() {
                         <td className="px-3.5 py-2.5 border-b border-border font-mono text-foreground">{(r as any).impact ?? 3}/5</td>
                         <td className="px-3.5 py-2.5 border-b border-border font-mono text-foreground">{(r as any).probability ?? 3}/5</td>
                         <td className="px-3.5 py-2.5 border-b border-border"><Pill color={lv.color}>{lv.label}</Pill></td>
-                        <td className="px-3.5 py-2.5 border-b border-border"><Pill color={r.status === "open" ? "amber" : "green"}>{r.status ?? "open"}</Pill></td>
+                        <td className="px-3.5 py-2.5 border-b border-border"><Pill color={statusColor as any}>{r.status ?? "open"}</Pill></td>
                         <td className="px-3.5 py-2.5 border-b border-border text-muted-foreground text-[11px] max-w-[200px] truncate">{r.mitigation ?? "—"}</td>
+                        <td className="px-3.5 py-2.5 border-b border-border">
+                          <Select value={r.status ?? "open"} onValueChange={(v) => updateStatus.mutate({ id: r.id, status: v })}>
+                            <SelectTrigger className="h-7 w-[130px] text-xs"><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="open">Ouvert</SelectItem>
+                              <SelectItem value="mitigated">Mitigé</SelectItem>
+                              <SelectItem value="resolved">Résolu</SelectItem>
+                              <SelectItem value="closed">Clôturé</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </td>
                       </tr>
                     );
                   })}
+
                 </tbody>
               </table>
             </div>
