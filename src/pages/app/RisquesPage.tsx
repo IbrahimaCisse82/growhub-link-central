@@ -23,8 +23,23 @@ const levelMap: Record<string, { label: string; color: "green" | "amber" | "rose
 
 export default function RisquesPage() {
   const { data: risks, isLoading } = useRisks();
+  const qc = useQueryClient();
   const open = risks?.filter(r => r.status === "open").length ?? 0;
   const critical = risks?.filter(r => r.level === "critical" || r.level === "high").length ?? 0;
+
+  const updateStatus = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      const { error } = await supabase.from("risks").update({ status } as any).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["risks"] });
+      toast({ title: "✓ Statut mis à jour" });
+    },
+    onError: (e) => toast({ title: "Erreur", description: (e as Error).message, variant: "destructive" }),
+  });
+
+
 
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
