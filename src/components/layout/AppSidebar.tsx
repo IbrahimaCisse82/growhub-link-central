@@ -103,9 +103,11 @@ function useNavGroups() {
         { label: t("nav.analytics"), icon: LineChart, path: "/app/analytics" },
         { label: "Impact ODD", icon: Target, path: "/app/analytics/impact" },
         { label: "Suivi-Évaluation", icon: Activity, path: "/app/me" },
+        { label: "Rapports bailleurs", icon: FileBarChart, path: "/app/rapports/bailleurs" },
         { label: "Collecte terrain", icon: Smartphone, path: "/app/terrain" },
       ],
     },
+
     {
       label: t("nav.insightsAdmin"),
       adminOnly: true,
