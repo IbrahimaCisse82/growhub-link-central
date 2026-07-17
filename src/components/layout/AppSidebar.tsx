@@ -113,8 +113,8 @@ function useNavGroups() {
       adminOnly: true,
       items: [
         { label: t("nav.reports"), icon: FileBarChart, path: "/app/rapports" },
-        { label: "Rapports bailleurs", icon: FileBarChart, path: "/app/rapports/bailleurs" },
         { label: "AfriDataHub", icon: Globe, path: "/app/afridatahub" },
+
       ],
     },
     {
