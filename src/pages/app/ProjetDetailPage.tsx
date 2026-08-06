@@ -15,6 +15,8 @@ import InlineEditField from "@/components/projects/InlineEditField";
 import { buildWorkPackages } from "@/lib/workPackageUtils";
 import EntityDocumentsTab from "@/components/shared/EntityDocumentsTab";
 import ProjectCostBreakdownPanel from "@/components/projects/ProjectCostBreakdownPanel";
+import PMOTab from "@/components/projects/PMOTab";
+import DataroomTab from "@/components/projects/DataroomTab";
 import EntityCommentsPanel from "@/components/shared/EntityCommentsPanel";
 import AISuggestPanel from "@/components/ai/AISuggestPanel";
 import { useAuth } from "@/hooks/useAuth";
@@ -317,6 +319,8 @@ export default function ProjetDetailPage() {
           <TabsTrigger value="bailleurs">Bailleurs ({projectGrants?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="couts">Coûts consolidés</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
+          <TabsTrigger value="pmo">PMO</TabsTrigger>
+          <TabsTrigger value="dataroom">Dataroom</TabsTrigger>
           <TabsTrigger value="discussion">💬 Discussion & IA</TabsTrigger>
         </TabsList>
 
@@ -458,6 +462,14 @@ export default function ProjetDetailPage() {
 
         <TabsContent value="couts" className="mt-4">
           <ProjectCostBreakdownPanel projectId={project.id} />
+        </TabsContent>
+
+        <TabsContent value="pmo" className="mt-4">
+          <PMOTab projectId={project.id} />
+        </TabsContent>
+
+        <TabsContent value="dataroom" className="mt-4">
+          <DataroomTab projectId={project.id} />
         </TabsContent>
       </Tabs>
 
