@@ -461,6 +461,14 @@ export default function ProjetDetailPage() {
         <TabsContent value="couts" className="mt-4">
           <ProjectCostBreakdownPanel projectId={project.id} />
         </TabsContent>
+
+        <TabsContent value="pmo" className="mt-4">
+          <PMOTab projectId={project.id} />
+        </TabsContent>
+
+        <TabsContent value="dataroom" className="mt-4">
+          <DataroomTab projectId={project.id} />
+        </TabsContent>
       </Tabs>
 
       <EditProjectDialog open={editOpen} onOpenChange={setEditOpen} project={project} />
