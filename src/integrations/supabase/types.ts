@@ -2119,6 +2119,103 @@ export type Database = {
         }
         Relationships: []
       }
+      dataroom_checklist: {
+        Row: {
+          created_at: string
+          document_id: string | null
+          due_date: string | null
+          folder_code: string
+          id: string
+          is_required: boolean
+          item: string
+          notes: string | null
+          project_id: string
+          sort_order: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          document_id?: string | null
+          due_date?: string | null
+          folder_code: string
+          id?: string
+          is_required?: boolean
+          item: string
+          notes?: string | null
+          project_id: string
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          document_id?: string | null
+          due_date?: string | null
+          folder_code?: string
+          id?: string
+          is_required?: boolean
+          item?: string
+          notes?: string | null
+          project_id?: string
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dataroom_checklist_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dataroom_folders: {
+        Row: {
+          code: string
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          parent_code: string | null
+          project_id: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          parent_code?: string | null
+          project_id: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          parent_code?: string | null
+          project_id?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dataroom_folders_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       digest_email_log: {
         Row: {
           id: string
@@ -5220,6 +5317,327 @@ export type Database = {
           },
         ]
       }
+      pmo_decisions: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          decision: string | null
+          decision_date: string
+          follow_up: string | null
+          id: string
+          impact: string | null
+          project_id: string
+          reference: string | null
+          status: string
+          subject: string
+          taken_by: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          decision?: string | null
+          decision_date?: string
+          follow_up?: string | null
+          id?: string
+          impact?: string | null
+          project_id: string
+          reference?: string | null
+          status?: string
+          subject: string
+          taken_by?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          decision?: string | null
+          decision_date?: string
+          follow_up?: string | null
+          id?: string
+          impact?: string | null
+          project_id?: string
+          reference?: string | null
+          status?: string
+          subject?: string
+          taken_by?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pmo_decisions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pmo_meetings: {
+        Row: {
+          agenda: string | null
+          attendees: string | null
+          created_at: string
+          frequency: string | null
+          id: string
+          location: string | null
+          meeting_type: string
+          minutes: string | null
+          project_id: string
+          scheduled_at: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          agenda?: string | null
+          attendees?: string | null
+          created_at?: string
+          frequency?: string | null
+          id?: string
+          location?: string | null
+          meeting_type?: string
+          minutes?: string | null
+          project_id: string
+          scheduled_at?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          agenda?: string | null
+          attendees?: string | null
+          created_at?: string
+          frequency?: string | null
+          id?: string
+          location?: string | null
+          meeting_type?: string
+          minutes?: string | null
+          project_id?: string
+          scheduled_at?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pmo_meetings_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pmo_members: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string
+          id: string
+          is_steering_committee: boolean
+          organization: string | null
+          phone: string | null
+          project_id: string
+          reports_to: string | null
+          responsibilities: string | null
+          role_title: string
+          sort_order: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name: string
+          id?: string
+          is_steering_committee?: boolean
+          organization?: string | null
+          phone?: string | null
+          project_id: string
+          reports_to?: string | null
+          responsibilities?: string | null
+          role_title: string
+          sort_order?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          is_steering_committee?: boolean
+          organization?: string | null
+          phone?: string | null
+          project_id?: string
+          reports_to?: string | null
+          responsibilities?: string | null
+          role_title?: string
+          sort_order?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pmo_members_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pmo_raci: {
+        Row: {
+          activity: string
+          created_at: string
+          id: string
+          project_id: string
+          raci: string
+          role_title: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          activity: string
+          created_at?: string
+          id?: string
+          project_id: string
+          raci?: string
+          role_title: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          activity?: string
+          created_at?: string
+          id?: string
+          project_id?: string
+          raci?: string
+          role_title?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pmo_raci_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pmo_report_schedule: {
+        Row: {
+          created_at: string
+          due_date: string | null
+          id: string
+          owner_role: string | null
+          period_label: string | null
+          project_id: string
+          report_type: string
+          sort_order: number
+          status: string
+          submitted_at: string | null
+          template_key: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          owner_role?: string | null
+          period_label?: string | null
+          project_id: string
+          report_type?: string
+          sort_order?: number
+          status?: string
+          submitted_at?: string | null
+          template_key?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          owner_role?: string | null
+          period_label?: string | null
+          project_id?: string
+          report_type?: string
+          sort_order?: number
+          status?: string
+          submitted_at?: string | null
+          template_key?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pmo_report_schedule_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pmo_stakeholders: {
+        Row: {
+          category: string
+          contact: string | null
+          created_at: string
+          engagement_strategy: string | null
+          id: string
+          influence: string
+          interest: string
+          name: string
+          organization: string | null
+          project_id: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          contact?: string | null
+          created_at?: string
+          engagement_strategy?: string | null
+          id?: string
+          influence?: string
+          interest?: string
+          name: string
+          organization?: string | null
+          project_id: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          contact?: string | null
+          created_at?: string
+          engagement_strategy?: string | null
+          id?: string
+          influence?: string
+          interest?: string
+          name?: string
+          organization?: string | null
+          project_id?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pmo_stakeholders_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       portfolios: {
         Row: {
           code: string
@@ -5718,6 +6136,62 @@ export type Database = {
             foreignKeyName: "project_indicators_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_pmo: {
+        Row: {
+          charter_mission: string | null
+          charter_objectives: string | null
+          charter_out_of_scope: string | null
+          charter_scope: string | null
+          created_at: string
+          deliverable_validation_procedure: string | null
+          doc_management_procedure: string | null
+          governance_manual: string | null
+          id: string
+          meeting_cadence: string | null
+          project_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          charter_mission?: string | null
+          charter_objectives?: string | null
+          charter_out_of_scope?: string | null
+          charter_scope?: string | null
+          created_at?: string
+          deliverable_validation_procedure?: string | null
+          doc_management_procedure?: string | null
+          governance_manual?: string | null
+          id?: string
+          meeting_cadence?: string | null
+          project_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          charter_mission?: string | null
+          charter_objectives?: string | null
+          charter_out_of_scope?: string | null
+          charter_scope?: string | null
+          created_at?: string
+          deliverable_validation_procedure?: string | null
+          doc_management_procedure?: string | null
+          governance_manual?: string | null
+          id?: string
+          meeting_cadence?: string | null
+          project_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_pmo_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: true
             referencedRelation: "projects"
             referencedColumns: ["id"]
           },
@@ -7703,6 +8177,7 @@ export type Database = {
           sender_id: string
         }[]
       }
+      seed_project_pmo: { Args: { _project_id: string }; Returns: undefined }
       should_notify: {
         Args: { _category: string; _user_id: string }
         Returns: boolean
