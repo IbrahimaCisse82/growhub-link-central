@@ -317,6 +317,8 @@ export default function ProjetDetailPage() {
           <TabsTrigger value="bailleurs">Bailleurs ({projectGrants?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="couts">Coûts consolidés</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
+          <TabsTrigger value="pmo">PMO</TabsTrigger>
+          <TabsTrigger value="dataroom">Dataroom</TabsTrigger>
           <TabsTrigger value="discussion">💬 Discussion & IA</TabsTrigger>
         </TabsList>
 
