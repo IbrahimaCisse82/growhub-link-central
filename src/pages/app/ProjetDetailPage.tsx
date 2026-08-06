@@ -15,6 +15,8 @@ import InlineEditField from "@/components/projects/InlineEditField";
 import { buildWorkPackages } from "@/lib/workPackageUtils";
 import EntityDocumentsTab from "@/components/shared/EntityDocumentsTab";
 import ProjectCostBreakdownPanel from "@/components/projects/ProjectCostBreakdownPanel";
+import PMOTab from "@/components/projects/PMOTab";
+import DataroomTab from "@/components/projects/DataroomTab";
 import EntityCommentsPanel from "@/components/shared/EntityCommentsPanel";
 import AISuggestPanel from "@/components/ai/AISuggestPanel";
 import { useAuth } from "@/hooks/useAuth";
