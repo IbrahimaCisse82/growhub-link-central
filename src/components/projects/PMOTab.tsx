@@ -44,7 +44,7 @@ function CharterPanel({ projectId }: { projectId: string }) {
 
   if (isLoading) return <Skeleton className="h-64 rounded-xl" />;
 
-  const val = (k: string) => draft[k] ?? ((pmo as unknown as Record<string, string | null>)?.[k] ?? "") ?? "";
+  const val = (k: string) => draft[k] ?? (pmo as unknown as Record<string, string | null> | null)?.[k] ?? "";
   const set = (k: string, v: string) => setDraft(d => ({ ...d, [k]: v }));
 
   const fields: { key: string; label: string; hint?: string }[] = [
