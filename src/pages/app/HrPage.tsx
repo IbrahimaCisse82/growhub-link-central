@@ -998,7 +998,9 @@ export default function HrPage() {
 
   const variablesByEmployee = useMemo(() => new Map(variables.map(v => [v.employee_id, v])), [variables]);
   const currentRun = useMemo(() => payrollRuns.runs.find((r: any) => r.mois === payrollMonth && r.annee === payrollYear), [payrollRuns.runs, payrollMonth, payrollYear]) as any;
-  const isPeriodClosed = currentRun?.status === "closed";
+  // RG-RH-05 : un run validé ou clôturé fige les variables de paie
+  const isPeriodClosed = currentRun?.status === "closed" || currentRun?.status === "validated";
+
   const allPaies = useMemo(() => employees.map(e => {
     const empWithVariables = applyPayrollVariable(e, variablesByEmployee.get(e.id!));
     return { ...empWithVariables, paie: calculerPaie(empWithVariables, params, new Date(payrollYear, payrollMonth + 1, 0)) };
@@ -1373,7 +1375,7 @@ export default function HrPage() {
             <StatCard label="Employés variables" value={String(variables.length)} note="Saisies enregistrées" color="green" icon={<Users size={18} />} />
             <StatCard label="Net prévisionnel" value={`${fmtXOF(totaux.net)} F`} note="Après variables" color="purple" icon={<TrendingUp size={18} />} />
           </div>
-          <VariablesTab employees={employees} variables={variables} onSave={(v) => isPeriodClosed ? toast.error("Cette période est clôturée") : saveVariable.mutateAsync(v)} />
+          <VariablesTab employees={employees} variables={variables} onSave={(v) => isPeriodClosed ? toast.error(currentRun?.status === "validated" ? "Paie validée : repassez le run en brouillon pour modifier" : "Cette période est clôturée") : saveVariable.mutateAsync(v)} />
         </TabsContent>
 
         {/* ═══ EMPLOYÉS ═══ */}
