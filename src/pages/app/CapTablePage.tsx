@@ -28,8 +28,12 @@ export default function CapTablePage() {
   const [editingInv, setEditingInv] = useState<any | null>(null);
 
   const totalShares = capTable.reduce((s, e) => s + Number(e.shares), 0);
+  // RG-CAP-02 : la répartition doit totaliser 100 %
+  const totalPct = capTable.reduce((s, e) => s + Number(e.ownership_pct ?? 0), 0);
+  const pctBalanced = capTable.length === 0 || Math.abs(totalPct - 100) < 0.05;
   const totalRaised = investments.filter((i) => i.status === "closed").reduce((s, i) => s + Number(i.amount_xof), 0);
   const lastValuation = investments.find((i) => i.post_money_valuation_xof)?.post_money_valuation_xof ?? 0;
+
 
   const pieData = useMemo(
     () => capTable.map((e) => ({ name: e.holder_name, value: Number(e.ownership_pct ?? 0) })),
