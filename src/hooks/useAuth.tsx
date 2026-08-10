@@ -1,5 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode, useMemo } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Session, User } from "@supabase/supabase-js";
+
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -88,11 +90,13 @@ function derivePersona(roles: AppRole[]): Persona {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const queryClient = useQueryClient();
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [roles, setRoles] = useState<AppRole[]>([]);
   const [assignments, setAssignments] = useState<RoleAssignment[]>([]);
   const [loading, setLoading] = useState(true);
+
 
   const fetchProfileAndRoles = async (userId: string) => {
     const [profileRes, rolesRes, assignRes] = await Promise.all([
@@ -144,7 +148,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfile(null);
     setRoles([]);
     setAssignments([]);
+    // RG-AUTH-05 : purge intégrale de l'état client (cache requêtes, état local, jetons)
+    queryClient.clear();
+    try {
+      Object.keys(localStorage)
+        .filter((k) => k.startsWith("sb-") || k.startsWith("growhub."))
+        .forEach((k) => localStorage.removeItem(k));
+      sessionStorage.clear();
+    } catch {
+      /* stockage indisponible */
+    }
   };
+
 
   const refetchProfile = async () => {
     if (session?.user) await fetchProfileAndRoles(session.user.id);
