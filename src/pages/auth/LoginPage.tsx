@@ -147,6 +147,8 @@ export default function LoginPage() {
             {submitting ? "Connexion…" : "Se connecter"}
           </button>
         </form>
+        )}
+
 
         <p className="text-center text-xs text-muted-foreground">
           L'accès se fait sur invitation ou via un{" "}
