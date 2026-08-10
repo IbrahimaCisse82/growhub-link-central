@@ -3,6 +3,8 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useMentorBlacklists } from "@/hooks/useMentorBlacklists";
+
 import SectionHeader from "@/components/shared/SectionHeader";
 import GhCard from "@/components/shared/GhCard";
 import GhButton from "@/components/shared/GhButton";
@@ -213,22 +215,31 @@ export default function MatchingPage() {
   const currentStartup = startups?.find(s => s.id === selectedStartup);
   const activeMatches = matches?.filter(m => m.status === "active") ?? [];
 
+  // RG-MENT-02 : une exclusion déclarée interdit toute mise en relation
+  const { isBlacklisted } = useMentorBlacklists(selectedStartup ?? undefined);
+
   // Compute scores for selected startup
   const matchResults = currentStartup && mentors
-    ? mentors.map(mentor => {
-        const mentorForAlgo = { expertise_areas: mentor.expertise_areas, max_startups: mentor.max_startups, availability: mentor.availability, user_id: mentor.user_id };
-        const { score, reasons } = computeMatchScore(mentorForAlgo, currentStartup, matches ?? []);
-        const existingMatch = matches?.find(m => m.mentor_id === mentor.user_id && m.startup_id === currentStartup.id);
-        return { mentor, score, reasons, existingMatch };
-      }).sort((a, b) => b.score - a.score)
+    ? mentors
+        .filter(mentor => !isBlacklisted(mentor.user_id))
+        .map(mentor => {
+          const mentorForAlgo = { expertise_areas: mentor.expertise_areas, max_startups: mentor.max_startups, availability: mentor.availability, user_id: mentor.user_id };
+          const { score, reasons } = computeMatchScore(mentorForAlgo, currentStartup, matches ?? []);
+          const existingMatch = matches?.find(m => m.mentor_id === mentor.user_id && m.startup_id === currentStartup.id);
+          // RG-MENT-01 : capacité déclarée non dépassable
+          const currentLoad = (matches ?? []).filter(m => m.mentor_id === mentor.user_id && m.status === "active").length;
+          const atCapacity = currentLoad >= (mentor.max_startups ?? 5);
+          return { mentor, score, reasons, existingMatch, atCapacity };
+        }).sort((a, b) => b.score - a.score)
     : [];
 
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
       <SectionHeader
-        title="Matching Mentors ↔ Startups"
+        title="Matching Mentors ↔ Entreprises"
         subtitle="Algorithme de correspondance basé sur l'expertise, le secteur et la disponibilité"
       />
+
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5 mb-5">
         <StatCard label="Mentors disponibles" value={String(mentors?.filter(m => m.availability !== "unavailable").length ?? 0)} note="" color="green" />
@@ -280,21 +291,28 @@ export default function MatchingPage() {
             <EmptyState icon="🧑‍🏫" title="Aucun mentor disponible" description="Invitez des mentors pour activer le matching" />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {matchResults.map(({ mentor, score, reasons, existingMatch }) => (
+              {matchResults.map(({ mentor, score, reasons, existingMatch, atCapacity }) => (
                 <MatchCard
                   key={mentor.user_id}
                   mentor={mentor}
                   startup={currentStartup}
                   score={score}
-                  reasons={reasons}
+                  reasons={atCapacity ? [...reasons, "Capacité maximale atteinte — mise en relation bloquée"] : reasons}
                   existingMatch={existingMatch}
-                  onMatch={() => createMatch.mutate({
-                    mentorId: mentor.user_id,
-                    startupId: currentStartup.id,
-                    score,
-                  })}
+                  onMatch={() => {
+                    if (atCapacity) {
+                      toast({ title: "Capacité maximale atteinte", description: "Ce mentor accompagne déjà le nombre maximal d'entreprises déclaré.", variant: "destructive" });
+                      return;
+                    }
+                    createMatch.mutate({
+                      mentorId: mentor.user_id,
+                      startupId: currentStartup.id,
+                      score,
+                    });
+                  }}
                 />
               ))}
+
             </div>
           )}
         </div>

@@ -108,14 +108,14 @@ export default function CohortAdvancedAnalytics() {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <StatCard label="Total startups" value={String(totalStartups)} note="" color="blue" />
+        <StatCard label="Total entreprises" value={String(totalStartups)} note="" color="blue" />
         <StatCard label="Secteurs" value={String(totalSectors)} note="couverts" color="purple" />
         <StatCard label="KPIs collectés" value={String(totalKpis)} note="" color="green" />
-        <StatCard label="KPI / startup" value={String(avgKpiPerStartup)} note="moyenne" color="amber" />
+        <StatCard label="KPI / entreprise" value={String(avgKpiPerStartup)} note="moyenne" color="amber" />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <GhCard title="📊 Benchmark sectoriel — Nombre de startups">
+        <GhCard title="📊 Benchmark sectoriel — Nombre d'entreprises">
           {sectorBenchmarks.length === 0 ? (
             <div className="text-[12px] text-muted-foreground text-center py-6">Aucune donnée sectorielle</div>
           ) : (
@@ -125,7 +125,7 @@ export default function CohortAdvancedAnalytics() {
                 <XAxis type="number" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
                 <YAxis dataKey="sector" type="category" width={90} tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
                 <Tooltip contentStyle={tooltipStyle} />
-                <Bar dataKey="count" fill="hsl(199,90%,48%)" radius={[0, 4, 4, 0]} name="Startups" />
+                <Bar dataKey="count" fill="hsl(199,90%,48%)" radius={[0, 4, 4, 0]} name="Entreprises" />
               </BarChart>
             </ResponsiveContainer>
           )}
@@ -138,7 +138,7 @@ export default function CohortAdvancedAnalytics() {
               <XAxis dataKey="stage" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
               <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
               <Tooltip contentStyle={tooltipStyle} />
-              <Bar dataKey="count" fill="hsl(165,100%,41%)" radius={[4, 4, 0, 0]} name="Startups" />
+              <Bar dataKey="count" fill="hsl(165,100%,41%)" radius={[4, 4, 0, 0]} name="Entreprises" />
             </BarChart>
           </ResponsiveContainer>
         </GhCard>

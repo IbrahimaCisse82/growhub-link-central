@@ -126,7 +126,7 @@ export default function GlobalSearchDialog({ open, onOpenChange }: Props) {
       <DialogContent className="p-0 max-w-2xl overflow-hidden">
         <Command shouldFilter={false}>
           <CommandInput
-            placeholder="Rechercher startup, projet, employé, contrat, facture..."
+            placeholder="Rechercher entreprise, projet, employé, contrat, facture..."
             value={query}
             onValueChange={setQuery}
           />
@@ -134,7 +134,7 @@ export default function GlobalSearchDialog({ open, onOpenChange }: Props) {
             <CommandEmpty>Aucun résultat</CommandEmpty>
 
             {matchedStartups.length > 0 && (
-              <CommandGroup heading="Startups">
+              <CommandGroup heading="Entreprises">
                 {matchedStartups.map((s) => (
                   <CommandItem
                     key={s.id}

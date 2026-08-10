@@ -36,7 +36,7 @@ export default function MentorDetailSheet({ mentor, open, onOpenChange }: Props)
           <section className="grid grid-cols-2 gap-3">
             <Stat label="Sessions" value={String(mentor.total_sessions ?? 0)} />
             <Stat label="Note moyenne" value={mentor.average_rating ? `${mentor.average_rating}★` : "—"} />
-            <Stat label="Startups max" value={String(mentor.max_startups ?? 5)} />
+            <Stat label="Entreprises max" value={String(mentor.max_startups ?? 5)} />
             <Stat label="Tarif/h" value={mentor.hourly_rate ? `${mentor.hourly_rate} XOF` : "—"} />
           </section>
           <section>

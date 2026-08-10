@@ -28,8 +28,12 @@ export default function CapTablePage() {
   const [editingInv, setEditingInv] = useState<any | null>(null);
 
   const totalShares = capTable.reduce((s, e) => s + Number(e.shares), 0);
+  // RG-CAP-02 : la répartition doit totaliser 100 %
+  const totalPct = capTable.reduce((s, e) => s + Number(e.ownership_pct ?? 0), 0);
+  const pctBalanced = capTable.length === 0 || Math.abs(totalPct - 100) < 0.05;
   const totalRaised = investments.filter((i) => i.status === "closed").reduce((s, i) => s + Number(i.amount_xof), 0);
   const lastValuation = investments.find((i) => i.post_money_valuation_xof)?.post_money_valuation_xof ?? 0;
+
 
   const pieData = useMemo(
     () => capTable.map((e) => ({ name: e.holder_name, value: Number(e.ownership_pct ?? 0) })),
@@ -156,8 +160,23 @@ export default function CapTablePage() {
                   </tr>
                 ))}
               </tbody>
+              {capTable.length > 0 && (
+                <tfoot>
+                  <tr className="border-t border-border">
+                    <td colSpan={4} className="py-2 pr-4 text-right text-xs font-mono uppercase text-muted-foreground">Total</td>
+                    <td className={`py-2 pr-4 text-right font-mono font-bold ${pctBalanced ? "text-gh-green" : "text-destructive"}`}>{totalPct.toFixed(2)}%</td>
+                    <td colSpan={2}></td>
+                  </tr>
+                </tfoot>
+              )}
             </table>
+            {!pctBalanced && (
+              <p className="mt-3 text-xs text-destructive">
+                La répartition du capital ne totalise pas 100 % ({totalPct.toFixed(2)} %). Corrigez les parts détenues avant toute opération.
+              </p>
+            )}
           </div>
+
 
           {termSheets.length > 0 && (
             <div className="bg-card border border-border rounded-xl p-5">

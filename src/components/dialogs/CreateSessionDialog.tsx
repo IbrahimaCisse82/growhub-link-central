@@ -57,7 +57,7 @@ export default function CreateSessionDialog({ children }: { children: React.Reac
         <form onSubmit={(e) => { e.preventDefault(); if (!title.trim() || !startupId || !mentorId || !scheduledAt) return; create.mutate(); }} className="space-y-4">
           <div className="space-y-2"><label className="text-sm font-medium text-foreground">Titre *</label><input value={title} onChange={e => setTitle(e.target.value)} required className={inputCls} /></div>
           <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-2"><label className="text-sm font-medium text-foreground">Startup *</label>
+            <div className="space-y-2"><label className="text-sm font-medium text-foreground">Entreprise *</label>
               <select value={startupId} onChange={e => setStartupId(e.target.value)} required className={inputCls}>
                 <option value="">— Sélectionner</option>
                 {startups?.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}

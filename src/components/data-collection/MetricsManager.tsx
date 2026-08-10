@@ -90,7 +90,7 @@ function AddCategoryDialog() {
 function AddMetricDialog({ categoryId, categoryName, existingMetrics }: { categoryId: string; categoryName: string; existingMetrics: any[] }) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
-  const [assignedTo, setAssignedTo] = useState("Selected startups");
+  const [assignedTo, setAssignedTo] = useState("Entreprises sélectionnées");
   const [betterIs, setBetterIs] = useState<"higher" | "lower">("higher");
   const [conditions, setConditions] = useState<Condition[]>([]);
   const qc = useQueryClient();
@@ -130,8 +130,8 @@ function AddMetricDialog({ categoryId, categoryName, existingMetrics }: { catego
             <label className="text-[10px] font-mono text-muted-foreground uppercase">Assigned to</label>
             <select value={assignedTo} onChange={e => setAssignedTo(e.target.value)}
               className="w-full bg-surface-2 border border-border rounded-lg px-3 py-2 text-[12px] text-foreground">
-              <option>Selected startups</option>
-              <option>All startups</option>
+              <option>Entreprises sélectionnées</option>
+              <option>Toutes les entreprises</option>
             </select>
           </div>
 
@@ -232,7 +232,7 @@ export default function MetricsManager() {
                       <td className="px-4 py-2.5 text-foreground pl-8">• {m.name}</td>
                       <td className="px-4 py-2.5 text-muted-foreground">
                         <div className="flex items-center gap-1 flex-wrap">
-                          <span>{m.assigned_to ?? "All startups"}</span>
+                          <span>{m.assigned_to ?? "Toutes les entreprises"}</span>
                           {m.conditions?.map((c: Condition, i: number) => (
                             <span key={i} className="inline-flex items-center gap-0.5">
                               {i > 0 && <Pill color={c.join === "and" ? "blue" : "amber"}>{c.join}</Pill>}

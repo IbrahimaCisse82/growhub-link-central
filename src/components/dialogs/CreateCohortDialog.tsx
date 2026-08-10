@@ -38,7 +38,7 @@ export default function CreateCohortDialog({ children, projectId }: { children: 
               {projects?.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
             </select>
           </div>
-          <div className="space-y-2"><label className="text-sm font-medium text-foreground">Max startups</label><input type="number" value={maxStartups} onChange={e => setMaxStartups(e.target.value)} className={inputCls} /></div>
+          <div className="space-y-2"><label className="text-sm font-medium text-foreground">Nombre max d'entreprises</label><input type="number" value={maxStartups} onChange={e => setMaxStartups(e.target.value)} className={inputCls} /></div>
           <button type="submit" disabled={create.isPending} className="w-full h-10 rounded-lg bg-primary text-primary-foreground font-semibold text-sm hover:brightness-110 transition-all disabled:opacity-50">
             {create.isPending ? "Création…" : "Créer"}
           </button>
