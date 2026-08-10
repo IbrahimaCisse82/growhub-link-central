@@ -10,18 +10,51 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  // RG-AUTH-03 : étape de vérification du second facteur TOTP
+  const [mfaStep, setMfaStep] = useState<{ factorId: string; challengeId: string } | null>(null);
+  const [totpCode, setTotpCode] = useState("");
 
   if (loading) return null;
-  if (session) return <Navigate to="/app/dashboard" replace />;
+  if (session && !mfaStep) return <Navigate to="/app/dashboard" replace />;
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSubmitting(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) setError(error.message);
+    if (error) {
+      setError(error.message);
+      setSubmitting(false);
+      return;
+    }
+    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (aal?.nextLevel === "aal2" && aal.currentLevel !== "aal2") {
+      const { data: factors } = await supabase.auth.mfa.listFactors();
+      const factor = (factors?.totp ?? []).find((f) => f.status === "verified");
+      if (factor) {
+        const { data: ch, error: chErr } = await supabase.auth.mfa.challenge({ factorId: factor.id });
+        if (chErr) setError(chErr.message);
+        else setMfaStep({ factorId: factor.id, challengeId: ch.id });
+      }
+    }
     setSubmitting(false);
   };
+
+  const handleVerifyTotp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!mfaStep) return;
+    setError("");
+    setSubmitting(true);
+    const { error } = await supabase.auth.mfa.verify({
+      factorId: mfaStep.factorId,
+      challengeId: mfaStep.challengeId,
+      code: totpCode.trim(),
+    });
+    if (error) setError(error.message);
+    else setMfaStep(null);
+    setSubmitting(false);
+  };
+
 
   return (
     <div
