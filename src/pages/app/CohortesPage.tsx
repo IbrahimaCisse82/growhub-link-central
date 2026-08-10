@@ -52,7 +52,7 @@ export default function CohortesPage() {
                 <div className="font-display text-[15px] font-bold text-foreground">{c.name}</div>
                 <div className="text-[11px] text-muted-foreground mt-0.5">{c.projects?.name ?? "—"} {c.projects?.code ? `· ${c.projects.code}` : ""}</div>
                 <div className="grid grid-cols-2 gap-2 mt-3.5">
-                  <div className="text-center"><div className="font-mono text-lg font-semibold text-foreground">{c.max_startups ?? "—"}</div><div className="text-[10px] text-muted-foreground mt-px">Max Startups</div></div>
+                  <div className="text-center"><div className="font-mono text-lg font-semibold text-foreground">{c.max_startups ?? "—"}</div><div className="text-[10px] text-muted-foreground mt-px">Max Entreprises</div></div>
                   <div className="text-center"><div className="font-mono text-lg font-semibold text-foreground">{c.start_date ? new Date(c.start_date).toLocaleDateString("fr-FR", { month: "short", year: "numeric" }) : "—"}</div><div className="text-[10px] text-muted-foreground mt-px">Début</div></div>
                 </div>
               </div>
