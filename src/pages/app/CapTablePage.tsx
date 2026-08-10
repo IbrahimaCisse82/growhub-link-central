@@ -160,8 +160,23 @@ export default function CapTablePage() {
                   </tr>
                 ))}
               </tbody>
+              {capTable.length > 0 && (
+                <tfoot>
+                  <tr className="border-t border-border">
+                    <td colSpan={4} className="py-2 pr-4 text-right text-xs font-mono uppercase text-muted-foreground">Total</td>
+                    <td className={`py-2 pr-4 text-right font-mono font-bold ${pctBalanced ? "text-gh-green" : "text-destructive"}`}>{totalPct.toFixed(2)}%</td>
+                    <td colSpan={2}></td>
+                  </tr>
+                </tfoot>
+              )}
             </table>
+            {!pctBalanced && (
+              <p className="mt-3 text-xs text-destructive">
+                La répartition du capital ne totalise pas 100 % ({totalPct.toFixed(2)} %). Corrigez les parts détenues avant toute opération.
+              </p>
+            )}
           </div>
+
 
           {termSheets.length > 0 && (
             <div className="bg-card border border-border rounded-xl p-5">
