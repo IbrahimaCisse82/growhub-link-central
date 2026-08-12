@@ -1,85 +1,52 @@
-# BLOC 6 — Sécurité & Conformité (P0)
+# Migration de la base GrowHub vers Hostinger — analyse et options
 
-Objectif : rendre la plateforme déployable en production avec conformité RGPD / Loi sénégalaise 2008-12 et durcissement sécurité admin.
+## Verdict
 
-## Périmètre
+Un **hébergement web mutualisé Hostinger ne peut pas héberger la base GrowHub**. C'est une limite de l'offre, pas de la plateforme :
 
-### 6.1 — MFA / 2FA (TOTP)
-- Activer Supabase Auth MFA (TOTP) via `configure_auth` + HIBP password check.
-- Page `/app/parametres/securite` : enrôlement TOTP (QR code), liste facteurs, révocation.
-- **Enforcement** : guard `MfaGuard` qui force l'enrôlement pour `super_admin` et `coordinator` (redirection si aucun facteur actif).
-- Hook `useMfaFactors` (list, enroll, verify, unenroll).
+- Pas d'accès root ni de Docker : impossible d'installer Postgres + les services Supabase (auth, API REST, storage, edge functions).
+- Le MySQL fourni par le mutualisé n'est pas compatible : GrowHub utilise du PostgreSQL avancé (RLS, `SECURITY DEFINER`, triggers, vues `security_invoker`, types enum, JSONB, RPC). Une conversion vers MySQL signifierait réécrire ~141 tables, toutes les politiques de sécurité et ~30 fonctions serverless.
+- Les ~30 fonctions serverless (invitations, emails, webhooks, API publique, RGPD, digests) tournent en Deno : le mutualisé ne les exécute pas.
 
-### 6.2 — RGPD : Export & droit à l'oubli
-- **Table** `data_export_requests` (user_id, status, requested_at, completed_at, file_path).
-- **Table** `account_deletion_requests` (user_id, status, requested_at, scheduled_for, reason).
-- **Edge function `gdpr-export`** : agrège toutes les données personnelles (profiles, applications, alumni, hr_employees, messages, coaching, kpis…) en un ZIP JSON+CSV stocké dans bucket privé `gdpr-exports`, retour signed URL 7 jours.
-- **Edge function `gdpr-delete`** : anonymise le user (full_name→"Utilisateur supprimé", email→hash, photo→null), conserve les agrégats métier (factures, paie historique pour obligations légales 10 ans) avec flag `is_anonymized`, supprime PII (phone, bio, linkedin, avatar). Délai 30j avec possibilité d'annulation.
-- Page `/app/profil` → onglet "Mes données" : bouton Export + bouton Supprimer (double confirmation + raison).
-- Colonnes `is_anonymized boolean default false` sur `profiles`, `hr_employees`.
+Autrement dit : migrer la base sur du mutualisé n'est pas une migration, c'est une reconstruction complète de l'application.
 
-### 6.3 — Registre des traitements (Article 30 RGPD)
-- **Table** `data_processing_register` (treatment_name, purpose, legal_basis, data_categories[], retention_period_days, recipients[], cross_border_transfer, security_measures).
-- Page `/app/parametres/conformite` : CRUD admin avec export PDF.
-- Seed 8 traitements types (RH, Candidatures, Coaching, Subventions, Alumni, Communications, Logs, Cookies).
+## Ce que Hostinger peut faire pour GrowHub aujourd'hui
 
-### 6.4 — Audit consultations PII
-- **Table** `pii_access_log` (user_id, accessed_entity_type, accessed_entity_id, accessed_fields[], purpose, accessed_at).
-- Vue admin `/app/parametres/audit-pii` : recherche par user/entité/période, export CSV.
-- Hook `useLogPiiAccess` appelé dans `StartupDetailPage`, `HrEmployees`, `AlumniDetailPanel` (lecture fiche complète d'un tiers).
-- Trigger d'écriture côté client (RLS : insert only own logs).
+**Servir le domaine.** L'app publiée reste sur Lovable, et le domaine acheté chez Hostinger pointe dessus (enregistrements A + TXT). C'est immédiat, sans risque et sans perte de fonctionnalité.
 
-### 6.5 — Consentement cookies & opt-in
-- Bannière `<CookieConsent />` (3 catégories : nécessaires/analytics/marketing) avec localStorage + table `cookie_consents` (user_id, categories, given_at, revoked_at, ip_hash).
-- Page publique `/politique-confidentialite` et `/mentions-legales` (templates FR/EN/AR).
-- Lien footer dans `AppLayout` + `LoginPage`.
+## Les vraies options pour la souveraineté des données
 
-### 6.6 — Backup & DR — Documentation
-- `docs/SECURITY.md` : procédures backup (Lovable Cloud auto-PITR), restore, RPO/RTO cibles.
-- `docs/INCIDENT_RESPONSE.md` : matrice escalade, contacts CDP Sénégal (notification 72h obligatoire).
-- README mis à jour avec section conformité.
+### Option A — Rester sur Lovable Cloud + exports réguliers (recommandé court terme)
+Les données restent sur le backend managé, mais vous gardez une copie sous votre contrôle.
+- Export CSV par table depuis Cloud → Advanced settings → Export data.
+- Aucun changement de code, aucune régression.
+- Limite : l'hébergement reste managé, pas chez vous.
 
-## Hors périmètre (justification)
+### Option B — VPS (Hostinger VPS ou autre) avec Supabase auto-hébergé
+La seule voie technique réelle vers l'auto-hébergement.
+- Nécessite une offre **VPS** (accès root), pas le mutualisé : upgrade requis. Dimensionnement réaliste pour GrowHub : 4 vCPU / 8–16 Go RAM / 100 Go SSD.
+- Stack Docker : Postgres 15, GoTrue (auth), PostgREST, Storage, Realtime, Kong, Edge Runtime (Deno).
+- Travail : dump/restore du schéma et des données, redéploiement des ~30 fonctions, recréation des buckets, régénération des clés, repointage de l'app (`VITE_SUPABASE_URL` / clé publiable), tests des 7 personas.
+- À votre charge ensuite : sauvegardes, mises à jour de sécurité, monitoring, certificats SSL, disponibilité.
+- Ce que Lovable ne peut pas faire : provisionner, configurer ou maintenir le VPS. Je peux préparer le dump, les scripts de déploiement et adapter le code, mais l'exploitation du serveur reste côté équipe.
 
-- **Rate limiting** : la plateforme Lovable Cloud n'expose pas de primitive standard ; à adresser séparément côté infra/WAF si exposition publique critique.
-- **WAF / DDoS** : géré par Lovable Cloud / Cloudflare en amont.
-- **Pentest** : audit externe distinct (livré par cabinet certifié post-bloc).
+### Option C — Postgres managé souverain (compromis)
+Un Postgres managé chez un hébergeur de votre choix (ex. hébergeur européen/africain avec Postgres managé), + Supabase auto-hébergé pour auth/storage/functions. Moins d'exploitation qu'un VPS nu, mais même effort de migration.
 
-## Détails techniques
+## Recommandation
 
-| Élément | Tech |
-|---|---|
-| MFA enrôlement | `supabase.auth.mfa.enroll({factorType: 'totp'})` + QR code via `qrcode.react` |
-| Export ZIP | `jszip` + `papaparse` côté edge function |
-| Anonymisation | function SQL `anonymize_user_data(uuid)` SECURITY DEFINER |
-| Audit triggers | côté front (RLS strict) car certaines lectures ne traversent pas la DB |
-| Cookie banner | nouveau composant + provider React |
-| Migrations | 4 migrations atomiques (MFA n'en nécessite pas — géré par Supabase Auth) |
-| Edge functions | 2 nouvelles : `gdpr-export`, `gdpr-delete` (`verify_jwt = true`) |
-| Buckets | 1 nouveau : `gdpr-exports` (privé) |
+1. **Maintenant** : brancher le domaine Hostinger sur l'app publiée, et mettre en place des exports de données périodiques (Option A). Zéro risque, la plateforme reste 100 % opérationnelle.
+2. **Si la souveraineté est une exigence contractuelle** (bailleur, CDP Sénégal) : passer sur un **VPS** (Option B) et planifier la migration comme un chantier dédié, avec une fenêtre de bascule et une phase de recette des 7 personas.
 
-## Volumétrie
+## Détails techniques (pour référence)
 
-| Item | Tables | Edge fn | Pages | Composants | Hooks |
-|---|---|---|---|---|---|
-| 6.1 MFA | 0 | 0 | 1 | 2 (Setup, Guard) | 1 |
-| 6.2 RGPD | 2 | 2 | 1 onglet | 3 | 2 |
-| 6.3 Registre | 1 | 0 | 1 | 2 | 1 |
-| 6.4 Audit PII | 1 | 0 | 1 | 1 | 1 |
-| 6.5 Cookies | 1 | 0 | 2 publiques | 2 | 1 |
-| 6.6 Docs | 0 | 0 | 0 | 0 | 0 |
+- Base actuelle : PostgreSQL managé, ~141 tables en schéma `public`, RLS activée partout, fonctions `SECURITY DEFINER` (`has_role`, `has_scoped_role`, `verify_api_key`, `seed_project_pmo`, `anonymize_user_data`…), vues `security_invoker` pour la protection PII.
+- Storage : buckets `entity-documents`, `gdpr-exports`.
+- Fonctions serverless Deno : invitations, emails transactionnels, webhooks, API publique v1, RGPD export/delete, digests, push, jobs quotidiens CRM/RH.
+- Le front est un SPA Vite/React : il se rebranche via `VITE_SUPABASE_URL` et `VITE_SUPABASE_PUBLISHABLE_KEY`, donc le changement de backend est trivial côté code — la complexité est entièrement côté infrastructure.
 
-## Ordre d'exécution suggéré
+## Prochaine étape à confirmer
 
-1. Migration globale (6 tables + 1 bucket + function anonymize)
-2. Activation `configure_auth` (MFA + HIBP)
-3. Edge functions `gdpr-export` + `gdpr-delete`
-4. Hooks (`useMfaFactors`, `useGdprRequests`, `useDataProcessingRegister`, `usePiiAccessLog`, `useCookieConsent`)
-5. Pages & composants (Sécurité, Conformité, Audit PII, Mes données, Cookie banner)
-6. Routes + sidebar
-7. Documentation `docs/SECURITY.md` + `docs/INCIDENT_RESPONSE.md`
-8. Mémoires (`mem://security/mfa-rgpd-conformite`)
-
-## Question
-
-Confirme-tu ce périmètre, ou tu veux qu'on **réduise** (ex: seulement MFA + RGPD export/delete, sans registre ni cookies pour ce bloc) afin d'aller plus vite ?
+Dites-moi laquelle vous voulez et j'exécute :
+- **A** : je vous guide sur le branchement du domaine Hostinger + la procédure d'export des données.
+- **B** : je prépare le dossier de migration VPS (inventaire schéma, script docker-compose, checklist de bascule, plan de recette) — à exécuter par votre équipe infra sur un VPS.
