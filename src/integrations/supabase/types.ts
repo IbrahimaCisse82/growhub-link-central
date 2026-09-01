@@ -5180,6 +5180,80 @@ export type Database = {
         }
         Relationships: []
       }
+      partner_outreach: {
+        Row: {
+          category: string | null
+          channel: string | null
+          contact_info: string | null
+          contact_person: string | null
+          created_at: string
+          documents: string | null
+          followup_date: string | null
+          id: string
+          institution: string
+          letter_ref: string | null
+          next_step: string | null
+          num: number | null
+          partnership_type: string | null
+          priority: string | null
+          project_id: string
+          response_date: string | null
+          sent_date: string | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          channel?: string | null
+          contact_info?: string | null
+          contact_person?: string | null
+          created_at?: string
+          documents?: string | null
+          followup_date?: string | null
+          id?: string
+          institution: string
+          letter_ref?: string | null
+          next_step?: string | null
+          num?: number | null
+          partnership_type?: string | null
+          priority?: string | null
+          project_id: string
+          response_date?: string | null
+          sent_date?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          channel?: string | null
+          contact_info?: string | null
+          contact_person?: string | null
+          created_at?: string
+          documents?: string | null
+          followup_date?: string | null
+          id?: string
+          institution?: string
+          letter_ref?: string | null
+          next_step?: string | null
+          num?: number | null
+          partnership_type?: string | null
+          priority?: string | null
+          project_id?: string
+          response_date?: string | null
+          sent_date?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_outreach_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       partners: {
         Row: {
           contact_email: string | null
@@ -5853,6 +5927,59 @@ export type Database = {
           },
         ]
       }
+      project_activities: {
+        Row: {
+          code: string | null
+          created_at: string
+          end_date: string | null
+          end_period: string | null
+          id: string
+          objective: string | null
+          project_id: string
+          start_date: string | null
+          start_period: string | null
+          title: string
+          updated_at: string
+          work_package: string | null
+        }
+        Insert: {
+          code?: string | null
+          created_at?: string
+          end_date?: string | null
+          end_period?: string | null
+          id?: string
+          objective?: string | null
+          project_id: string
+          start_date?: string | null
+          start_period?: string | null
+          title: string
+          updated_at?: string
+          work_package?: string | null
+        }
+        Update: {
+          code?: string | null
+          created_at?: string
+          end_date?: string | null
+          end_period?: string | null
+          id?: string
+          objective?: string | null
+          project_id?: string
+          start_date?: string | null
+          start_period?: string | null
+          title?: string
+          updated_at?: string
+          work_package?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_activities_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_budget_assumptions: {
         Row: {
           created_at: string
@@ -6134,6 +6261,127 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "project_indicators_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_plan_milestones: {
+        Row: {
+          created_at: string
+          id: string
+          lot: string | null
+          owner: string | null
+          project_id: string
+          target_date: string | null
+          task_ref: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lot?: string | null
+          owner?: string | null
+          project_id: string
+          target_date?: string | null
+          task_ref?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lot?: string | null
+          owner?: string | null
+          project_id?: string
+          target_date?: string | null
+          task_ref?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_plan_milestones_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_plan_tasks: {
+        Row: {
+          comment: string | null
+          created_at: string
+          deliverable: string | null
+          description: string | null
+          duration_days: number | null
+          end_date: string | null
+          id: string
+          is_milestone: boolean
+          level: number
+          owner: string | null
+          predecessors: string | null
+          priority: string | null
+          progress: number
+          project_id: string
+          start_date: string | null
+          status: string
+          task_ref: string | null
+          title: string
+          updated_at: string
+          wbs: string | null
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          deliverable?: string | null
+          description?: string | null
+          duration_days?: number | null
+          end_date?: string | null
+          id?: string
+          is_milestone?: boolean
+          level?: number
+          owner?: string | null
+          predecessors?: string | null
+          priority?: string | null
+          progress?: number
+          project_id: string
+          start_date?: string | null
+          status?: string
+          task_ref?: string | null
+          title: string
+          updated_at?: string
+          wbs?: string | null
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          deliverable?: string | null
+          description?: string | null
+          duration_days?: number | null
+          end_date?: string | null
+          id?: string
+          is_milestone?: boolean
+          level?: number
+          owner?: string | null
+          predecessors?: string | null
+          priority?: string | null
+          progress?: number
+          project_id?: string
+          start_date?: string | null
+          status?: string
+          task_ref?: string | null
+          title?: string
+          updated_at?: string
+          wbs?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_plan_tasks_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
