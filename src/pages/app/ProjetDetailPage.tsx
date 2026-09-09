@@ -17,6 +17,9 @@ import EntityDocumentsTab from "@/components/shared/EntityDocumentsTab";
 import ProjectCostBreakdownPanel from "@/components/projects/ProjectCostBreakdownPanel";
 import PMOTab from "@/components/projects/PMOTab";
 import DataroomTab from "@/components/projects/DataroomTab";
+import ProjectPlanTab from "@/components/projects/ProjectPlanTab";
+import ProjectGanttTab from "@/components/projects/ProjectGanttTab";
+import PartnerOutreachTab from "@/components/projects/PartnerOutreachTab";
 import EntityCommentsPanel from "@/components/shared/EntityCommentsPanel";
 import AISuggestPanel from "@/components/ai/AISuggestPanel";
 import { useAuth } from "@/hooks/useAuth";
@@ -321,6 +324,9 @@ export default function ProjetDetailPage() {
           <TabsTrigger value="documents">Documents</TabsTrigger>
           <TabsTrigger value="pmo">PMO</TabsTrigger>
           <TabsTrigger value="dataroom">Dataroom</TabsTrigger>
+          <TabsTrigger value="plan">Plan de travail</TabsTrigger>
+          <TabsTrigger value="gantt">Gantt</TabsTrigger>
+          <TabsTrigger value="partenaires">Partenaires</TabsTrigger>
           <TabsTrigger value="discussion">💬 Discussion & IA</TabsTrigger>
         </TabsList>
 
@@ -470,6 +476,18 @@ export default function ProjetDetailPage() {
 
         <TabsContent value="dataroom" className="mt-4">
           <DataroomTab projectId={project.id} />
+        </TabsContent>
+
+        <TabsContent value="plan" className="mt-4">
+          <ProjectPlanTab projectId={project.id} />
+        </TabsContent>
+
+        <TabsContent value="gantt" className="mt-4">
+          <ProjectGanttTab projectId={project.id} />
+        </TabsContent>
+
+        <TabsContent value="partenaires" className="mt-4">
+          <PartnerOutreachTab projectId={project.id} />
         </TabsContent>
       </Tabs>
 
