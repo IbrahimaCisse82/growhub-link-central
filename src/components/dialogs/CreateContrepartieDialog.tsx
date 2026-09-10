@@ -47,7 +47,7 @@ export default function CreateContrepartieDialog({ open, onOpenChange, defaultTy
       let founderName = "";
       if (s.founder_id) {
         const { data: prof } = await supabase
-          .from("profiles")
+          .from("profiles_safe")
           .select("full_name, email")
           .eq("user_id", s.founder_id)
           .maybeSingle();

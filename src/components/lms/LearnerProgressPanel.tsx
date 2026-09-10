@@ -38,7 +38,7 @@ export default function LearnerProgressPanel() {
 
       const [coursesRes, profilesRes] = await Promise.all([
         supabase.from("courses").select("id, title, modules_count, duration_hours").in("id", courseIds),
-        supabase.from("profiles").select("user_id, full_name").in("user_id", userIds),
+        supabase.from("profiles_safe").select("user_id, full_name").in("user_id", userIds),
       ]);
 
       return enrolls.map(e => {

@@ -52,7 +52,7 @@ export default function AuditTrailPanel({ entityType, entityId, limit = 20 }: Au
       // Fetch user names
       const userIds = [...new Set(data.filter(d => d.user_id).map(d => d.user_id!))];
       const { data: profiles } = await supabase
-        .from("profiles")
+        .from("profiles_safe")
         .select("user_id, full_name")
         .in("user_id", userIds);
 

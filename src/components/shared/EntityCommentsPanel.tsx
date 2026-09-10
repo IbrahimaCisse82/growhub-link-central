@@ -41,7 +41,7 @@ export default function EntityCommentsPanel({ entityType, entityId }: { entityTy
         .order("created_at", { ascending: true });
       if (error) throw error;
       const userIds = [...new Set((data ?? []).map(c => c.author_id))];
-      const { data: profiles } = await supabase.from("profiles").select("user_id, full_name").in("user_id", userIds);
+      const { data: profiles } = await supabase.from("profiles_safe").select("user_id, full_name").in("user_id", userIds);
       return (data ?? []).map(c => ({
         ...c,
         author_name: profiles?.find(p => p.user_id === c.author_id)?.full_name ?? "Utilisateur",
