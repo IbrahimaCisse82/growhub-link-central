@@ -344,7 +344,7 @@ export function useGrantChanges(grantId: string | undefined) {
       const userIds = [...new Set((data ?? []).map(c => c.user_id).filter(Boolean))] as string[];
       let profiles: Record<string, string> = {};
       if (userIds.length > 0) {
-        const { data: pData } = await supabase.from("profiles").select("user_id, full_name").in("user_id", userIds);
+        const { data: pData } = await supabase.from("profiles_safe").select("user_id, full_name").in("user_id", userIds);
         profiles = Object.fromEntries((pData ?? []).map(p => [p.user_id, p.full_name]));
       }
       return (data ?? []).map(c => ({ ...c, user_name: profiles[c.user_id ?? ""] ?? "Système" })) as GrantChange[];

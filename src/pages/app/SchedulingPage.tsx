@@ -45,7 +45,7 @@ function useMentorProfiles() {
       if (error) throw error;
       const userIds = data.map(m => m.user_id);
       const { data: profiles } = await supabase
-        .from("profiles")
+        .from("profiles_safe")
         .select("user_id, full_name")
         .in("user_id", userIds);
       return data.map(m => ({
