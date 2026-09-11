@@ -8320,6 +8320,14 @@ export type Database = {
     }
     Functions: {
       anonymize_user_data: { Args: { _user_id: string }; Returns: undefined }
+      can_access_grant: {
+        Args: { _grant_id: string; _user_id: string }
+        Returns: boolean
+      }
+      can_access_project: {
+        Args: { _project_id: string; _user_id: string }
+        Returns: boolean
+      }
       compute_startup_health_score: {
         Args: { p_startup_id: string }
         Returns: number
