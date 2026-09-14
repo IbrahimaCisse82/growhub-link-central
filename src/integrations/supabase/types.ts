@@ -8399,6 +8399,14 @@ export type Database = {
         Returns: boolean
       }
       is_demo_user: { Args: { _user_id?: string }; Returns: boolean }
+      is_startup_founder: {
+        Args: { _startup_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_startup_member: {
+        Args: { _startup_id: string; _user_id: string }
+        Returns: boolean
+      }
       log_api_key_usage: { Args: { _id: string }; Returns: undefined }
       move_to_dlq: {
         Args: {
