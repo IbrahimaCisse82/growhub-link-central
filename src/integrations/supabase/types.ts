@@ -53,6 +53,282 @@ export type Database = {
         }
         Relationships: []
       }
+      accounting_accounts: {
+        Row: {
+          account_class: number
+          code: string
+          created_at: string
+          id: string
+          is_active: boolean
+          is_detail: boolean
+          label: string
+          level: number
+          nature: string
+          parent_code: string | null
+          updated_at: string
+        }
+        Insert: {
+          account_class: number
+          code: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_detail?: boolean
+          label: string
+          level?: number
+          nature?: string
+          parent_code?: string | null
+          updated_at?: string
+        }
+        Update: {
+          account_class?: number
+          code?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_detail?: boolean
+          label?: string
+          level?: number
+          nature?: string
+          parent_code?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      accounting_entries: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          currency: string
+          entry_date: string
+          fiscal_year_id: string | null
+          grant_id: string | null
+          id: string
+          journal_id: string | null
+          label: string
+          notes: string | null
+          piece_ref: string | null
+          project_id: string | null
+          source_id: string | null
+          source_type: string | null
+          status: string
+          total_credit: number
+          total_debit: number
+          updated_at: string
+          validated_at: string | null
+          validated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          entry_date?: string
+          fiscal_year_id?: string | null
+          grant_id?: string | null
+          id?: string
+          journal_id?: string | null
+          label: string
+          notes?: string | null
+          piece_ref?: string | null
+          project_id?: string | null
+          source_id?: string | null
+          source_type?: string | null
+          status?: string
+          total_credit?: number
+          total_debit?: number
+          updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          entry_date?: string
+          fiscal_year_id?: string | null
+          grant_id?: string | null
+          id?: string
+          journal_id?: string | null
+          label?: string
+          notes?: string | null
+          piece_ref?: string | null
+          project_id?: string | null
+          source_id?: string | null
+          source_type?: string | null
+          status?: string
+          total_credit?: number
+          total_debit?: number
+          updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "accounting_entries_fiscal_year_id_fkey"
+            columns: ["fiscal_year_id"]
+            isOneToOne: false
+            referencedRelation: "accounting_fiscal_years"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounting_entries_grant_id_fkey"
+            columns: ["grant_id"]
+            isOneToOne: false
+            referencedRelation: "grants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounting_entries_journal_id_fkey"
+            columns: ["journal_id"]
+            isOneToOne: false
+            referencedRelation: "accounting_journals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounting_entries_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      accounting_entry_lines: {
+        Row: {
+          account_code: string
+          analytic_code: string | null
+          created_at: string
+          credit: number
+          debit: number
+          entry_id: string
+          id: string
+          label: string | null
+          line_no: number
+          project_id: string | null
+          third_party_id: string | null
+        }
+        Insert: {
+          account_code: string
+          analytic_code?: string | null
+          created_at?: string
+          credit?: number
+          debit?: number
+          entry_id: string
+          id?: string
+          label?: string | null
+          line_no?: number
+          project_id?: string | null
+          third_party_id?: string | null
+        }
+        Update: {
+          account_code?: string
+          analytic_code?: string | null
+          created_at?: string
+          credit?: number
+          debit?: number
+          entry_id?: string
+          id?: string
+          label?: string | null
+          line_no?: number
+          project_id?: string | null
+          third_party_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "accounting_entry_lines_entry_id_fkey"
+            columns: ["entry_id"]
+            isOneToOne: false
+            referencedRelation: "accounting_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounting_entry_lines_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounting_entry_lines_third_party_id_fkey"
+            columns: ["third_party_id"]
+            isOneToOne: false
+            referencedRelation: "crm_contreparties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      accounting_fiscal_years: {
+        Row: {
+          closed_at: string | null
+          closed_by: string | null
+          created_at: string
+          created_by: string | null
+          end_date: string
+          id: string
+          label: string
+          start_date: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          closed_at?: string | null
+          closed_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          end_date: string
+          id?: string
+          label: string
+          start_date: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          closed_at?: string | null
+          closed_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          end_date?: string
+          id?: string
+          label?: string
+          start_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      accounting_journals: {
+        Row: {
+          code: string
+          counterpart_account: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          journal_type: string
+          label: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          counterpart_account?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          journal_type?: string
+          label: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          counterpart_account?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          journal_type?: string
+          label?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       activity_log: {
         Row: {
           action: string
@@ -8123,6 +8399,26 @@ export type Database = {
       }
     }
     Views: {
+      accounting_balance: {
+        Row: {
+          account_class: number | null
+          account_code: string | null
+          account_label: string | null
+          fiscal_year_id: string | null
+          solde: number | null
+          total_credit: number | null
+          total_debit: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "accounting_entries_fiscal_year_id_fkey"
+            columns: ["fiscal_year_id"]
+            isOneToOne: false
+            referencedRelation: "accounting_fiscal_years"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       budget_vs_actual: {
         Row: {
           execution_rate: number | null
@@ -8328,6 +8624,7 @@ export type Database = {
         Args: { _project_id: string; _user_id: string }
         Returns: boolean
       }
+      can_view_accounting: { Args: { _user_id: string }; Returns: boolean }
       compute_startup_health_score: {
         Args: { p_startup_id: string }
         Returns: number
