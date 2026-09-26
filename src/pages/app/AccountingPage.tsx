@@ -6,6 +6,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Trash2, CheckCircle2, Lock, Search, AlertTriangle, RotateCcw, Pencil } from "lucide-react";
 import AccountGuidePanel from "@/components/accounting/AccountGuide";
 import LetteringSection from "@/components/accounting/LetteringSection";
+import { MappingView, PlaquetteView } from "@/components/accounting/PlaquetteSection";
 import { normalSide, bilanActif, bilanPassif, compteResultat, fluxTresorerie, type BalLine, type StatementLine } from "@/lib/syscohada";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
@@ -445,7 +446,7 @@ function StatementsSection() {
   const [fy, setFy] = useDefaultFy();
   const { data = [] } = useBalance(fy);
   const { data: opening = [] } = useOpening(fy);
-  const [tab, setTab] = useState<"bilan" | "resultat" | "flux">("bilan");
+  const [tab, setTab] = useState<"bilan" | "resultat" | "flux" | "plaquette" | "mappage">("bilan");
   const bal: BalLine[] = data.map((r) => ({ code: r.account_code ?? "", solde: Number(r.solde ?? 0) }));
   const cr = compteResultat(bal);
   const resultat = cr[cr.length - 1].value;
@@ -453,7 +454,8 @@ function StatementsSection() {
   const passif = bilanPassif(bal, resultat);
   const flux = fluxTresorerie(bal, opening, resultat);
   const ecart = actif[actif.length - 1].value - passif[passif.length - 1].value;
-  const tabs = [["bilan", tr("Bilan")], ["resultat", tr("Compte de résultat")], ["flux", tr("Tableau des flux de trésorerie")]] as const;
+  const tabs = [["bilan", tr("Bilan")], ["resultat", tr("Compte de résultat")], ["flux", tr("Tableau des flux de trésorerie")], ["plaquette", tr("Plaquette (57)")], ["mappage", tr("Mappage des comptes")]] as const;
+  const balRows = data.map((r) => ({ code: r.account_code ?? "", label: r.account_label ?? "", solde: Number(r.solde ?? 0) }));
   const exportStatements = (kind: "csv" | "pdf") => {
     const rows = (tab === "bilan"
       ? [...actif.map((l) => ({ ...l, part: "Actif" })), ...passif.map((l) => ({ ...l, part: "Passif" }))]
@@ -479,6 +481,8 @@ function StatementsSection() {
           {Math.abs(ecart) < 1 ? "Bilan équilibré (actif = passif)." : `Écart actif − passif : ${fmt(ecart)} — vérifiez les écritures en attente ou les comptes hors bilan.`}</p>
         <div className="grid xl:grid-cols-2 gap-4"><StatementTable title={tr("Bilan — Actif")} lines={actif} withBrut /><StatementTable title={tr("Bilan — Passif")} lines={passif} /></div></>}
       {tab === "resultat" && <StatementTable title={tr("Compte de résultat (avec soldes intermédiaires de gestion)")} lines={cr} />}
+      {tab === "mappage" && <MappingView rows={balRows} />}
+      {tab === "plaquette" && <PlaquetteView rows={balRows} onOpenState={setTab} />}
       {tab === "flux" && <>
         {opening.length === 0 && <p className="text-[12px] text-muted-foreground mb-2">{tr("Aucun à-nouveau sur cet exercice : la trésorerie d'ouverture est considérée comme nulle.")}</p>}
         <StatementTable title={tr("Tableau des flux de trésorerie")} lines={flux} /></>}
