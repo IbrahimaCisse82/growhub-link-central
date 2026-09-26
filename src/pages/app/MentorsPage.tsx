@@ -71,7 +71,7 @@ export default function MentorsPage() {
                 </div>
                 <div className="mt-3 flex justify-between items-center">
                   <Pill color={avail.color}>● {avail.label}</Pill>
-                  <div className="flex items-center gap-1"><RecordActions table="mentor_profiles" id={m.id} record={m} entityLabel="Profil mentor" queryKeys={["mentors","mentor_profiles","mentor-profiles"]} fields={[{key:"bio",label:"Biographie",type:"textarea"},{key:"availability",label:"Disponibilité",type:"select",options:[{value:"available",label:"Disponible"},{value:"limited",label:"Limitée"},{value:"unavailable",label:"Indisponible"}]},{key:"max_startups",label:"Nombre max d'entreprises",type:"number"},{key:"hourly_rate",label:"Tarif horaire (XOF)",type:"number"},{key:"linkedin_url",label:"LinkedIn"}]} /><GhButton variant="accent" onClick={() => setSelected(m)}>Voir profil →</GhButton></div>
+                  <div className="flex items-center gap-1"><RecordActions table="mentor_profiles" id={m.id} record={m} entityLabel="Profil mentor" queryKeys={["mentors","mentor_profiles","mentor-profiles"]} fields={[{key:"bio",label:"Biographie",type:"textarea"},{key:"availability",label:"Disponibilité",type:"select",options:[{value:"available",label:"Disponible"},{value:"partial",label:"Partiel"},{value:"unavailable",label:"Indisponible"}]},{key:"max_startups",label:"Nombre max d'entreprises",type:"number"},{key:"hourly_rate",label:"Tarif horaire (XOF)",type:"number"},{key:"linkedin_url",label:"LinkedIn"}]} /><GhButton variant="accent" onClick={() => setSelected(m)}>Voir profil →</GhButton></div>
                 </div>
               </div>
             );
