@@ -8481,6 +8481,45 @@ export type Database = {
           },
         ]
       }
+      treasury_accounts: {
+        Row: {
+          account_code: string
+          bank_name: string | null
+          created_at: string
+          currency: string
+          iban: string | null
+          id: string
+          is_active: boolean
+          kind: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          account_code: string
+          bank_name?: string | null
+          created_at?: string
+          currency?: string
+          iban?: string | null
+          id?: string
+          is_active?: boolean
+          kind?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          account_code?: string
+          bank_name?: string | null
+          created_at?: string
+          currency?: string
+          iban?: string | null
+          id?: string
+          is_active?: boolean
+          kind?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       treasury_forecasts: {
         Row: {
           amount_xof: number
@@ -8524,6 +8563,124 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      treasury_movements: {
+        Row: {
+          amount: number
+          category: string
+          counterpart_account: string | null
+          created_at: string
+          created_by: string | null
+          direction: string
+          entry_id: string | null
+          grant_id: string | null
+          id: string
+          invoice_id: string | null
+          label: string
+          method: string
+          movement_date: string
+          payment_id: string | null
+          project_id: string | null
+          reconciled: boolean
+          reconciled_at: string | null
+          reference: string | null
+          target_account_id: string | null
+          third_party_id: string | null
+          treasury_account_id: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          category: string
+          counterpart_account?: string | null
+          created_at?: string
+          created_by?: string | null
+          direction: string
+          entry_id?: string | null
+          grant_id?: string | null
+          id?: string
+          invoice_id?: string | null
+          label: string
+          method?: string
+          movement_date?: string
+          payment_id?: string | null
+          project_id?: string | null
+          reconciled?: boolean
+          reconciled_at?: string | null
+          reference?: string | null
+          target_account_id?: string | null
+          third_party_id?: string | null
+          treasury_account_id: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          category?: string
+          counterpart_account?: string | null
+          created_at?: string
+          created_by?: string | null
+          direction?: string
+          entry_id?: string | null
+          grant_id?: string | null
+          id?: string
+          invoice_id?: string | null
+          label?: string
+          method?: string
+          movement_date?: string
+          payment_id?: string | null
+          project_id?: string | null
+          reconciled?: boolean
+          reconciled_at?: string | null
+          reference?: string | null
+          target_account_id?: string | null
+          third_party_id?: string | null
+          treasury_account_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "treasury_movements_grant_id_fkey"
+            columns: ["grant_id"]
+            isOneToOne: false
+            referencedRelation: "grants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "treasury_movements_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "crm_invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "treasury_movements_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "treasury_movements_target_account_id_fkey"
+            columns: ["target_account_id"]
+            isOneToOne: false
+            referencedRelation: "treasury_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "treasury_movements_third_party_id_fkey"
+            columns: ["third_party_id"]
+            isOneToOne: false
+            referencedRelation: "crm_contreparties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "treasury_movements_treasury_account_id_fkey"
+            columns: ["treasury_account_id"]
+            isOneToOne: false
+            referencedRelation: "treasury_accounts"
             referencedColumns: ["id"]
           },
         ]
