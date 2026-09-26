@@ -65,7 +65,7 @@ export default function SettlementsSection() {
     const { data, error } = await supabase.from("crm_contreparties").select("id,name").order("name"); if (error) throw error; return data ?? [];
   } });
   const { data: invoices = [] } = useQuery({ queryKey: ["tr-invoices"], queryFn: async () => {
-    const { data, error } = await supabase.from("crm_invoices").select("id,invoice_number,direction,total_ttc,amount_paid,contrepartie_id,status").neq("status", "payee"); if (error) throw error; return data ?? [];
+    const { data, error } = await supabase.from("crm_invoices").select("id,invoice_number,direction,total,amount_paid,contrepartie_id,status").neq("status", "payee"); if (error) throw error; return data ?? [];
   } });
   const { data: projects = [] } = useQuery({ queryKey: ["tr-projects"], queryFn: async () => {
     const { data, error } = await supabase.from("projects").select("id,name").order("name"); if (error) throw error; return data ?? [];
@@ -93,7 +93,7 @@ export default function SettlementsSection() {
   const setCat = (k: string) => { const c = CATEGORIES[f.direction].find((x) => x.key === k); setF({ ...f, category: k, counterpart_account: c?.account ?? "", invoice_id: "" }); };
   const pickInvoice = (id: string) => {
     const inv = invoices.find((i) => i.id === id);
-    setF({ ...f, invoice_id: id, third_party_id: inv?.contrepartie_id ?? "", amount: inv ? String(Number(inv.total_ttc) - Number(inv.amount_paid ?? 0)) : f.amount, label: inv ? `Règlement ${inv.invoice_number}` : f.label, reference: inv?.invoice_number ?? f.reference });
+    setF({ ...f, invoice_id: id, third_party_id: inv?.contrepartie_id ?? "", amount: inv ? String(Number(inv.total) - Number(inv.amount_paid ?? 0)) : f.amount, label: inv ? `Règlement ${inv.invoice_number}` : f.label, reference: inv?.invoice_number ?? f.reference });
   };
 
   const create = useMutation({
@@ -156,7 +156,7 @@ export default function SettlementsSection() {
           {isAdmin && <GhButton onClick={() => { setF({ ...f, treasury_account_id: f.treasury_account_id || taccs[0]?.id || "" }); setOpen(true); }}><Plus className="w-3.5 h-3.5" /> Nouveau règlement</GhButton>}
         </div>
       </div>
-      <GhCard>
+      <GhCard title="Règlements">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead><tr><th className={th}>Date</th><th className={th}>Sens</th><th className={th}>Libellé</th><th className={th}>Compte</th><th className={th}>Tiers</th><th className={th}>Mode</th><th className={`${th} text-right`}>Montant</th><th className={th}>Écriture</th><th className={th}>Rapproché</th></tr></thead>
@@ -194,7 +194,7 @@ export default function SettlementsSection() {
             <label className="col-span-2">Type de règlement<select className={input} value={f.category} onChange={(e) => setCat(e.target.value)}>{CATEGORIES[f.direction].map((c) => <option key={c.key} value={c.key}>{c.label}</option>)}</select></label>
             {cat?.invoice && (
               <label className="col-span-2">Facture réglée<select className={input} value={f.invoice_id} onChange={(e) => pickInvoice(e.target.value)}>
-                <option value="">—</option>{invChoices.map((i) => <option key={i.id} value={i.id}>{i.invoice_number} · reste {fmt(Number(i.total_ttc) - Number(i.amount_paid ?? 0))}</option>)}
+                <option value="">—</option>{invChoices.map((i) => <option key={i.id} value={i.id}>{i.invoice_number} · reste {fmt(Number(i.total) - Number(i.amount_paid ?? 0))}</option>)}
               </select></label>
             )}
             <label>{f.direction === "virement" ? "Compte source" : "Compte de trésorerie"}<select className={input} value={f.treasury_account_id} onChange={(e) => setF({ ...f, treasury_account_id: e.target.value })}>{taccs.filter((t) => t.is_active).map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}</select></label>
