@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import RecordActions from "@/components/shared/RecordActions";
 import SectionHeader from "@/components/shared/SectionHeader";
 import Pill from "@/components/shared/Pill";
 import EmptyState from "@/components/shared/EmptyState";
@@ -64,10 +65,10 @@ export default function AlumniPage() {
               ) : (
                 <ul className="space-y-1">
                   {records.map((r) => (
-                    <li key={r.id}>
+                    <li key={r.id} className="flex items-start gap-1">
                       <button
                         onClick={() => setSelectedId(r.id)}
-                        className={`w-full text-left p-2 rounded text-xs hover:bg-muted/50 ${selectedId === r.id ? "bg-muted" : ""}`}
+                        className={`flex-1 text-left p-2 rounded text-xs hover:bg-muted/50 ${selectedId === r.id ? "bg-muted" : ""}`}
                       >
                         <div className="font-medium">{r.startup?.name ?? "—"}</div>
                         <div className="text-[10px] text-muted-foreground flex items-center gap-2">
@@ -76,6 +77,7 @@ export default function AlumniPage() {
                           <span>{new Date(r.graduation_date).toLocaleDateString("fr-FR")}</span>
                         </div>
                       </button>
+                      <RecordActions table="alumni_records" id={r.id} record={r} entityLabel="Ancien" queryKeys={["alumni_records"]} fields={[{key:"graduation_date",label:"Date de sortie",type:"date",required:true},{key:"contact_email",label:"E-mail",type:"email"},{key:"contact_phone",label:"Téléphone"},{key:"website_url",label:"Site web"},{key:"impact_summary",label:"Résumé d'impact",type:"textarea"},{key:"notes",label:"Notes",type:"textarea"}]} />
                     </li>
                   ))}
                 </ul>

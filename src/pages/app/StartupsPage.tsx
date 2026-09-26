@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import RecordActions from "@/components/shared/RecordActions";
 import { useNavigate } from "react-router-dom";
 import SectionHeader from "@/components/shared/SectionHeader";
 import GhCard from "@/components/shared/GhCard";
@@ -71,6 +72,7 @@ export default function StartupsPage() {
                   <td className="px-3.5 py-2.5 border-b border-border" onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-center gap-1 justify-end">
                       <GhButton variant="ghost" onClick={() => setEditingStartup(s)} title="Modifier"><Pencil size={14} /></GhButton>
+                      <RecordActions canEdit={false} table="startups" id={s.id} record={s} entityLabel="Entreprise" queryKeys={["startups"]} fields={[]} />
                       <GhButton variant="ghost" onClick={() => navigate(`/app/entreprises/${s.id}`)}>→</GhButton>
                     </div>
                   </td>

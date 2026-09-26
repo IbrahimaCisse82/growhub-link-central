@@ -29,11 +29,12 @@ type Primitive = string | number | boolean | null | undefined;
 interface Props {
   table: TableName;
   id: string;
-  record: Record<string, unknown>;
+  record: object;
   fields: FieldDef[];
   queryKeys: string[];
   entityLabel: string;
   canDelete?: boolean;
+  canEdit?: boolean;
 }
 
 function toInput(v: unknown): string {
@@ -42,7 +43,7 @@ function toInput(v: unknown): string {
   return String(v);
 }
 
-export default function RecordActions({ table, id, record, fields, queryKeys, entityLabel, canDelete = true }: Props) {
+export default function RecordActions({ table, id, record, fields, queryKeys, entityLabel, canDelete = true, canEdit = true }: Props) {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [confirm, setConfirm] = useState(false);
@@ -51,7 +52,7 @@ export default function RecordActions({ table, id, record, fields, queryKeys, en
 
   const start = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setValues(Object.fromEntries(fields.map((f) => [f.key, toInput(record[f.key])])));
+    setValues(Object.fromEntries(fields.map((f) => [f.key, toInput((record as Record<string, unknown>)[f.key])])));
     setOpen(true);
   };
 
@@ -87,10 +88,12 @@ export default function RecordActions({ table, id, record, fields, queryKeys, en
 
   return (
     <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+      {canEdit && (
       <button type="button" aria-label="Modifier" onClick={start}
         className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary">
         <Pencil className="h-3.5 w-3.5" />
       </button>
+      )}
       {canDelete && (
         <button type="button" aria-label="Supprimer" onClick={(e) => { e.stopPropagation(); setConfirm(true); }}
           className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-secondary">

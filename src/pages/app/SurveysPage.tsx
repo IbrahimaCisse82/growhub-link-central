@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import RecordActions from "@/components/shared/RecordActions";
 import SectionHeader from "@/components/shared/SectionHeader";
 import GhButton from "@/components/shared/GhButton";
 import Pill from "@/components/shared/Pill";
@@ -58,7 +59,7 @@ export default function SurveysPage() {
                 </div>
                 <div className="text-[11px] text-muted-foreground">{typeLabels[s.survey_type] ?? s.survey_type}{(s as any).programs?.name ? ` · ${(s as any).programs.name}` : ""}</div>
                 {isAdmin && (
-                  <button onClick={(e) => { e.stopPropagation(); deleteSurvey.mutate(s.id); }} className="text-[10px] text-destructive hover:underline mt-2">Supprimer</button>
+                  <div className="mt-2"><RecordActions table="surveys" id={s.id} record={s} entityLabel="Enquête" queryKeys={["surveys"]} fields={[{key:"title",label:"Titre",required:true},{key:"survey_type",label:"Type",required:true},{key:"description",label:"Description",type:"textarea"}]} /></div>
                 )}
               </div>
             ))}

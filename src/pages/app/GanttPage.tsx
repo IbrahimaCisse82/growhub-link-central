@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import RecordActions, { STATUS_OPTIONS } from "@/components/shared/RecordActions";
 import SectionHeader from "@/components/shared/SectionHeader";
 import GhButton from "@/components/shared/GhButton";
 import Pill from "@/components/shared/Pill";
@@ -50,13 +51,14 @@ export default function GanttPage() {
             return (
               <div key={p.id} className="flex items-center border-b border-border last:border-b-0 hover:bg-secondary/50 transition-colors">
                 <div className="w-[200px] flex-shrink-0 px-4 py-3">
-                  <div className="text-xs font-bold text-foreground truncate">{p.name}</div>
+                  <div className="flex items-center justify-between gap-1"><div className="text-xs font-bold text-foreground truncate">{p.name}</div><RecordActions canDelete={false} table="projects" id={p.id} record={p} entityLabel="Planning du projet" queryKeys={["projects"]} fields={[{key:"start_date",label:"Début",type:"date"},{key:"end_date",label:"Fin",type:"date"},{key:"status",label:"Statut",type:"select",options:STATUS_OPTIONS}]} /></div>
                   <div className="flex items-center gap-1.5 mt-1">
                     <Pill color={statusColor[p.status] ?? "gray"}>{p.status}</Pill>
                     <span className="font-mono text-[9px] text-muted-foreground">{p.progress ?? 0}%</span>
                   </div>
                 </div>
                 <div className="flex-1 relative h-12 py-2">
+                  {Date.now() >= minDate && Date.now() <= maxDate && <div className="absolute top-0 bottom-0 w-px bg-destructive/60" style={{ left: `${((Date.now() - minDate) / range) * 100}%` }} title="Aujourd'hui" />}
                   {/* Project bar */}
                   <div className="absolute h-5 rounded-md bg-primary/20 border border-primary/30" style={{ left: `${startPct}%`, width: `${barWidth}%` }}>
                     <div className="h-full rounded-md bg-primary/60" style={{ width: `${p.progress ?? 0}%` }} />
@@ -65,7 +67,7 @@ export default function GanttPage() {
                   {pMilestones.map(m => {
                     if (!m.due_date) return null;
                     const mPct = ((new Date(m.due_date).getTime() - minDate) / range) * 100;
-                    return <div key={m.id} className={`absolute w-2.5 h-2.5 rounded-full border-2 top-1/2 -translate-y-1/2 -translate-x-1/2 ${m.status === "completed" ? "bg-primary border-primary" : "bg-card border-gh-amber"}`} style={{ left: `${mPct}%` }} title={m.title} />;
+                    return <div key={m.id} className={`absolute w-2.5 h-2.5 rounded-full border-2 top-1/2 -translate-y-1/2 -translate-x-1/2 ${m.status === "completed" ? "bg-primary border-primary" : "bg-card border-gh-amber"}`} style={{ left: `${mPct}%` }} title={`${m.title} — ${new Date(m.due_date).toLocaleDateString("fr-FR")}`} />;
                   })}
                 </div>
               </div>
