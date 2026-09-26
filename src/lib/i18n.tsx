@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from "react";
+import { setPhraseLocale } from "@/lib/phrases";
+import { createContext, useContext, useState, useCallback, useEffect, ReactNode , Fragment } from "react";
 
 export type Locale = "fr" | "en" | "ar";
 
@@ -643,10 +644,11 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   }, [locale]);
 
   const dir = locale === "ar" ? "rtl" : "ltr";
+  setPhraseLocale(locale);
 
   return (
     <I18nContext.Provider value={{ locale, setLocale, t, dir }}>
-      {children}
+      <Fragment key={locale}>{children}</Fragment>
     </I18nContext.Provider>
   );
 }
