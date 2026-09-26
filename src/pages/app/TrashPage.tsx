@@ -1,3 +1,4 @@
+import { tr } from "@/lib/phrases";
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { RotateCcw, Trash2 } from "lucide-react";
@@ -54,16 +55,16 @@ export default function TrashPage() {
 
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-      <SectionHeader title="Corbeille" subtitle="Éléments supprimés — restaurables par les administrateurs et coordinateurs" />
+      <SectionHeader title={tr("Corbeille")} subtitle={tr("Éléments supprimés — restaurables par les administrateurs et coordinateurs")} />
       <div className="flex flex-wrap gap-2 mb-4">
-        <Input placeholder="Rechercher…" value={q} onChange={(e) => setQ(e.target.value)} className="max-w-xs h-9" />
+        <Input placeholder={tr("Rechercher…")} value={q} onChange={(e) => setQ(e.target.value)} className="max-w-xs h-9" />
         <select value={type} onChange={(e) => setType(e.target.value)} className="h-9 rounded-md border border-input bg-background px-2 text-sm">
-          <option value="">Tous types</option>
+          <option value="">{tr("Tous types")}</option>
           {Object.entries(TABLE_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
         </select>
       </div>
       {isLoading ? <Skeleton className="h-40 rounded-xl" /> : rows.length === 0 ? (
-        <div className="bg-card border border-border rounded-xl p-8 text-center text-muted-foreground text-sm">La corbeille est vide</div>
+        <div className="bg-card border border-border rounded-xl p-8 text-center text-muted-foreground text-sm">{tr("La corbeille est vide")}</div>
       ) : (
         <div className="bg-card border border-border rounded-xl divide-y divide-border">
           {rows.map((r) => (
@@ -77,10 +78,10 @@ export default function TrashPage() {
               </div>
               {!r.restored_at && (
                 <GhButton variant="ghost" onClick={() => restore.mutate(r.id)} disabled={restore.isPending}>
-                  <RotateCcw className="h-3.5 w-3.5 mr-1 inline" />Restaurer
+                  <RotateCcw className="h-3.5 w-3.5 mr-1 inline" />{tr("Restaurer")}
                 </GhButton>
               )}
-              <button aria-label="Supprimer définitivement" onClick={() => window.confirm("Supprimer définitivement ?") && purge.mutate(r.id)}
+              <button aria-label={tr("Supprimer définitivement")} onClick={() => window.confirm("Supprimer définitivement ?") && purge.mutate(r.id)}
                 className="p-1.5 rounded-md text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>
             </div>
           ))}

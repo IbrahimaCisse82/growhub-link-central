@@ -1,3 +1,4 @@
+import { tr } from "@/lib/phrases";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -66,12 +67,12 @@ export default function DonorReportVersions({ current, onLoad }: { current: Vers
   return (
     <Card className="lg:col-span-3">
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-base">Versions et validation</CardTitle>
-        <Button size="sm" variant="secondary" onClick={save} disabled={!current.grantId}>Enregistrer une version</Button>
+        <CardTitle className="text-base">{tr("Versions et validation")}</CardTitle>
+        <Button size="sm" variant="secondary" onClick={save} disabled={!current.grantId}>{tr("Enregistrer une version")}</Button>
       </CardHeader>
       <CardContent>
-        {!current.grantId ? <div className="text-sm text-muted-foreground">Choisissez une subvention pour voir son historique.</div>
-          : data.length === 0 ? <div className="text-sm text-muted-foreground">Aucune version enregistrée.</div> : (
+        {!current.grantId ? <div className="text-sm text-muted-foreground">{tr("Choisissez une subvention pour voir son historique.")}</div>
+          : data.length === 0 ? <div className="text-sm text-muted-foreground">{tr("Aucune version enregistrée.")}</div> : (
           <div className="divide-y divide-border">
             {data.map((v) => {
               const st = STATUS[v.status] ?? STATUS.draft;
@@ -85,11 +86,11 @@ export default function DonorReportVersions({ current, onLoad }: { current: Vers
                   <Button size="sm" variant="ghost" onClick={() => onLoad({
                     grantId: v.grant_id, template: v.template, periodLabel: v.period_label,
                     startDate: v.start_date ?? "", endDate: v.end_date ?? "", narrative: toNarrative(v.narrative),
-                  })}>Charger</Button>
-                  {(v.status === "draft" || v.status === "rejected") && <Button size="sm" variant="ghost" onClick={() => setStatus(v.id, "submitted")}>Soumettre</Button>}
+                  })}>{tr("Charger")}</Button>
+                  {(v.status === "draft" || v.status === "rejected") && <Button size="sm" variant="ghost" onClick={() => setStatus(v.id, "submitted")}>{tr("Soumettre")}</Button>}
                   {isAdmin && v.status === "submitted" && <>
-                    <Button size="sm" variant="ghost" onClick={() => setStatus(v.id, "validated")}>Valider</Button>
-                    <Button size="sm" variant="ghost" onClick={() => setStatus(v.id, "rejected")}>Rejeter</Button>
+                    <Button size="sm" variant="ghost" onClick={() => setStatus(v.id, "validated")}>{tr("Valider")}</Button>
+                    <Button size="sm" variant="ghost" onClick={() => setStatus(v.id, "rejected")}>{tr("Rejeter")}</Button>
                   </>}
                 </div>
               );

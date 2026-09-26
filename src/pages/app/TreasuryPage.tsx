@@ -1,3 +1,4 @@
+import { tr } from "@/lib/phrases";
 import TreasuryForecasts from "@/components/finance/TreasuryForecasts";
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
@@ -65,19 +66,19 @@ export default function TreasuryPage() {
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <SectionHeader title="Trésorerie consolidée" subtitle="Cashflow agrégé : subventions, factures, paies, BC, notes de frais" />
-        <GhButton onClick={exportCsv} variant="secondary" size="sm"><Download size={14} /> Exporter CSV</GhButton>
+        <SectionHeader title={tr("Trésorerie consolidée")} subtitle={tr("Cashflow agrégé : subventions, factures, paies, BC, notes de frais")} />
+        <GhButton onClick={exportCsv} variant="secondary" size="sm"><Download size={14} /> {tr("Exporter CSV")}</GhButton>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-        <KpiCard icon={ArrowUpRight} label="Entrées (12 mois)" value={fmtXof(kpis.inflow)} color="green" />
-        <KpiCard icon={ArrowDownRight} label="Sorties (12 mois)" value={fmtXof(kpis.outflow)} color="rose" />
-        <KpiCard icon={Wallet} label="Solde net période" value={fmtXof(kpis.net)} color={kpis.net >= 0 ? "blue" : "rose"} />
-        <KpiCard icon={kpis.realized >= 0 ? TrendingUp : TrendingDown} label="Réalisé" value={fmtXof(kpis.realized)} color={kpis.realized >= 0 ? "green" : "rose"} />
+        <KpiCard icon={ArrowUpRight} label={tr("Entrées (12 mois)")} value={fmtXof(kpis.inflow)} color="green" />
+        <KpiCard icon={ArrowDownRight} label={tr("Sorties (12 mois)")} value={fmtXof(kpis.outflow)} color="rose" />
+        <KpiCard icon={Wallet} label={tr("Solde net période")} value={fmtXof(kpis.net)} color={kpis.net >= 0 ? "blue" : "rose"} />
+        <KpiCard icon={kpis.realized >= 0 ? TrendingUp : TrendingDown} label={tr("Réalisé")} value={fmtXof(kpis.realized)} color={kpis.realized >= 0 ? "green" : "rose"} />
       </div>
 
       <div className="bg-card border border-border rounded-xl p-5">
-        <h3 className="font-display font-bold text-foreground mb-4">Cashflow mensuel (entrées vs sorties)</h3>
+        <h3 className="font-display font-bold text-foreground mb-4">{tr("Cashflow mensuel (entrées vs sorties)")}</h3>
         <div className="h-72">
           <ResponsiveContainer>
             <BarChart data={chartData}>
@@ -94,7 +95,7 @@ export default function TreasuryPage() {
       </div>
 
       <div className="bg-card border border-border rounded-xl p-5">
-        <h3 className="font-display font-bold text-foreground mb-4">Solde cumulé prévisionnel</h3>
+        <h3 className="font-display font-bold text-foreground mb-4">{tr("Solde cumulé prévisionnel")}</h3>
         <div className="h-64">
           <ResponsiveContainer>
             <LineChart data={chartData}>
@@ -114,20 +115,20 @@ export default function TreasuryPage() {
         <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
           <h3 className="font-display font-bold text-foreground">Détail des flux ({filtered.length})</h3>
           <select className="h-9 rounded-lg border border-input bg-secondary px-3 text-sm" value={sourceFilter} onChange={(e) => setSourceFilter(e.target.value)}>
-            <option value="">Toutes sources</option>
+            <option value="">{tr("Toutes sources")}</option>
             {Object.entries(SOURCE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
           </select>
         </div>
-        {isLoading ? <div className="text-sm text-muted-foreground">Chargement…</div> : (
+        {isLoading ? <div className="text-sm text-muted-foreground">{tr("Chargement…")}</div> : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="text-xs text-muted-foreground uppercase font-mono">
                 <tr className="border-b border-border">
-                  <th className="text-left py-2 pr-4">Date</th>
-                  <th className="text-left py-2 pr-4">Source</th>
-                  <th className="text-left py-2 pr-4">Libellé</th>
-                  <th className="text-right py-2 pr-4">Montant</th>
-                  <th className="text-left py-2">Statut</th>
+                  <th className="text-left py-2 pr-4">{tr("Date")}</th>
+                  <th className="text-left py-2 pr-4">{tr("Source")}</th>
+                  <th className="text-left py-2 pr-4">{tr("Libellé")}</th>
+                  <th className="text-right py-2 pr-4">{tr("Montant")}</th>
+                  <th className="text-left py-2">{tr("Statut")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -144,7 +145,7 @@ export default function TreasuryPage() {
                 ))}
               </tbody>
             </table>
-            {filtered.length > 100 && <div className="text-xs text-muted-foreground mt-3">Affichage limité à 100 lignes. Exporter en CSV pour le détail complet.</div>}
+            {filtered.length > 100 && <div className="text-xs text-muted-foreground mt-3">{tr("Affichage limité à 100 lignes. Exporter en CSV pour le détail complet.")}</div>}
           </div>
         )}
       </div>

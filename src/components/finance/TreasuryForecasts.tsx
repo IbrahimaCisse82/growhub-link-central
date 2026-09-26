@@ -1,3 +1,4 @@
+import { tr } from "@/lib/phrases";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -39,23 +40,23 @@ export default function TreasuryForecasts() {
   return (
     <div className="bg-card border border-border rounded-xl p-5">
       <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
-        <h3 className="font-display font-bold text-foreground">Prévisions de trésorerie</h3>
+        <h3 className="font-display font-bold text-foreground">{tr("Prévisions de trésorerie")}</h3>
         <div className="text-xs font-mono text-muted-foreground">
-          Entrées <span className="text-gh-green">{fmt(totalIn)}</span> · Sorties <span className="text-gh-rose">{fmt(totalOut)}</span> · Net <span className="text-foreground">{fmt(totalIn - totalOut)}</span>
+          {tr("Entrées")} <span className="text-gh-green">{fmt(totalIn)}</span> · Sorties <span className="text-gh-rose">{fmt(totalOut)}</span> · Net <span className="text-foreground">{fmt(totalIn - totalOut)}</span>
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-5 gap-2 mb-4">
-        <Input className="md:col-span-2" placeholder="Libellé (ex. 2e tranche bailleur)" value={f.label} maxLength={200} onChange={(e) => setF({ ...f, label: e.target.value })} />
+        <Input className="md:col-span-2" placeholder={tr("Libellé (ex. 2e tranche bailleur)")} value={f.label} maxLength={200} onChange={(e) => setF({ ...f, label: e.target.value })} />
         <select className="h-10 rounded-md border border-input bg-background px-2 text-sm" value={f.direction} onChange={(e) => setF({ ...f, direction: e.target.value })}>
-          <option value="in">Entrée</option><option value="out">Sortie</option>
+          <option value="in">{tr("Entrée")}</option><option value="out">{tr("Sortie")}</option>
         </select>
-        <Input type="number" min={0} placeholder="Montant XOF" value={f.amount_xof} onChange={(e) => setF({ ...f, amount_xof: e.target.value })} />
+        <Input type="number" min={0} placeholder={tr("Montant XOF")} value={f.amount_xof} onChange={(e) => setF({ ...f, amount_xof: e.target.value })} />
         <div className="flex gap-2">
           <Input type="date" value={f.expected_on} onChange={(e) => setF({ ...f, expected_on: e.target.value })} />
-          <GhButton onClick={add}>Ajouter</GhButton>
+          <GhButton onClick={add}>{tr("Ajouter")}</GhButton>
         </div>
       </div>
-      {data.length === 0 ? <div className="text-sm text-muted-foreground">Aucune prévision saisie.</div> : (
+      {data.length === 0 ? <div className="text-sm text-muted-foreground">{tr("Aucune prévision saisie.")}</div> : (
         <div className="divide-y divide-border">
           {data.map((d) => (
             <div key={d.id} className="flex items-center gap-3 py-2 text-sm">
