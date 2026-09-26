@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { AlertTriangle, CheckCircle2, FileText, Calculator, PenLine } from "lucide-react";
 import GhCard from "@/components/shared/GhCard";
 import GhButton from "@/components/shared/GhButton";
@@ -25,14 +25,14 @@ export function MappingView({ rows }: { rows: BalRow[] }) {
           <tbody>{STATEMENT_MAP.map((m) => {
             const hit = rows.filter((r) => matches(r.code, m));
             const key = m.statement + m.ref;
-            return (<>
-              <tr key={key} className="cursor-pointer hover:bg-surface-2/40" onClick={() => setOpen(open === key ? null : key)}>
+            return (<Fragment key={key}>
+              <tr className="cursor-pointer hover:bg-surface-2/40" onClick={() => setOpen(open === key ? null : key)}>
                 <td className={td}>{m.statement}</td><td className={`${td} font-mono`}>{m.ref}</td><td className={td}>{m.label}</td>
                 <td className={`${td} font-mono text-[11px]`}>{m.prefixes.join(", ")}{m.exclude ? ` (sauf ${m.exclude.join(", ")})` : ""}{m.amort ? ` · amort./dépr. ${m.amort.join(", ")}` : ""}</td>
                 <td className={`${td} font-mono`}>{hit.length}</td></tr>
               {open === key && hit.map((r) => (
                 <tr key={key + r.code} className="bg-surface-2/30"><td className={td} /><td className={`${td} font-mono`}>{r.code}</td><td className={td} colSpan={2}>{r.label}</td><td className={`${td} font-mono whitespace-nowrap`}>{fmt(r.solde)}</td></tr>))}
-            </>);
+            </Fragment>);
           })}</tbody></table>
       </GhCard>
     </>
