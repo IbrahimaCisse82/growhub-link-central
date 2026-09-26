@@ -15,4 +15,4 @@
 - [x] Comptabilité : écriture auto de paie
 - [x] Comptabilité : exports CSV/PDF des états et de la balance
 - [ ] Traduction EN/AR du contenu des pages des nouveaux modules
-- [ ] Tests avec comptes entrepreneur / mentor / bailleur (bloqué : comptes à créer)
+- [x] Comptes de test entrepreneur/mentor/bailleur créés et cloisonnement vérifié
