@@ -13,8 +13,8 @@
 ## À faire
 - [ ] Place de marché, mesures S&E : modification
 - [ ] Corbeille
-- [ ] 28 points de vigilance sécurité
-- [ ] Trésorerie : prévisions modifiables ; Budgets : prévu / réalisé
+- [x] Registre RGPD restreint (autres signalements jugés volontaires : paramètres org, présence chat, référentiels)
+- [ ] Trésorerie : prévisions modifiables
 - [ ] Comptabilité : test réel, écritures auto (factures, paie, bons de commande), exports officiels
 - [ ] Rapports bailleurs : versions + circuit de validation
 - [ ] Traductions EN/AR des nouveaux modules
