@@ -81,6 +81,7 @@ const FunnelBuilderPage = lazy(() => import("@/pages/app/FunnelBuilderPage"));
 const HrPage = lazy(() => import("@/pages/app/HrPage"));
 const CrmPage = lazy(() => import("@/pages/app/CrmPage"));
 const PurchaseOrdersPage = lazy(() => import("@/pages/app/PurchaseOrdersPage"));
+const AccountingPage = lazy(() => import("@/pages/app/AccountingPage"));
 const EventsPage = lazy(() => import("@/pages/app/EventsPage"));
 const PublicApplicationPage = lazy(() => import("@/pages/public/PublicApplicationPage"));
 const UnsubscribePage = lazy(() => import("@/pages/public/UnsubscribePage"));
@@ -184,6 +185,8 @@ const App = () => (
                 <Route path="rh" element={<HrPage />} />
                 <Route path="crm" element={<CrmPage />} />
                 <Route path="bons-de-commande" element={<PurchaseOrdersPage />} />
+                <Route path="comptabilite" element={<Navigate to="/app/comptabilite/ecritures" replace />} />
+                <Route path="comptabilite/:section" element={<AccountingPage />} />
                 <Route path="finance/tresorerie" element={<AdminRoute><TreasuryPage /></AdminRoute>} />
                 <Route path="finance/cap-table" element={<CapTablePage />} />
                 <Route path="me" element={<MePage />} />

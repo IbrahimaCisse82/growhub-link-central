@@ -222,6 +222,7 @@ export default function AppSidebar({ mobile, onNavigate }: AppSidebarProps) {
   const { t } = useTranslation();
   const { data: counts } = useSidebarCounts();
   const navGroups = useNavGroups();
+  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
   const initials = profile?.full_name ? profile.full_name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "??";
   const mainRole = profile?.job_title || roles[0] || persona;
   const allowedPaths = PERSONA_ALLOWED_PATHS[persona] ?? null;
@@ -265,6 +266,35 @@ export default function AppSidebar({ mobile, onNavigate }: AppSidebarProps) {
                 const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + "/");
                 const badge = getBadge(item);
                 const Icon = item.icon;
+                if (item.children) {
+                  const isOpen = openMenus[item.path] ?? isActive;
+                  return (
+                    <div key={item.path}>
+                      <button
+                        onClick={() => setOpenMenus({ ...openMenus, [item.path]: !isOpen })}
+                        aria-expanded={isOpen}
+                        className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[12.5px] font-medium mb-0.5 transition-all select-none ${isActive ? "text-primary" : "text-muted-foreground hover:bg-surface-2 hover:text-foreground"}`}
+                      >
+                        <Icon size={15} className="flex-shrink-0" />
+                        <span>{item.label}</span>
+                        <ChevronDown size={13} className={`ml-auto transition-transform ${isOpen ? "" : "-rotate-90"}`} />
+                      </button>
+                      {isOpen && (
+                        <div className="ml-4 pl-2 border-l border-border mb-1">
+                          {item.children.map((c) => {
+                            const active = location.pathname === c.path;
+                            return (
+                              <button key={c.path} onClick={() => handleNav(c.path)}
+                                className={`w-full text-left px-2.5 py-1.5 rounded-md text-[12px] mb-0.5 ${active ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-surface-2 hover:text-foreground"}`}>
+                                {c.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
                 return (
                   <button
                     key={item.path}
