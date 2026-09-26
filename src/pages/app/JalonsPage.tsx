@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import RecordActions, { STATUS_OPTIONS } from "@/components/shared/RecordActions";
 import SectionHeader from "@/components/shared/SectionHeader";
 import GhButton from "@/components/shared/GhButton";
 import Pill from "@/components/shared/Pill";
@@ -94,6 +95,7 @@ export default function JalonsPage() {
                 <th className="text-left px-4 py-3 text-[10px] font-mono uppercase text-muted-foreground">Statut</th>
                 <th className="text-left px-4 py-3 text-[10px] font-mono uppercase text-muted-foreground">Échéance</th>
                 <th className="text-left px-4 py-3 text-[10px] font-mono uppercase text-muted-foreground">Terminé le</th>
+                <th className="px-4 py-3" />
               </tr>
             </thead>
             <tbody>
@@ -107,6 +109,7 @@ export default function JalonsPage() {
                   <td className="px-4 py-3"><Pill color={statusColor[m.status ?? "pending"] ?? "gray"}>{m.status ?? "pending"}</Pill></td>
                   <td className="px-4 py-3 text-[10px] font-mono text-muted-foreground">{m.due_date ? new Date(m.due_date).toLocaleDateString("fr-FR") : "—"}</td>
                   <td className="px-4 py-3 text-[10px] font-mono text-muted-foreground">{m.completed_at ? new Date(m.completed_at).toLocaleDateString("fr-FR") : "—"}</td>
+                  <td className="px-4 py-3"><RecordActions table="milestones" id={m.id} record={m} entityLabel="Jalon" queryKeys={["milestones"]} fields={[{key:"title",label:"Titre",required:true},{key:"due_date",label:"Échéance",type:"date"},{key:"status",label:"Statut",type:"select",options:[{value:"pending",label:"En attente"},{value:"in_progress",label:"En cours"},{value:"completed",label:"Terminé"},{value:"delayed",label:"En retard"}]},{key:"description",label:"Description",type:"textarea"}]} /></td>
                 </tr>
               ))}
             </tbody>

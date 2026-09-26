@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import RecordActions, { STATUS_OPTIONS } from "@/components/shared/RecordActions";
 import { useNavigate } from "react-router-dom";
 import StatCard from "@/components/shared/StatCard";
 import SectionHeader from "@/components/shared/SectionHeader";
@@ -58,7 +59,7 @@ export default function CohortesPage() {
               </div>
               <div className="px-4 py-2.5 bg-surface-2 border-t border-border flex justify-between items-center">
                 <Pill color={st.color}>● {st.label}</Pill>
-                <GhButton variant="ghost">Détails →</GhButton>
+                <div className="flex items-center gap-1"><RecordActions table="cohorts" id={c.id} record={c} entityLabel="Cohorte" queryKeys={["cohorts"]} fields={[{key:"name",label:"Nom",required:true},{key:"max_startups",label:"Nombre max d'entreprises",type:"number"},{key:"start_date",label:"Début",type:"date"},{key:"end_date",label:"Fin",type:"date"},{key:"status",label:"Statut",type:"select",options:STATUS_OPTIONS},{key:"description",label:"Description",type:"textarea"}]} /><GhButton variant="ghost">Détails →</GhButton></div>
               </div>
             </div>
           );

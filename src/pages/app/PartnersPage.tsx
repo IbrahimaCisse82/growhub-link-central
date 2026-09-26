@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import RecordActions, { STATUS_OPTIONS } from "@/components/shared/RecordActions";
 import SectionHeader from "@/components/shared/SectionHeader";
 import GhButton from "@/components/shared/GhButton";
 import Pill from "@/components/shared/Pill";
@@ -65,8 +66,8 @@ export default function PartnersPage() {
                 </div>
                 {(p as any).programs?.name && <div className="mt-2 text-[10px] text-muted-foreground">Programme : <span className="text-foreground">{(p as any).programs.name}</span></div>}
                 {isAdmin && (
-                  <div className="mt-3 pt-2 border-t border-border opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => deletePartner.mutate(p.id)} className="text-[10px] text-destructive hover:underline">Supprimer</button>
+                  <div className="mt-3 pt-2 border-t border-border ">
+                    <RecordActions table="partners" id={p.id} record={p} entityLabel="Partenaire" queryKeys={["partners"]} fields={[{key:"name",label:"Nom",required:true},{key:"country",label:"Pays"},{key:"sector",label:"Secteur"},{key:"contact_name",label:"Contact"},{key:"contact_email",label:"E-mail",type:"email"},{key:"contact_phone",label:"Téléphone"},{key:"website",label:"Site web"},{key:"description",label:"Description",type:"textarea"}]} />
                   </div>
                 )}
               </div>
