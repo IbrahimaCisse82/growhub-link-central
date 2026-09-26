@@ -12,6 +12,7 @@
 - [x] Menu traduit EN/AR pour les nouveaux modules
 
 ## À faire
-- [ ] Comptabilité : écritures auto paie et bons de commande ; exports officiels Excel/PDF
+- [x] Comptabilité : écriture auto de paie
+- [ ] Comptabilité : exports officiels Excel/PDF des états
 - [ ] Traduction EN/AR du contenu des pages des nouveaux modules
 - [ ] Tests avec comptes entrepreneur / mentor / bailleur (bloqué : comptes à créer)
