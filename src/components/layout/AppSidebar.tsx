@@ -8,8 +8,7 @@ import {
   AlertTriangle, FileText, Settings as SettingsIcon, Filter, Triangle, CircleDot, GraduationCap,
   Users, Link2, Headphones, CalendarDays, BookOpen, ClipboardList, BarChart3, DollarSign,
   PieChart, Wallet, Store, Handshake, Diamond, MessageCircle, FolderOpen, LineChart,
-  FileBarChart, Zap, LogOut, Globe, UserCog, Receipt, ShoppingCart, Target, Upload, ShieldCheck, FileLock2, Eye, Smartphone, HeartPulse, KeyRound, Calculator, ChevronDown, type LucideIcon
-} from "lucide-react";
+  FileBarChart, Zap, LogOut, Globe, UserCog, Receipt, ShoppingCart, Target, Upload, ShieldCheck, FileLock2, Eye, Smartphone, HeartPulse, KeyRound, Calculator, ChevronDown, type LucideIcon, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 interface NavItem {
@@ -53,7 +52,7 @@ function useNavGroups() {
       label: t("nav.acceleration"),
       items: [
         { label: t("nav.applications"), icon: FileText, path: "/app/candidatures", badgeKey: "pendingApps", badgeType: "alert" },
-        { label: "Funnel Builder", icon: Filter, path: "/app/funnel-builder" },
+        { label: t("nav.funnelBuilder"), icon: Filter, path: "/app/funnel-builder" },
         { label: t("nav.startups"), icon: Triangle, path: "/app/entreprises", badgeKey: "startups" },
         { label: t("nav.cohorts"), icon: CircleDot, path: "/app/cohortes", badgeKey: "activeCohorts" },
         { label: t("nav.alumni"), icon: GraduationCap, path: "/app/alumni" },
@@ -77,8 +76,8 @@ function useNavGroups() {
         { label: t("nav.grants"), icon: DollarSign, path: "/app/grants" },
         { label: t("nav.grantsAnalytics"), icon: PieChart, path: "/app/grants-analytics" },
         { label: t("nav.budgets"), icon: Wallet, path: "/app/budgets" },
-        { label: "Trésorerie", icon: LineChart, path: "/app/finance/tresorerie" },
-        { label: "Cap Table", icon: PieChart, path: "/app/finance/cap-table" },
+        { label: t("nav.treasury"), icon: LineChart, path: "/app/finance/tresorerie" },
+        { label: t("nav.capTable"), icon: PieChart, path: "/app/finance/cap-table" },
       ],
     },
     {
@@ -94,20 +93,20 @@ function useNavGroups() {
     {
       label: t("nav.management") || "Management",
       items: [
-        { label: "RH & Paie", icon: UserCog, path: "/app/rh" },
-        { label: "CRM & Facturation", icon: Receipt, path: "/app/crm" },
-        { label: "Bons de commande", icon: ShoppingCart, path: "/app/bons-de-commande" },
+        { label: t("nav.hrPayroll"), icon: UserCog, path: "/app/rh" },
+        { label: t("nav.crm"), icon: Receipt, path: "/app/crm" },
+        { label: t("nav.purchaseOrders"), icon: ShoppingCart, path: "/app/bons-de-commande" },
         {
-          label: "Comptabilité", icon: Calculator, path: "/app/comptabilite",
+          label: t("nav.accounting"), icon: Calculator, path: "/app/comptabilite",
           children: [
-            { label: "Plan comptable", path: "/app/comptabilite/plan" },
-            { label: "Journaux", path: "/app/comptabilite/journaux" },
-            { label: "Saisie d'écritures", path: "/app/comptabilite/ecritures" },
-            { label: "Grand livre", path: "/app/comptabilite/grand-livre" },
-            { label: "Balance", path: "/app/comptabilite/balance" },
-            { label: "Lettrage", path: "/app/comptabilite/lettrage" },
-            { label: "États financiers", path: "/app/comptabilite/etats" },
-            { label: "Exercices & clôture", path: "/app/comptabilite/exercices" },
+            { label: t("nav.accChart"), path: "/app/comptabilite/plan" },
+            { label: t("nav.accJournals"), path: "/app/comptabilite/journaux" },
+            { label: t("nav.accEntries"), path: "/app/comptabilite/ecritures" },
+            { label: t("nav.accLedger"), path: "/app/comptabilite/grand-livre" },
+            { label: t("nav.accBalance"), path: "/app/comptabilite/balance" },
+            { label: t("nav.accLettering"), path: "/app/comptabilite/lettrage" },
+            { label: t("nav.accStatements"), path: "/app/comptabilite/etats" },
+            { label: t("nav.accFiscalYears"), path: "/app/comptabilite/exercices" },
           ],
         },
       ],
@@ -116,10 +115,10 @@ function useNavGroups() {
       label: t("nav.insights"),
       items: [
         { label: t("nav.analytics"), icon: LineChart, path: "/app/analytics" },
-        { label: "Impact ODD", icon: Target, path: "/app/analytics/impact" },
-        { label: "Suivi-Évaluation", icon: Activity, path: "/app/me" },
-        { label: "Rapports bailleurs", icon: FileBarChart, path: "/app/rapports/bailleurs" },
-        { label: "Collecte terrain", icon: Smartphone, path: "/app/terrain" },
+        { label: t("nav.sdgImpact"), icon: Target, path: "/app/analytics/impact" },
+        { label: t("nav.me"), icon: Activity, path: "/app/me" },
+        { label: t("nav.donorReports"), icon: FileBarChart, path: "/app/rapports/bailleurs" },
+        { label: t("nav.fieldCollection"), icon: Smartphone, path: "/app/terrain" },
       ],
     },
 
@@ -128,7 +127,7 @@ function useNavGroups() {
       adminOnly: true,
       items: [
         { label: t("nav.reports"), icon: FileBarChart, path: "/app/rapports" },
-        { label: "AfriDataHub", icon: Globe, path: "/app/afridatahub" },
+        { label: t("nav.afridatahub"), icon: Globe, path: "/app/afridatahub" },
 
       ],
     },
@@ -138,19 +137,20 @@ function useNavGroups() {
       items: [
         { label: t("nav.users"), icon: Users, path: "/app/utilisateurs", badgeType: "alert" },
         { label: t("nav.webhooks"), icon: Zap, path: "/app/webhooks" },
-        { label: "Bus d'événements", icon: Activity, path: "/app/events" },
-        { label: "Import de données", icon: Upload, path: "/app/parametres/import" },
-        { label: "Registre RGPD", icon: FileLock2, path: "/app/parametres/conformite" },
-        { label: "Audit PII", icon: Eye, path: "/app/parametres/audit-pii" },
-        { label: "Santé système", icon: HeartPulse, path: "/app/admin/system-health" },
-        { label: "Clés API", icon: KeyRound, path: "/app/admin/api-keys" },
+        { label: t("nav.eventBus"), icon: Activity, path: "/app/events" },
+        { label: t("nav.dataImport"), icon: Upload, path: "/app/parametres/import" },
+        { label: t("nav.gdprRegister"), icon: FileLock2, path: "/app/parametres/conformite" },
+        { label: t("nav.piiAudit"), icon: Eye, path: "/app/parametres/audit-pii" },
+        { label: t("nav.systemHealth"), icon: HeartPulse, path: "/app/admin/system-health" },
+        { label: t("nav.apiKeys"), icon: KeyRound, path: "/app/admin/api-keys" },
+        { label: t("nav.trash"), icon: Trash2, path: "/app/corbeille" },
 
       ],
     },
     {
       label: "Compte",
       items: [
-        { label: "Sécurité (2FA)", icon: ShieldCheck, path: "/app/parametres/securite" },
+        { label: t("nav.security2fa"), icon: ShieldCheck, path: "/app/parametres/securite" },
       ],
     },
   ];

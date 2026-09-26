@@ -1,3 +1,4 @@
+import RecordActions from "@/components/shared/RecordActions";
 import { useState, useMemo } from "react";
 import SectionHeader from "@/components/shared/SectionHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -216,6 +217,7 @@ export default function MePage() {
                       <TableCell>{m.validated_at ? <Badge className="bg-emerald-500/15 text-emerald-400">Validée</Badge> : <Badge variant="outline">En attente</Badge>}</TableCell>
                       <TableCell className="text-right">
                         {!m.validated_at && <Button size="icon" variant="ghost" onClick={() => validate.mutate(m.id)}><CheckCircle2 className="w-4 h-4" /></Button>}
+                        {!m.validated_at && <span className="inline-flex align-middle"><RecordActions canDelete={false} table="me_measurements" id={m.id} record={m} entityLabel="Mesure" queryKeys={["me_measurements","me_indicator_progress"]} fields={[{key:"measured_at",label:"Date",type:"date",required:true},{key:"measured_value",label:"Valeur mesurée",type:"number",required:true},{key:"sample_size",label:"Taille d'échantillon",type:"number"},{key:"methodology",label:"Méthodologie"},{key:"notes",label:"Notes",type:"textarea"}]} /></span>}
                         <Button size="icon" variant="ghost" onClick={() => remove.mutate(m.id)}><Trash2 className="w-4 h-4" /></Button>
                       </TableCell>
                     </TableRow>

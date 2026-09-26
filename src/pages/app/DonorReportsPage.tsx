@@ -11,6 +11,7 @@ import { useGrants } from "@/hooks/useGrants";
 import { generateDonorReport, DONOR_TEMPLATE_LABELS, type DonorTemplate } from "@/lib/donorReportTemplates";
 import { useOrgSettings } from "@/hooks/useOrgSettings";
 import { toast } from "sonner";
+import DonorReportVersions, { type VersionPayload } from "@/components/grants/DonorReportVersions";
 
 export default function DonorReportsPage() {
   const { data: grants = [] } = useGrants();
@@ -122,6 +123,14 @@ export default function DonorReportsPage() {
             </div>
           </CardContent>
         </Card>
+        <DonorReportVersions
+          current={{ grantId, template, periodLabel, startDate, endDate, narrative: { progress, challenges, nextSteps, lessons } }}
+          onLoad={(p: VersionPayload) => {
+            setGrantId(p.grantId); setTemplate(p.template as DonorTemplate); setPeriodLabel(p.periodLabel);
+            setStartDate(p.startDate); setEndDate(p.endDate); setProgress(p.narrative.progress);
+            setChallenges(p.narrative.challenges); setNextSteps(p.narrative.nextSteps); setLessons(p.narrative.lessons);
+            toast.success("Version chargée");
+          }} />
       </div>
     </div>
   );
