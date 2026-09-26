@@ -21,7 +21,7 @@ type Line = Database["public"]["Tables"]["accounting_entry_lines"]["Row"];
 type FiscalYear = Database["public"]["Tables"]["accounting_fiscal_years"]["Row"];
 type BalanceRow = Database["public"]["Views"]["accounting_balance"]["Row"];
 
-const fmt = (n: number) => new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 }).format(n) + " XOF";
+const fmt = (n: number) => new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 }).format(Math.round(n) || 0) + " XOF";
 const input = "bg-surface-2 border border-border rounded-lg px-2.5 py-1.5 text-[12px] text-foreground outline-none focus:border-primary";
 const th = "text-left font-mono text-[10px] uppercase tracking-wider text-muted-foreground px-3 py-2 border-b border-border";
 const td = "px-3 py-2 text-[12px] border-b border-border/50";
@@ -368,8 +368,8 @@ function StatementTable({ title, lines, withBrut }: { title: string; lines: Stat
         <tbody>{lines.map((l) => (
           <tr key={l.ref} className={l.total ? "bg-surface-2/50 font-semibold" : ""}>
             <td className={`${td} font-mono`}>{l.ref}</td><td className={td}>{l.label}</td>
-            {withBrut && <><td className={`${td} font-mono`}>{l.brut !== undefined ? fmt(l.brut) : ""}</td><td className={`${td} font-mono`}>{l.amort !== undefined ? fmt(l.amort) : ""}</td></>}
-            <td className={`${td} font-mono`}>{fmt(l.value)}</td></tr>))}</tbody></table>
+            {withBrut && <><td className={`${td} font-mono whitespace-nowrap`}>{l.brut !== undefined ? fmt(l.brut) : ""}</td><td className={`${td} font-mono whitespace-nowrap`}>{l.amort !== undefined ? fmt(l.amort) : ""}</td></>}
+            <td className={`${td} font-mono whitespace-nowrap`}>{fmt(l.value)}</td></tr>))}</tbody></table>
     </GhCard>
   );
 }
