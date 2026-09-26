@@ -1,3 +1,4 @@
+import { exportToCSV, exportToPDF } from "@/lib/exportUtils";
 import { useMemo, useState } from "react";
 import { useParams, Navigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -335,7 +336,7 @@ function BalanceSection() {
   const tD = data.reduce((s, r) => s + Number(r.total_debit ?? 0), 0);
   const tC = data.reduce((s, r) => s + Number(r.total_credit ?? 0), 0);
   return (
-    <GhCard title="Balance générale" badge={`${data.length} comptes mouvementés`} noPadding action={<FySelect value={fy} onChange={setFy} />}>
+    <GhCard title="Balance générale" badge={`${data.length} comptes mouvementés`} noPadding action={<div className="flex items-center gap-2"><GhButton variant="ghost" onClick={() => exportToCSV(data.map((r) => ({ ...r })), "balance-generale")}>Exporter CSV</GhButton><FySelect value={fy} onChange={setFy} /></div>}>
       <table className="w-full"><thead><tr><th className={th}>Compte</th><th className={th}>Libellé</th><th className={th}>Débit</th><th className={th}>Crédit</th><th className={th}>Solde débiteur</th><th className={th}>Solde créditeur</th></tr></thead>
         <tbody>{data.map((r) => { const s = Number(r.solde ?? 0); return (
           <tr key={r.account_code}><td className={`${td} font-mono`}>{r.account_code}</td><td className={td}>{r.account_label}</td>
@@ -387,11 +388,25 @@ function StatementsSection() {
   const flux = fluxTresorerie(bal, opening, resultat);
   const ecart = actif[actif.length - 1].value - passif[passif.length - 1].value;
   const tabs = [["bilan", "Bilan"], ["resultat", "Compte de résultat"], ["flux", "Tableau des flux de trésorerie"]] as const;
+  const exportStatements = (kind: "csv" | "pdf") => {
+    const rows = (tab === "bilan"
+      ? [...actif.map((l) => ({ ...l, part: "Actif" })), ...passif.map((l) => ({ ...l, part: "Passif" }))]
+      : (tab === "resultat" ? cr : flux).map((l) => ({ ...l, part: "" })))
+      .map((l) => ({ partie: l.part, ref: l.ref, libelle: l.label, brut: l.brut ?? "", amort: l.amort ?? "", montant: Math.round(l.value) }));
+    const cols = [{ key: "partie", label: "Partie" }, { key: "ref", label: "Réf." }, { key: "libelle", label: "Libellé" },
+      { key: "brut", label: "Brut (XOF)" }, { key: "amort", label: "Amort./Dépréc. (XOF)" }, { key: "montant", label: "Net (XOF)" }];
+    const title = tabs.find(([k]) => k === tab)?.[1] ?? "Etats";
+    if (kind === "csv") exportToCSV(rows, `syscohada-${tab}`, cols); else exportToPDF(`${title} — SYSCOHADA révisé (XOF)`, rows, cols);
+  };
   return (
     <>
       <div className="flex flex-wrap items-center gap-2 mb-3">
         {tabs.map(([k, l]) => <GhButton key={k} variant={tab === k ? "primary" : "ghost"} onClick={() => setTab(k)}>{l}</GhButton>)}
-        <div className="ml-auto"><FySelect value={fy} onChange={setFy} /></div>
+        <div className="ml-auto flex items-center gap-2">
+          <GhButton variant="ghost" onClick={() => exportStatements("csv")}>Exporter CSV</GhButton>
+          <GhButton variant="ghost" onClick={() => exportStatements("pdf")}>Exporter PDF</GhButton>
+          <FySelect value={fy} onChange={setFy} />
+        </div>
       </div>
       {tab === "bilan" && <>
         <p className={`text-[12px] mb-2 ${Math.abs(ecart) < 1 ? "text-primary" : "text-destructive"}`}>

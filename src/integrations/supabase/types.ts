@@ -2540,6 +2540,39 @@ export type Database = {
           },
         ]
       }
+      deleted_records: {
+        Row: {
+          data: Json
+          deleted_at: string
+          deleted_by: string | null
+          id: string
+          label: string | null
+          record_id: string | null
+          restored_at: string | null
+          table_name: string
+        }
+        Insert: {
+          data: Json
+          deleted_at?: string
+          deleted_by?: string | null
+          id?: string
+          label?: string | null
+          record_id?: string | null
+          restored_at?: string | null
+          table_name: string
+        }
+        Update: {
+          data?: Json
+          deleted_at?: string
+          deleted_by?: string | null
+          id?: string
+          label?: string | null
+          record_id?: string | null
+          restored_at?: string | null
+          table_name?: string
+        }
+        Relationships: []
+      }
       digest_email_log: {
         Row: {
           id: string
@@ -2611,6 +2644,71 @@ export type Database = {
           webhook_dispatched_at?: string | null
         }
         Relationships: []
+      }
+      donor_report_versions: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          end_date: string | null
+          grant_id: string
+          id: string
+          narrative: Json
+          period_label: string
+          review_comment: string | null
+          start_date: string | null
+          status: string
+          submitted_at: string | null
+          template: string
+          updated_at: string
+          validated_at: string | null
+          validated_by: string | null
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          end_date?: string | null
+          grant_id: string
+          id?: string
+          narrative?: Json
+          period_label: string
+          review_comment?: string | null
+          start_date?: string | null
+          status?: string
+          submitted_at?: string | null
+          template: string
+          updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
+          version?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          end_date?: string | null
+          grant_id?: string
+          id?: string
+          narrative?: Json
+          period_label?: string
+          review_comment?: string | null
+          start_date?: string | null
+          status?: string
+          submitted_at?: string | null
+          template?: string
+          updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "donor_report_versions_grant_id_fkey"
+            columns: ["grant_id"]
+            isOneToOne: false
+            referencedRelation: "grants"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       email_send_log: {
         Row: {
@@ -8238,6 +8336,53 @@ export type Database = {
           },
         ]
       }
+      treasury_forecasts: {
+        Row: {
+          amount_xof: number
+          created_at: string
+          created_by: string | null
+          direction: string
+          expected_on: string
+          id: string
+          label: string
+          notes: string | null
+          project_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount_xof: number
+          created_at?: string
+          created_by?: string | null
+          direction: string
+          expected_on: string
+          id?: string
+          label: string
+          notes?: string | null
+          project_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount_xof?: number
+          created_at?: string
+          created_by?: string | null
+          direction?: string
+          expected_on?: string
+          id?: string
+          label?: string
+          notes?: string | null
+          project_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "treasury_forecasts_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_notification_prefs: {
         Row: {
           application_notifications: boolean
@@ -8663,6 +8808,7 @@ export type Database = {
       }
     }
     Functions: {
+      acc_open_fy: { Args: { _d: string }; Returns: string }
       anonymize_user_data: { Args: { _user_id: string }; Returns: undefined }
       can_access_grant: {
         Args: { _grant_id: string; _user_id: string }
@@ -8774,6 +8920,7 @@ export type Database = {
         Args: { _startup_id: string }
         Returns: undefined
       }
+      restore_deleted_record: { Args: { _id: string }; Returns: undefined }
       search_messages: {
         Args: { _channel_id?: string; _query: string }
         Returns: {

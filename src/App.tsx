@@ -84,6 +84,7 @@ const CrmPage = lazy(() => import("@/pages/app/CrmPage"));
 const PurchaseOrdersPage = lazy(() => import("@/pages/app/PurchaseOrdersPage"));
 const AccountingPage = lazy(() => import("@/pages/app/AccountingPage"));
 const EventsPage = lazy(() => import("@/pages/app/EventsPage"));
+const TrashPage = lazy(() => import("@/pages/app/TrashPage"));
 const PublicApplicationPage = lazy(() => import("@/pages/public/PublicApplicationPage"));
 const UnsubscribePage = lazy(() => import("@/pages/public/UnsubscribePage"));
 const PrivacyPolicyPage = lazy(() => import("@/pages/public/PrivacyPolicyPage"));
@@ -176,6 +177,7 @@ const App = () => (
                 <Route path="marketplace" element={<MarketplacePage />} />
                 <Route path="webhooks" element={<AdminRoute><WebhooksPage /></AdminRoute>} />
                 <Route path="events" element={<AdminRoute><EventsPage /></AdminRoute>} />
+                <Route path="corbeille" element={<AdminRoute><TrashPage /></AdminRoute>} />
                 <Route path="utilisateurs" element={<AdminRoute><UsersPage /></AdminRoute>} />
                 <Route path="profil" element={<ProfilePage />} />
                 <Route path="parametres" element={<SettingsPage />} />

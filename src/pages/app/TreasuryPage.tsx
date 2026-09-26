@@ -1,3 +1,4 @@
+import TreasuryForecasts from "@/components/finance/TreasuryForecasts";
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight, Download } from "lucide-react";
@@ -106,6 +107,8 @@ export default function TreasuryPage() {
           </ResponsiveContainer>
         </div>
       </div>
+
+      <TreasuryForecasts />
 
       <div className="bg-card border border-border rounded-xl p-5">
         <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
