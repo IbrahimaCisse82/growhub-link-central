@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import RecordActions, { STATUS_OPTIONS } from "@/components/shared/RecordActions";
 import { useNavigate } from "react-router-dom";
 import SectionHeader from "@/components/shared/SectionHeader";
 import StatCard from "@/components/shared/StatCard";
@@ -51,7 +52,7 @@ export default function PortfoliosPage() {
               </div>
               <div className="px-4 py-2.5 bg-secondary border-t border-border flex justify-between items-center">
                 <Pill color={st.color}>● {st.label}</Pill>
-                <GhButton variant="ghost">Détails →</GhButton>
+                <div className="flex items-center gap-1"><RecordActions table="portfolios" id={p.id} record={p} entityLabel="Portefeuille" queryKeys={["portfolios"]} fields={[{key:"name",label:"Nom",required:true},{key:"code",label:"Code",required:true},{key:"start_date",label:"Début",type:"date"},{key:"end_date",label:"Fin",type:"date"},{key:"status",label:"Statut",type:"select",options:STATUS_OPTIONS},{key:"objectives",label:"Objectifs",type:"textarea"},{key:"description",label:"Description",type:"textarea"}]} /><GhButton variant="ghost">Détails →</GhButton></div>
               </div>
             </div>
           );

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import RecordActions, { STATUS_OPTIONS } from "@/components/shared/RecordActions";
 import SectionHeader from "@/components/shared/SectionHeader";
 import GhButton from "@/components/shared/GhButton";
 import Pill from "@/components/shared/Pill";
@@ -57,7 +58,8 @@ export default function ResourcesPage() {
               )}
             </div>
             <div className="px-3.5 py-2 bg-secondary border-t border-border flex justify-between items-center">
-              <div className="flex gap-1.5">
+              <div className="flex gap-1.5 items-center">
+                <RecordActions table="resources" id={r.id} record={r} entityLabel="Ressource" queryKeys={["resources"]} fields={[{key:"title",label:"Titre",required:true},{key:"category",label:"Catégorie"},{key:"type",label:"Type"},{key:"file_url",label:"Lien du fichier"},{key:"description",label:"Description",type:"textarea"}]} />
                 {r.category && <Pill color={categoryColor[r.category.toLowerCase()] ?? "gray"}>{r.category}</Pill>}
                 {r.is_public && <Pill color="green">Public</Pill>}
               </div>
