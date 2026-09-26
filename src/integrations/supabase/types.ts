@@ -131,6 +131,55 @@ export type Database = {
         }
         Relationships: []
       }
+      accounting_depreciations: {
+        Row: {
+          amount: number
+          asset_id: string
+          created_at: string
+          entry_id: string | null
+          fiscal_year_id: string
+          id: string
+        }
+        Insert: {
+          amount: number
+          asset_id: string
+          created_at?: string
+          entry_id?: string | null
+          fiscal_year_id: string
+          id?: string
+        }
+        Update: {
+          amount?: number
+          asset_id?: string
+          created_at?: string
+          entry_id?: string | null
+          fiscal_year_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "accounting_depreciations_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "accounting_fixed_assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounting_depreciations_entry_id_fkey"
+            columns: ["entry_id"]
+            isOneToOne: false
+            referencedRelation: "accounting_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounting_depreciations_fiscal_year_id_fkey"
+            columns: ["fiscal_year_id"]
+            isOneToOne: false
+            referencedRelation: "accounting_fiscal_years"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       accounting_entries: {
         Row: {
           created_at: string
@@ -340,6 +389,102 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      accounting_fixed_assets: {
+        Row: {
+          acquisition_date: string
+          acquisition_entry_id: string | null
+          amort_account: string
+          asset_account: string
+          code: string
+          cost: number
+          created_at: string
+          created_by: string | null
+          disposal_date: string | null
+          disposal_entry_id: string | null
+          disposal_price: number | null
+          dotation_account: string
+          duration_years: number
+          grant_id: string | null
+          id: string
+          label: string
+          method: string
+          notes: string | null
+          project_id: string | null
+          residual_value: number
+          service_date: string
+          status: string
+          supplier_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          acquisition_date: string
+          acquisition_entry_id?: string | null
+          amort_account: string
+          asset_account: string
+          code: string
+          cost: number
+          created_at?: string
+          created_by?: string | null
+          disposal_date?: string | null
+          disposal_entry_id?: string | null
+          disposal_price?: number | null
+          dotation_account?: string
+          duration_years: number
+          grant_id?: string | null
+          id?: string
+          label: string
+          method?: string
+          notes?: string | null
+          project_id?: string | null
+          residual_value?: number
+          service_date: string
+          status?: string
+          supplier_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          acquisition_date?: string
+          acquisition_entry_id?: string | null
+          amort_account?: string
+          asset_account?: string
+          code?: string
+          cost?: number
+          created_at?: string
+          created_by?: string | null
+          disposal_date?: string | null
+          disposal_entry_id?: string | null
+          disposal_price?: number | null
+          dotation_account?: string
+          duration_years?: number
+          grant_id?: string | null
+          id?: string
+          label?: string
+          method?: string
+          notes?: string | null
+          project_id?: string | null
+          residual_value?: number
+          service_date?: string
+          status?: string
+          supplier_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "accounting_fixed_assets_grant_id_fkey"
+            columns: ["grant_id"]
+            isOneToOne: false
+            referencedRelation: "grants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounting_fixed_assets_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       accounting_journals: {
         Row: {
@@ -8808,6 +8953,19 @@ export type Database = {
       }
     }
     Functions: {
+      acc_asset_dotation: {
+        Args: {
+          _a: Database["public"]["Tables"]["accounting_fixed_assets"]["Row"]
+          _end: string
+          _start: string
+        }
+        Returns: number
+      }
+      acc_dispose_asset: {
+        Args: { _date: string; _id: string; _price: number }
+        Returns: string
+      }
+      acc_generate_depreciation: { Args: { _fy: string }; Returns: number }
       acc_open_fy: { Args: { _d: string }; Returns: string }
       anonymize_user_data: { Args: { _user_id: string }; Returns: undefined }
       can_access_grant: {
