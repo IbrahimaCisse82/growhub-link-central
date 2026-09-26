@@ -1,7 +1,10 @@
 import { useMemo, useState } from "react";
 import { useParams, Navigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Trash2, CheckCircle2, Lock, Search } from "lucide-react";
+import { Plus, Trash2, CheckCircle2, Lock, Search, AlertTriangle, RotateCcw } from "lucide-react";
+import AccountGuidePanel from "@/components/accounting/AccountGuide";
+import LetteringSection from "@/components/accounting/LetteringSection";
+import { normalSide, bilanActif, bilanPassif, compteResultat, fluxTresorerie, type BalLine, type StatementLine } from "@/lib/syscohada";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import SectionHeader from "@/components/shared/SectionHeader";
@@ -29,6 +32,7 @@ export const ACCOUNTING_SECTIONS = [
   { key: "ecritures", label: "Saisie d'écritures" },
   { key: "grand-livre", label: "Grand livre" },
   { key: "balance", label: "Balance" },
+  { key: "lettrage", label: "Lettrage" },
   { key: "etats", label: "États financiers" },
   { key: "exercices", label: "Exercices & clôture" },
 ] as const;
@@ -86,6 +90,7 @@ function PlanSection() {
   const { data = [], isLoading } = useAccounts();
   const [q, setQ] = useState("");
   const [cls, setCls] = useState("");
+  const [guide, setGuide] = useState<string | null>(null);
   const rows = useMemo(() => data.filter((a) =>
     (!cls || String(a.account_class) === cls) &&
     (!q || a.code.startsWith(q) || a.label.toLowerCase().includes(q.toLowerCase()))).slice(0, 400), [data, q, cls]);
@@ -102,13 +107,19 @@ function PlanSection() {
         <div className="max-h-[65vh] overflow-auto"><table className="w-full">
           <thead className="sticky top-0 bg-card"><tr><th className={th}>Code</th><th className={th}>Libellé</th><th className={th}>Classe</th><th className={th}>Nature</th></tr></thead>
           <tbody>{rows.map((a) => (
-            <tr key={a.id} className="hover:bg-surface-2/50">
+            <tr key={a.id} className="hover:bg-surface-2/50 cursor-pointer" onClick={() => setGuide(a.code)} title="Voir le fonctionnement du compte">
               <td className={`${td} font-mono`} style={{ paddingLeft: 12 + (a.level - 1) * 12 }}>{a.code}</td>
               <td className={`${td} ${a.level <= 2 ? "font-semibold" : ""}`}>{a.label}</td>
               <td className={td}>{a.account_class}</td>
               <td className={`${td} text-muted-foreground`}>{a.nature}</td>
             </tr>))}</tbody>
-        </table>{rows.length === 400 && <p className="p-3 text-[11px] text-muted-foreground">Affinez la recherche pour voir plus de comptes.</p>}</div>
+        </table>
+        <Dialog open={!!guide} onOpenChange={(o) => !o && setGuide(null)}>
+          <DialogContent className="max-w-2xl max-h-[85vh] overflow-auto">
+            <DialogHeader><DialogTitle>Fonctionnement du compte {guide}</DialogTitle></DialogHeader>
+            {guide && <AccountGuidePanel code={guide} />}
+          </DialogContent>
+        </Dialog>{rows.length === 400 && <p className="p-3 text-[11px] text-muted-foreground">Affinez la recherche pour voir plus de comptes.</p>}</div>
       )}
     </GhCard>
   );
@@ -156,8 +167,25 @@ function EntryDialog({ open, onClose, fyId }: { open: boolean; onClose: () => vo
   const detail = useMemo(() => accounts.filter((a) => a.is_detail), [accounts]);
   const [head, setHead] = useState({ journal_id: "", entry_date: new Date().toISOString().slice(0, 10), piece_ref: "", label: "" });
   const [lines, setLines] = useState<DraftLine[]>([{ account_code: "", label: "", debit: "", credit: "" }, { account_code: "", label: "", debit: "", credit: "" }]);
+  const [focus, setFocus] = useState(0);
+  const journal = journals.find((j) => j.id === head.journal_id);
+  const warnings = lines.flatMap((l, i) => {
+    if (!l.account_code) return [];
+    const w: string[] = [];
+    const acc = accounts.find((a) => a.code === l.account_code);
+    if (!acc) w.push(`Ligne ${i + 1} : compte ${l.account_code} absent du plan SYSCOHADA`);
+    else if (!acc.is_detail) w.push(`Ligne ${i + 1} : ${l.account_code} est un compte de regroupement, utilisez un sous-compte`);
+    if (journal?.allowed_prefixes?.length && !journal.allowed_prefixes.some((p) => l.account_code.startsWith(p)))
+      w.push(`Ligne ${i + 1} : compte ${l.account_code} non autorisé dans le journal ${journal.code}`);
+    const side = normalSide(l.account_code);
+    if (side === "debit" && Number(l.credit) > 0 && /^[67]/.test(l.account_code)) w.push(`Ligne ${i + 1} : une charge (classe 6) au crédit est inhabituelle — s'agit-il d'une annulation ?`);
+    if (side === "credit" && Number(l.debit) > 0 && /^7/.test(l.account_code)) w.push(`Ligne ${i + 1} : un produit (classe 7) au débit est inhabituel — s'agit-il d'une annulation ?`);
+    if (Number(l.debit) > 0 && Number(l.credit) > 0) w.push(`Ligne ${i + 1} : une ligne ne peut être à la fois au débit et au crédit`);
+    return w;
+  });
   const tD = lines.reduce((s, l) => s + (Number(l.debit) || 0), 0);
   const tC = lines.reduce((s, l) => s + (Number(l.credit) || 0), 0);
+  const blocking = warnings.some((w) => w.includes("absent") || w.includes("regroupement") || w.includes("non autorisé") || w.includes("à la fois"));
   const balanced = tD > 0 && Math.abs(tD - tC) < 0.01;
   const save = useMutation({
     mutationFn: async (validate: boolean) => {
@@ -184,7 +212,7 @@ function EntryDialog({ open, onClose, fyId }: { open: boolean; onClose: () => vo
   const upd = (i: number, k: keyof DraftLine, v: string) => setLines(lines.map((l, j) => j === i ? { ...l, [k]: v } : l));
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-4xl">
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-auto">
         <DialogHeader><DialogTitle>Nouvelle écriture</DialogTitle></DialogHeader>
         <datalist id="acc-codes">{detail.map((a) => <option key={a.id} value={a.code}>{a.label}</option>)}</datalist>
         <div className="grid grid-cols-4 gap-2">
@@ -198,7 +226,7 @@ function EntryDialog({ open, onClose, fyId }: { open: boolean; onClose: () => vo
         <table className="w-full mt-2"><thead><tr><th className={th}>Compte</th><th className={th}>Libellé</th><th className={th}>Débit</th><th className={th}>Crédit</th><th className={th}></th></tr></thead>
           <tbody>{lines.map((l, i) => (
             <tr key={i}>
-              <td className="p-1"><input list="acc-codes" className={`${input} w-full font-mono`} value={l.account_code} onChange={(e) => upd(i, "account_code", e.target.value)} />
+              <td className="p-1"><input list="acc-codes" className={`${input} w-full font-mono`} value={l.account_code} onFocus={() => setFocus(i)} onChange={(e) => { setFocus(i); upd(i, "account_code", e.target.value); }} />
                 <div className="text-[10px] text-muted-foreground truncate max-w-[180px]">{accounts.find((a) => a.code === l.account_code)?.label}</div></td>
               <td className="p-1"><input className={`${input} w-full`} value={l.label} onChange={(e) => upd(i, "label", e.target.value)} /></td>
               <td className="p-1"><input type="number" className={`${input} w-full`} value={l.debit} onChange={(e) => upd(i, "debit", e.target.value)} /></td>
@@ -208,11 +236,16 @@ function EntryDialog({ open, onClose, fyId }: { open: boolean; onClose: () => vo
             <tr><td colSpan={2} className="p-2"><button onClick={() => setLines([...lines, { account_code: "", label: "", debit: "", credit: "" }])} className="text-[12px] text-primary flex items-center gap-1"><Plus size={12} /> Ligne</button></td>
               <td className="p-2 font-mono text-[12px]">{fmt(tD)}</td><td className="p-2 font-mono text-[12px]">{fmt(tC)}</td><td /></tr>
           </tbody></table>
+        {warnings.length > 0 && <div className="mt-2 space-y-0.5">{warnings.map((w) => (
+          <p key={w} className="flex items-center gap-1.5 text-[11.5px] text-destructive"><AlertTriangle size={12} /> {w}</p>))}</div>}
+        <div className="mt-2 rounded-lg border border-border bg-surface-2/40 p-3">
+          <AccountGuidePanel code={lines[focus]?.account_code ?? ""} compact />
+        </div>
         <div className="flex items-center justify-between mt-2">
           <span className={`text-[12px] ${balanced ? "text-primary" : "text-destructive"}`}>{balanced ? "Écriture équilibrée" : `Écart : ${fmt(tD - tC)}`}</span>
           <div className="flex gap-2">
             <GhButton variant="ghost" onClick={() => head.label && save.mutate(false)}>Enregistrer en brouillon</GhButton>
-            <GhButton onClick={() => head.label && balanced && save.mutate(true)}><CheckCircle2 size={13} /> Valider</GhButton>
+            <GhButton onClick={() => head.label && balanced && !blocking && save.mutate(true)}><CheckCircle2 size={13} /> Valider</GhButton>
           </div>
         </div>
       </DialogContent>
