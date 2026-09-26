@@ -3,7 +3,7 @@ import { exportToCSV, exportToPDF } from "@/lib/exportUtils";
 import { useMemo, useState } from "react";
 import { useParams, Navigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Trash2, CheckCircle2, Lock, Search, AlertTriangle, RotateCcw } from "lucide-react";
+import { Plus, Trash2, CheckCircle2, Lock, Search, AlertTriangle, RotateCcw, Pencil } from "lucide-react";
 import AccountGuidePanel from "@/components/accounting/AccountGuide";
 import LetteringSection from "@/components/accounting/LetteringSection";
 import { normalSide, bilanActif, bilanPassif, compteResultat, fluxTresorerie, type BalLine, type StatementLine } from "@/lib/syscohada";
@@ -161,14 +161,16 @@ function JournalsSection() {
 /* ---------------- Écritures ---------------- */
 interface DraftLine { account_code: string; label: string; debit: string; credit: string }
 
-function EntryDialog({ open, onClose, fyId }: { open: boolean; onClose: () => void; fyId?: string }) {
+interface EntryInitial { id?: string; head: { journal_id: string; entry_date: string; piece_ref: string; label: string }; lines: DraftLine[] }
+
+function EntryDialog({ open, onClose, fyId, initial }: { open: boolean; onClose: () => void; fyId?: string; initial?: EntryInitial }) {
   const { data: journals = [] } = useJournals();
   const { data: accounts = [] } = useAccounts();
   const qc = useQueryClient();
   const { user } = useAuth();
   const detail = useMemo(() => accounts.filter((a) => a.is_detail), [accounts]);
-  const [head, setHead] = useState({ journal_id: "", entry_date: new Date().toISOString().slice(0, 10), piece_ref: "", label: "" });
-  const [lines, setLines] = useState<DraftLine[]>([{ account_code: "", label: "", debit: "", credit: "" }, { account_code: "", label: "", debit: "", credit: "" }]);
+  const [head, setHead] = useState(initial?.head ?? { journal_id: "", entry_date: new Date().toISOString().slice(0, 10), piece_ref: "", label: "" });
+  const [lines, setLines] = useState<DraftLine[]>(initial?.lines ?? [{ account_code: "", label: "", debit: "", credit: "" }, { account_code: "", label: "", debit: "", credit: "" }]);
   const [focus, setFocus] = useState(0);
   const journal = journals.find((j) => j.id === head.journal_id);
   const warnings = lines.flatMap((l, i) => {
@@ -193,29 +195,40 @@ function EntryDialog({ open, onClose, fyId }: { open: boolean; onClose: () => vo
     mutationFn: async (validate: boolean) => {
       const valid = lines.filter((l) => l.account_code && (Number(l.debit) || Number(l.credit)));
       if (!valid.length) throw new Error("Ajoutez au moins une ligne");
-      const { data: e, error } = await supabase.from("accounting_entries").insert({
-        journal_id: head.journal_id || null, entry_date: head.entry_date, piece_ref: head.piece_ref || null,
-        label: head.label, fiscal_year_id: fyId ?? null, created_by: user?.id ?? null,
-      }).select("id").single();
-      if (error) throw error;
+      let entryId = initial?.id;
+      if (entryId) {
+        const { error } = await supabase.from("accounting_entries").update({
+          journal_id: head.journal_id || null, entry_date: head.entry_date, piece_ref: head.piece_ref || null, label: head.label,
+        }).eq("id", entryId);
+        if (error) throw error;
+        const { error: de } = await supabase.from("accounting_entry_lines").delete().eq("entry_id", entryId);
+        if (de) throw de;
+      } else {
+        const { data: e, error } = await supabase.from("accounting_entries").insert({
+          journal_id: head.journal_id || null, entry_date: head.entry_date, piece_ref: head.piece_ref || null,
+          label: head.label, fiscal_year_id: fyId ?? null, created_by: user?.id ?? null,
+        }).select("id").single();
+        if (error) throw error;
+        entryId = e.id;
+      }
       const { error: le } = await supabase.from("accounting_entry_lines").insert(valid.map((l, i) => ({
-        entry_id: e.id, line_no: i + 1, account_code: l.account_code, label: l.label || null,
+        entry_id: entryId!, line_no: i + 1, account_code: l.account_code, label: l.label || null,
         debit: Number(l.debit) || 0, credit: Number(l.credit) || 0,
       })));
       if (le) throw le;
       if (validate) {
-        const { error: ve } = await supabase.from("accounting_entries").update({ status: "validee", validated_at: new Date().toISOString(), validated_by: user?.id ?? null }).eq("id", e.id);
+        const { error: ve } = await supabase.from("accounting_entries").update({ status: "validee", validated_at: new Date().toISOString(), validated_by: user?.id ?? null }).eq("id", entryId!);
         if (ve) throw ve;
       }
     },
-    onSuccess: () => { toast.success("Écriture enregistrée"); qc.invalidateQueries({ queryKey: ["acc-entries"] }); qc.invalidateQueries({ queryKey: ["acc-balance"] }); onClose(); },
+    onSuccess: () => { toast.success("Écriture enregistrée"); qc.invalidateQueries({ queryKey: ["acc-entries"] }); qc.invalidateQueries({ queryKey: ["acc-lines"] }); qc.invalidateQueries({ queryKey: ["acc-balance"] }); onClose(); },
     onError: (e: Error) => toast.error(e.message),
   });
   const upd = (i: number, k: keyof DraftLine, v: string) => setLines(lines.map((l, j) => j === i ? { ...l, [k]: v } : l));
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-5xl max-h-[90vh] overflow-auto">
-        <DialogHeader><DialogTitle>{tr("Nouvelle écriture")}</DialogTitle></DialogHeader>
+        <DialogHeader><DialogTitle>{initial?.id ? tr("Modifier l'écriture") : initial ? tr("Écriture de correction") : tr("Nouvelle écriture")}</DialogTitle></DialogHeader>
         <datalist id="acc-codes">{detail.map((a) => <option key={a.id} value={a.code}>{a.label}</option>)}</datalist>
         <div className="grid grid-cols-4 gap-2">
           <select className={input} value={head.journal_id} onChange={(e) => setHead({ ...head, journal_id: e.target.value })}>
@@ -278,6 +291,53 @@ function EntriesSection() {
     onSuccess: () => { toast.success("Écriture validée"); qc.invalidateQueries({ queryKey: ["acc-entries"] }); qc.invalidateQueries({ queryKey: ["acc-balance"] }); },
     onError: (e: Error) => toast.error(e.message),
   });
+  const [editing, setEditing] = useState<EntryInitial | null>(null);
+  const invalidate = () => { qc.invalidateQueries({ queryKey: ["acc-entries"] }); qc.invalidateQueries({ queryKey: ["acc-balance"] }); qc.invalidateQueries({ queryKey: ["acc-ledger"] }); };
+  const fetchLines = async (id: string) => {
+    const { data, error } = await supabase.from("accounting_entry_lines").select("*").eq("entry_id", id).order("line_no");
+    if (error) throw error; return (data ?? []) as Line[];
+  };
+  /** Contre-passation : écriture inverse validée, seule annulation admise pour une écriture validée (SYSCOHADA, intangibilité). */
+  const reverse = async (e: Entry) => {
+    const ls = await fetchLines(e.id);
+    const { data: r, error } = await supabase.from("accounting_entries").insert({
+      journal_id: e.journal_id, entry_date: new Date().toISOString().slice(0, 10), fiscal_year_id: e.fiscal_year_id,
+      piece_ref: e.piece_ref, label: `Contre-passation — ${e.label}`, project_id: e.project_id, grant_id: e.grant_id,
+      source_type: "reversal", source_id: e.id, created_by: user?.id ?? null,
+    }).select("id").single();
+    if (error) throw error;
+    const { error: le } = await supabase.from("accounting_entry_lines").insert(ls.map((l, i) => ({
+      entry_id: r.id, line_no: i + 1, account_code: l.account_code, label: l.label, debit: Number(l.credit), credit: Number(l.debit),
+    })));
+    if (le) throw le;
+    const { error: ve } = await supabase.from("accounting_entries").update({ status: "validee" }).eq("id", r.id);
+    if (ve) throw ve;
+    return ls;
+  };
+  const remove = useMutation({
+    mutationFn: async (e: Entry) => {
+      if (e.status === "validee") { await reverse(e); return "reversed"; }
+      const { error: le } = await supabase.from("accounting_entry_lines").delete().eq("entry_id", e.id);
+      if (le) throw le;
+      const { error } = await supabase.from("accounting_entries").delete().eq("id", e.id);
+      if (error) throw error;
+      return "deleted";
+    },
+    onSuccess: (r) => { toast.success(r === "reversed" ? "Écriture validée annulée par contre-passation" : "Écriture supprimée"); invalidate(); },
+    onError: (err: Error) => toast.error(err.message),
+  });
+  const edit = useMutation({
+    mutationFn: async (e: Entry) => {
+      const validated = e.status === "validee";
+      const ls = validated ? await reverse(e) : await fetchLines(e.id);
+      return { id: validated ? undefined : e.id, head: { journal_id: e.journal_id ?? "", entry_date: validated ? new Date().toISOString().slice(0, 10) : e.entry_date, piece_ref: e.piece_ref ?? "", label: e.label },
+        lines: ls.map((l) => ({ account_code: l.account_code, label: l.label ?? "", debit: Number(l.debit) ? String(l.debit) : "", credit: Number(l.credit) ? String(l.credit) : "" })) } as EntryInitial;
+    },
+    onSuccess: (init) => { if (!init.id) { toast.info("Écriture validée contre-passée : saisissez la version corrigée"); invalidate(); } setEditing(init); },
+    onError: (err: Error) => toast.error(err.message),
+  });
+  const askEdit = (e: Entry) => { if (e.status !== "validee" || confirm("Cette écriture est validée : elle sera annulée par une contre-passation, puis une écriture corrigée vous sera proposée. Continuer ?")) edit.mutate(e); };
+  const askDelete = (e: Entry) => { if (confirm(e.status === "validee" ? "Écriture validée : elle ne peut pas être effacée. Une contre-passation (écriture inverse) va l'annuler. Continuer ?" : "Supprimer définitivement ce brouillon ?")) remove.mutate(e); };
   const jname = (id: string | null) => journals.find((j) => j.id === id)?.code ?? "—";
   return (
     <>
@@ -290,7 +350,11 @@ function EntriesSection() {
                 <td className={td}>{e.entry_date}</td><td className={`${td} font-mono`}>{jname(e.journal_id)}</td><td className={td}>{e.piece_ref ?? "—"}</td>
                 <td className={td}>{e.label}</td><td className={`${td} font-mono`}>{fmt(Number(e.total_debit))}</td><td className={`${td} font-mono`}>{fmt(Number(e.total_credit))}</td>
                 <td className={td}>{e.status === "validee" ? <span className="text-primary flex items-center gap-1"><Lock size={11} /> {tr("Validée")}</span> : <span className="text-muted-foreground">{tr("Brouillon")}</span>}</td>
-                <td className={td}>{isAdmin && e.status !== "validee" && <button className="text-primary text-[11px]" onClick={(ev) => { ev.stopPropagation(); validate.mutate(e.id); }}>{tr("Valider")}</button>}</td>
+                <td className={td}>{isAdmin && <div className="flex items-center gap-2" onClick={(ev) => ev.stopPropagation()}>
+                  {e.status !== "validee" && <button className="text-primary text-[11px]" onClick={() => validate.mutate(e.id)}>{tr("Valider")}</button>}
+                  <button aria-label={tr("Modifier")} title={tr("Modifier")} className="text-muted-foreground hover:text-primary" onClick={() => askEdit(e)}><Pencil size={13} /></button>
+                  <button aria-label={tr("Supprimer")} title={tr("Supprimer")} className="text-muted-foreground hover:text-destructive" onClick={() => askDelete(e)}><Trash2 size={13} /></button>
+                </div>}</td>
               </tr>
               {expanded === e.id && lines.map((l) => (
                 <tr key={l.id} className="bg-surface-2/30"><td /><td colSpan={2} className={`${td} font-mono`}>{l.account_code}</td><td className={td}>{l.label}</td>
@@ -298,6 +362,7 @@ function EntriesSection() {
             </>))}</tbody></table>)}
       </GhCard>
       {open && <EntryDialog open={open} onClose={() => setOpen(false)} fyId={fy} />}
+      {editing && <EntryDialog open onClose={() => setEditing(null)} fyId={fy} initial={editing} />
     </>
   );
 }
