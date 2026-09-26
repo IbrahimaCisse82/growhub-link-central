@@ -1,3 +1,4 @@
+import RoleRoute from "@/components/auth/RoleRoute";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -186,7 +187,7 @@ const App = () => (
                 <Route path="crm" element={<CrmPage />} />
                 <Route path="bons-de-commande" element={<PurchaseOrdersPage />} />
                 <Route path="comptabilite" element={<Navigate to="/app/comptabilite/ecritures" replace />} />
-                <Route path="comptabilite/:section" element={<AccountingPage />} />
+                <Route path="comptabilite/:section" element={<RoleRoute allow={["staff"]}><AccountingPage /></RoleRoute>} />
                 <Route path="finance/tresorerie" element={<AdminRoute><TreasuryPage /></AdminRoute>} />
                 <Route path="finance/cap-table" element={<CapTablePage />} />
                 <Route path="me" element={<MePage />} />
