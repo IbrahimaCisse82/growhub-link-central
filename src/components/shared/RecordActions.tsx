@@ -29,7 +29,7 @@ type Primitive = string | number | boolean | null | undefined;
 interface Props {
   table: TableName;
   id: string;
-  record: Record<string, unknown>;
+  record: object;
   fields: FieldDef[];
   queryKeys: string[];
   entityLabel: string;
@@ -52,7 +52,7 @@ export default function RecordActions({ table, id, record, fields, queryKeys, en
 
   const start = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setValues(Object.fromEntries(fields.map((f) => [f.key, toInput(record[f.key])])));
+    setValues(Object.fromEntries(fields.map((f) => [f.key, toInput((record as Record<string, unknown>)[f.key])])));
     setOpen(true);
   };
 
