@@ -13,6 +13,6 @@
 
 ## À faire
 - [x] Comptabilité : écriture auto de paie
-- [ ] Comptabilité : exports officiels Excel/PDF des états
+- [x] Comptabilité : exports CSV/PDF des états et de la balance
 - [ ] Traduction EN/AR du contenu des pages des nouveaux modules
 - [ ] Tests avec comptes entrepreneur / mentor / bailleur (bloqué : comptes à créer)
