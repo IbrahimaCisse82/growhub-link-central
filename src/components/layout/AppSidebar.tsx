@@ -8,8 +8,9 @@ import {
   AlertTriangle, FileText, Settings as SettingsIcon, Filter, Triangle, CircleDot, GraduationCap,
   Users, Link2, Headphones, CalendarDays, BookOpen, ClipboardList, BarChart3, DollarSign,
   PieChart, Wallet, Store, Handshake, Diamond, MessageCircle, FolderOpen, LineChart,
-  FileBarChart, Zap, LogOut, Globe, UserCog, Receipt, ShoppingCart, Target, Upload, ShieldCheck, FileLock2, Eye, Smartphone, HeartPulse, KeyRound, type LucideIcon
+  FileBarChart, Zap, LogOut, Globe, UserCog, Receipt, ShoppingCart, Target, Upload, ShieldCheck, FileLock2, Eye, Smartphone, HeartPulse, KeyRound, Calculator, ChevronDown, type LucideIcon
 } from "lucide-react";
+import { useState } from "react";
 
 interface NavItem {
   label: string;
@@ -17,6 +18,7 @@ interface NavItem {
   path: string;
   badgeKey?: string;
   badgeType?: "default" | "alert" | "new";
+  children?: { label: string; path: string }[];
 }
 
 interface NavGroup {
@@ -95,6 +97,18 @@ function useNavGroups() {
         { label: "RH & Paie", icon: UserCog, path: "/app/rh" },
         { label: "CRM & Facturation", icon: Receipt, path: "/app/crm" },
         { label: "Bons de commande", icon: ShoppingCart, path: "/app/bons-de-commande" },
+        {
+          label: "Comptabilité", icon: Calculator, path: "/app/comptabilite",
+          children: [
+            { label: "Plan comptable", path: "/app/comptabilite/plan" },
+            { label: "Journaux", path: "/app/comptabilite/journaux" },
+            { label: "Saisie d'écritures", path: "/app/comptabilite/ecritures" },
+            { label: "Grand livre", path: "/app/comptabilite/grand-livre" },
+            { label: "Balance", path: "/app/comptabilite/balance" },
+            { label: "États financiers", path: "/app/comptabilite/etats" },
+            { label: "Exercices & clôture", path: "/app/comptabilite/exercices" },
+          ],
+        },
       ],
     },
     {
@@ -193,7 +207,7 @@ const PERSONA_ALLOWED_PATHS: Record<string, string[] | null> = {
   ],
   staff: [
     "/app/dashboard", "/app/activites",
-    "/app/rh", "/app/crm", "/app/bons-de-commande",
+    "/app/rh", "/app/crm", "/app/bons-de-commande", "/app/comptabilite",
     "/app/ressources", "/app/messagerie",
     "/app/evenements", "/app/partenaires",
     "/app/parametres/securite",
