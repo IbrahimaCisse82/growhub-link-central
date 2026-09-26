@@ -53,6 +53,42 @@ export type Database = {
         }
         Relationships: []
       }
+      accounting_account_guides: {
+        Row: {
+          code: string
+          commentaires: string | null
+          contenu: string | null
+          controle: string | null
+          created_at: string
+          exclusions: string | null
+          fonctionnement: string | null
+          subdivisions: string | null
+          title: string
+        }
+        Insert: {
+          code: string
+          commentaires?: string | null
+          contenu?: string | null
+          controle?: string | null
+          created_at?: string
+          exclusions?: string | null
+          fonctionnement?: string | null
+          subdivisions?: string | null
+          title: string
+        }
+        Update: {
+          code?: string
+          commentaires?: string | null
+          contenu?: string | null
+          controle?: string | null
+          created_at?: string
+          exclusions?: string | null
+          fonctionnement?: string | null
+          subdivisions?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
       accounting_accounts: {
         Row: {
           account_class: number
@@ -104,6 +140,7 @@ export type Database = {
           fiscal_year_id: string | null
           grant_id: string | null
           id: string
+          is_opening: boolean
           journal_id: string | null
           label: string
           notes: string | null
@@ -126,6 +163,7 @@ export type Database = {
           fiscal_year_id?: string | null
           grant_id?: string | null
           id?: string
+          is_opening?: boolean
           journal_id?: string | null
           label: string
           notes?: string | null
@@ -148,6 +186,7 @@ export type Database = {
           fiscal_year_id?: string | null
           grant_id?: string | null
           id?: string
+          is_opening?: boolean
           journal_id?: string | null
           label?: string
           notes?: string | null
@@ -203,6 +242,8 @@ export type Database = {
           entry_id: string
           id: string
           label: string | null
+          lettered_at: string | null
+          lettrage: string | null
           line_no: number
           project_id: string | null
           third_party_id: string | null
@@ -216,6 +257,8 @@ export type Database = {
           entry_id: string
           id?: string
           label?: string | null
+          lettered_at?: string | null
+          lettrage?: string | null
           line_no?: number
           project_id?: string | null
           third_party_id?: string | null
@@ -229,6 +272,8 @@ export type Database = {
           entry_id?: string
           id?: string
           label?: string | null
+          lettered_at?: string | null
+          lettrage?: string | null
           line_no?: number
           project_id?: string | null
           third_party_id?: string | null
@@ -298,6 +343,7 @@ export type Database = {
       }
       accounting_journals: {
         Row: {
+          allowed_prefixes: string[] | null
           code: string
           counterpart_account: string | null
           created_at: string
@@ -308,6 +354,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          allowed_prefixes?: string[] | null
           code: string
           counterpart_account?: string | null
           created_at?: string
@@ -318,6 +365,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          allowed_prefixes?: string[] | null
           code?: string
           counterpart_account?: string | null
           created_at?: string
