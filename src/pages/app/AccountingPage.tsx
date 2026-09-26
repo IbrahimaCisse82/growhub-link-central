@@ -502,7 +502,7 @@ export default function AccountingPage() {
   const label = ACCOUNTING_SECTIONS.find((s) => s.key === section)?.label ?? "";
   return (
     <div>
-      <SectionHeader title={`Comptabilité — ${label}`} subtitle={tr("SYSCOHADA révisé · montants en Franc CFA (XOF)")} />
+      <SectionHeader title={`${tr("Comptabilité")} — ${tr(label)}`} subtitle={tr("SYSCOHADA révisé · montants en Franc CFA (XOF)")} />
       <Comp />
     </div>
   );

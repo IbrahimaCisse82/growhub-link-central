@@ -154,6 +154,7 @@ const P: Record<string, [string, string]> = {
   "Éléments de contrôle": ["Control points", "عناصر الرقابة"],
   "Éléments supprimés — restaurables par les administrateurs et coordinateurs": ["Deleted items — restorable by administrators and coordinators", "العناصر المحذوفة — قابلة للاستعادة من قبل المسؤولين والمنسقين"],
   "États financiers": ["Financial statements", "القوائم المالية"],
+  "Comptabilité": ["Accounting", "المحاسبة"],
   "Annuler": ["Cancel", "إلغاء"],
   "Enregistrer": ["Save", "حفظ"],
 };
