@@ -105,6 +105,7 @@ function useNavGroups() {
             { label: t("nav.accLedger"), path: "/app/comptabilite/grand-livre" },
             { label: t("nav.accBalance"), path: "/app/comptabilite/balance" },
             { label: t("nav.accLettering"), path: "/app/comptabilite/lettrage" },
+            { label: t("nav.accAssets"), path: "/app/comptabilite/immobilisations" },
             { label: t("nav.accStatements"), path: "/app/comptabilite/etats" },
             { label: t("nav.accFiscalYears"), path: "/app/comptabilite/exercices" },
           ],

@@ -6,6 +6,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Trash2, CheckCircle2, Lock, Search, AlertTriangle, RotateCcw, Pencil } from "lucide-react";
 import AccountGuidePanel from "@/components/accounting/AccountGuide";
 import LetteringSection from "@/components/accounting/LetteringSection";
+import FixedAssetsSection from "@/components/accounting/FixedAssetsSection";
 import { MappingView, PlaquetteView } from "@/components/accounting/PlaquetteSection";
 import { normalSide, bilanActif, bilanPassif, compteResultat, fluxTresorerie, type BalLine, type StatementLine } from "@/lib/syscohada";
 import { supabase } from "@/integrations/supabase/client";
@@ -36,6 +37,7 @@ export const ACCOUNTING_SECTIONS = [
   { key: "grand-livre", label: "Grand livre" },
   { key: "balance", label: "Balance" },
   { key: "lettrage", label: "Lettrage" },
+  { key: "immobilisations", label: "Immobilisations" },
   { key: "etats", label: "États financiers" },
   { key: "exercices", label: "Exercices & clôture" },
 ] as const;
@@ -561,7 +563,7 @@ function FiscalYearsSection() {
 
 const SECTIONS: Record<string, () => JSX.Element> = {
   plan: PlanSection, journaux: JournalsSection, ecritures: EntriesSection, "grand-livre": LedgerSection,
-  balance: BalanceSection, lettrage: LetteringSection, etats: StatementsSection, exercices: FiscalYearsSection,
+  balance: BalanceSection, lettrage: LetteringSection, immobilisations: FixedAssetsSection, etats: StatementsSection, exercices: FiscalYearsSection,
 };
 
 export default function AccountingPage() {
