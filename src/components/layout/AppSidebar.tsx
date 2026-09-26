@@ -105,6 +105,7 @@ function useNavGroups() {
             { label: "Saisie d'écritures", path: "/app/comptabilite/ecritures" },
             { label: "Grand livre", path: "/app/comptabilite/grand-livre" },
             { label: "Balance", path: "/app/comptabilite/balance" },
+            { label: "Lettrage", path: "/app/comptabilite/lettrage" },
             { label: "États financiers", path: "/app/comptabilite/etats" },
             { label: "Exercices & clôture", path: "/app/comptabilite/exercices" },
           ],
