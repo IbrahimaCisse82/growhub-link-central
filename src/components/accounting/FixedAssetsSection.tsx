@@ -90,7 +90,7 @@ export default function FixedAssetsSection() {
       <div className="flex flex-wrap items-center gap-2 mb-3">
         {isAdmin && <GhButton onClick={() => setOpen(true)}><Plus className="w-3.5 h-3.5" />{tr("Nouvelle immobilisation")}</GhButton>}
         <div className="ml-auto flex items-center gap-2">
-          <select className={input + " !w-auto"} value={fyId} onChange={(e) => setFy(e.target.value)}>{fys.map((x) => <option key={x.id} value={x.id}>{x.code}</option>)}</select>
+          <select className={input + " !w-auto"} value={fyId} onChange={(e) => setFy(e.target.value)}>{fys.map((x) => <option key={x.id} value={x.id}>{x.label}</option>)}</select>
           {isAdmin && <GhButton variant="ghost" onClick={() => generate.mutate()} disabled={!fyId || generate.isPending}><Calculator className="w-3.5 h-3.5" />{tr("Générer les dotations de l'exercice")}</GhButton>}
         </div>
       </div>
