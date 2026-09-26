@@ -162,9 +162,8 @@ export function fluxTresorerie(closing: BalLine[], opening: BalLine[], resultatN
   const fa = L("FA", "Capacité d'autofinancement globale (CAFG)", resultatNet + dot - rep - cess);
   const fb = L("FB", "Variation des actifs circulants HAO (−)", -delta(["485", "488"]));
   const fc = L("FC", "Variation des stocks (−)", -delta(["3"], ["39"]));
-  const fd = L("FD", "Variation des créances (−)", -delta(["409", "41", "42", "43", "44", "45", "46", "47"]) );
-  const fe = L("FE", "Variation du passif circulant", 0);
-  const zb = L("ZB", "Flux de trésorerie provenant des activités opérationnelles", fa.value + fb.value + fc.value + fd.value + fe.value, true);
+  const fd = L("FD", "Variation des créances et dettes d'exploitation (tiers)", -delta(["40", "41", "42", "43", "44", "45", "46", "47"]));
+  const zb = L("ZB", "Flux de trésorerie provenant des activités opérationnelles", fa.value + fb.value + fc.value + fd.value, true);
   const ff = L("FF", "Décaissements liés aux acquisitions d'immobilisations (−)", -Math.max(0, delta(["21", "22", "23", "24", "25", "26", "27"])));
   const fj = L("FJ", "Encaissements liés aux cessions d'immobilisations", -sumPrefix(closing, ["82"]));
   const zc = L("ZC", "Flux de trésorerie provenant des activités d'investissement", ff.value + fj.value, true);
