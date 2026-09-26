@@ -4,6 +4,16 @@ import SectionHeader from "@/components/shared/SectionHeader";
 import MfaSetupCard from "@/components/security/MfaSetupCard";
 import { useAuth } from "@/hooks/useAuth";
 import { useMfaFactors } from "@/hooks/useMfaFactors";
+import { supabase } from "@/integrations/supabase/client";
+import GhButton from "@/components/shared/GhButton";
+import { toast } from "sonner";
+
+async function signOutEverywhere() {
+  if (!window.confirm("Déconnecter ce compte de tous les appareils (ordinateurs, téléphones) ?")) return;
+  const { error } = await supabase.auth.signOut({ scope: "global" });
+  if (error) { toast.error("Échec : " + error.message); return; }
+  window.location.href = "/login";
+}
 
 export default function SecurityPage() {
   const { isAdmin } = useAuth();
@@ -37,6 +47,10 @@ export default function SecurityPage() {
         <p className="text-sm text-muted-foreground">
           Pour modifier votre mot de passe, rendez-vous dans votre <a href="/app/profil" className="text-primary underline">profil</a>.
         </p>
+        <div className="pt-2 border-t border-border">
+          <p className="text-sm text-muted-foreground mb-2">Appareil perdu ou connexion suspecte ? Fermez toutes les sessions ouvertes sur tous vos appareils.</p>
+          <GhButton variant="ghost" onClick={signOutEverywhere}>Se déconnecter de tous les appareils</GhButton>
+        </div>
       </div>
     </motion.div>
   );
