@@ -14,5 +14,7 @@
 ## À faire
 - [x] Comptabilité : écriture auto de paie
 - [x] Comptabilité : exports CSV/PDF des états et de la balance
-- [ ] Traduction EN/AR du contenu des pages des nouveaux modules
+- [x] Traduction EN/AR des pages Comptabilité, Trésorerie, Corbeille, Rapports bailleurs (titres, boutons, colonnes)
+- [ ] Traduire les postes officiels SYSCOHADA et les messages de confirmation
+- [ ] Décider : le bailleur doit-il voir risques et partenaires du projet ?
 - [x] Comptes de test entrepreneur/mentor/bailleur créés et cloisonnement vérifié
