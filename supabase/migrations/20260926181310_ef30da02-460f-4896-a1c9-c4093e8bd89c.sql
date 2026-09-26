@@ -1,0 +1,8 @@
+drop policy if exists dataroom_checklist_select on public.dataroom_checklist;
+drop policy if exists dataroom_checklist_write on public.dataroom_checklist;
+drop policy if exists dataroom_folders_select on public.dataroom_folders;
+drop policy if exists dataroom_folders_write on public.dataroom_folders;
+create policy dataroom_checklist_select on public.dataroom_checklist for select to authenticated using (is_admin_or_coordinator(auth.uid()) or (project_id in (select user_accessible_projects(auth.uid())) and not has_scoped_role(auth.uid(),'mentor','project',project_id)));
+create policy dataroom_checklist_write on public.dataroom_checklist for all to authenticated using (is_admin_or_coordinator(auth.uid()) or (project_id in (select user_accessible_projects(auth.uid())) and not has_scoped_role(auth.uid(),'mentor','project',project_id))) with check (is_admin_or_coordinator(auth.uid()) or (project_id in (select user_accessible_projects(auth.uid())) and not has_scoped_role(auth.uid(),'mentor','project',project_id)));
+create policy dataroom_folders_select on public.dataroom_folders for select to authenticated using (is_admin_or_coordinator(auth.uid()) or (project_id in (select user_accessible_projects(auth.uid())) and not has_scoped_role(auth.uid(),'mentor','project',project_id)));
+create policy dataroom_folders_write on public.dataroom_folders for all to authenticated using (is_admin_or_coordinator(auth.uid()) or (project_id in (select user_accessible_projects(auth.uid())) and not has_scoped_role(auth.uid(),'mentor','project',project_id))) with check (is_admin_or_coordinator(auth.uid()) or (project_id in (select user_accessible_projects(auth.uid())) and not has_scoped_role(auth.uid(),'mentor','project',project_id)));
