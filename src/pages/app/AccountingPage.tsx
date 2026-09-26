@@ -362,7 +362,7 @@ function EntriesSection() {
             </>))}</tbody></table>)}
       </GhCard>
       {open && <EntryDialog open={open} onClose={() => setOpen(false)} fyId={fy} />}
-      {editing && <EntryDialog open onClose={() => setEditing(null)} fyId={fy} initial={editing} />
+      {editing && <EntryDialog open onClose={() => setEditing(null)} fyId={fy} initial={editing} />}
     </>
   );
 }
