@@ -1,3 +1,4 @@
+import { tr } from "@/lib/phrases";
 import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link2, Unlink } from "lucide-react";
@@ -65,32 +66,32 @@ export default function LetteringSection() {
   });
   const openBalance = data.filter((l) => !l.lettrage).reduce((s, l) => s + Number(l.debit) - Number(l.credit), 0);
   return (
-    <GhCard title="Lettrage des comptes de tiers" badge={`Non lettré : ${fmt(openBalance)}`} noPadding
+    <GhCard title={tr("Lettrage des comptes de tiers")} badge={`Non lettré : ${fmt(openBalance)}`} noPadding
       action={<div className="flex gap-2">
-        <input className={`${input} font-mono w-28`} placeholder="Compte (ex. 411)" value={code} onChange={(e) => { setCode(e.target.value); setSel([]); }} />
+        <input className={`${input} font-mono w-28`} placeholder={tr("Compte (ex. 411)")} value={code} onChange={(e) => { setCode(e.target.value); setSel([]); }} />
         <select className={input} value={show} onChange={(e) => setShow(e.target.value as "open" | "all")}>
-          <option value="open">Non lettrées</option><option value="all">Toutes</option>
+          <option value="open">{tr("Non lettrées")}</option><option value="all">{tr("Toutes")}</option>
         </select></div>}>
       <p className="px-3 py-2 text-[11.5px] text-muted-foreground border-b border-border">
-        Rapprochez factures et règlements d'un même compte : cochez des lignes dont le total débit égale le total crédit, puis lettrez-les.
+        {tr("Rapprochez factures et règlements d'un même compte : cochez des lignes dont le total débit égale le total crédit, puis lettrez-les.")}
       </p>
-      {code.length < 3 ? <p className="p-5 text-sm text-muted-foreground">Saisissez un compte de tiers (3 chiffres minimum, ex. 401, 411, 421).</p> :
-        rows.length === 0 ? <p className="p-5 text-sm text-muted-foreground">Aucune ligne validée à lettrer.</p> : (
-        <table className="w-full"><thead><tr><th className={th}></th><th className={th}>Date</th><th className={th}>Compte</th><th className={th}>Pièce</th><th className={th}>Libellé</th><th className={th}>Débit</th><th className={th}>Crédit</th><th className={th}>Lettre</th></tr></thead>
+      {code.length < 3 ? <p className="p-5 text-sm text-muted-foreground">{tr("Saisissez un compte de tiers (3 chiffres minimum, ex. 401, 411, 421).")}</p> :
+        rows.length === 0 ? <p className="p-5 text-sm text-muted-foreground">{tr("Aucune ligne validée à lettrer.")}</p> : (
+        <table className="w-full"><thead><tr><th className={th}></th><th className={th}>{tr("Date")}</th><th className={th}>{tr("Compte")}</th><th className={th}>{tr("Pièce")}</th><th className={th}>{tr("Libellé")}</th><th className={th}>{tr("Débit")}</th><th className={th}>{tr("Crédit")}</th><th className={th}>{tr("Lettre")}</th></tr></thead>
           <tbody>{rows.map((l) => (
             <tr key={l.id} className={sel.includes(l.id) ? "bg-primary/10" : ""}>
-              <td className={td}>{!l.lettrage && isAdmin && <input type="checkbox" aria-label="Sélectionner" checked={sel.includes(l.id)} onChange={(e) => setSel(e.target.checked ? [...sel, l.id] : sel.filter((x) => x !== l.id))} />}</td>
+              <td className={td}>{!l.lettrage && isAdmin && <input type="checkbox" aria-label={tr("Sélectionner")} checked={sel.includes(l.id)} onChange={(e) => setSel(e.target.checked ? [...sel, l.id] : sel.filter((x) => x !== l.id))} />}</td>
               <td className={td}>{l.accounting_entries.entry_date}</td><td className={`${td} font-mono`}>{l.account_code}</td>
               <td className={td}>{l.accounting_entries.piece_ref ?? "—"}</td><td className={td}>{l.label ?? l.accounting_entries.label}</td>
               <td className={`${td} font-mono`}>{Number(l.debit) ? fmt(Number(l.debit)) : ""}</td><td className={`${td} font-mono`}>{Number(l.credit) ? fmt(Number(l.credit)) : ""}</td>
-              <td className={`${td} font-mono`}>{l.lettrage ? <span className="flex items-center gap-1">{l.lettrage}{isAdmin && <button aria-label="Délettrer" onClick={() => unletter.mutate(l.lettrage!)} className="text-muted-foreground hover:text-destructive"><Unlink size={11} /></button>}</span> : ""}</td>
+              <td className={`${td} font-mono`}>{l.lettrage ? <span className="flex items-center gap-1">{l.lettrage}{isAdmin && <button aria-label={tr("Délettrer")} onClick={() => unletter.mutate(l.lettrage!)} className="text-muted-foreground hover:text-destructive"><Unlink size={11} /></button>}</span> : ""}</td>
             </tr>))}</tbody></table>)}
       {isAdmin && sel.length > 0 && (
         <div className="flex items-center justify-between p-3 border-t border-border text-[12px]">
           <span className={ok ? "text-primary" : "text-destructive"}>
             Débit {fmt(sD)} · Crédit {fmt(sC)} {!sameAccount ? "· comptes différents" : !ok ? `· écart ${fmt(sD - sC)}` : "· équilibré"}
           </span>
-          <GhButton onClick={() => ok && letter.mutate()}><Link2 size={13} /> Lettrer</GhButton>
+          <GhButton onClick={() => ok && letter.mutate()}><Link2 size={13} /> {tr("Lettrer")}</GhButton>
         </div>)}
     </GhCard>
   );

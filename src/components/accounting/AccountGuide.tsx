@@ -1,3 +1,4 @@
+import { tr } from "@/lib/phrases";
 import { useQuery } from "@tanstack/react-query";
 import { BookOpen } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -37,7 +38,7 @@ function Block({ title, text }: { title: string; text: string | null }) {
 
 export default function AccountGuidePanel({ code, compact }: { code: string; compact?: boolean }) {
   const { data: guides = [] } = useGuides();
-  if (!code) return <p className="text-[12px] text-muted-foreground">Choisissez un compte pour afficher son fonctionnement SYSCOHADA.</p>;
+  if (!code) return <p className="text-[12px] text-muted-foreground">{tr("Choisissez un compte pour afficher son fonctionnement SYSCOHADA.")}</p>;
   const g = findGuide(guides, code);
   const side = normalSide(code);
   return (
@@ -47,13 +48,13 @@ export default function AccountGuidePanel({ code, compact }: { code: string; com
         <span className="font-semibold">{g ? `Compte ${g.code} — ${g.title}` : `Compte ${code}`}</span>
         <span className="ml-auto text-muted-foreground">Solde normal : {sideLabel[side]}</span>
       </div>
-      {!g ? <p className="text-[12px] text-muted-foreground">Pas de fiche de fonctionnement pour cette racine.</p> : (
+      {!g ? <p className="text-[12px] text-muted-foreground">{tr("Pas de fiche de fonctionnement pour cette racine.")}</p> : (
         <>
-          <Block title="Fonctionnement" text={g.fonctionnement} />
-          <Block title="Exclusions" text={g.exclusions} />
-          {!compact && <Block title="Contenu" text={g.contenu} />}
-          <Block title="Éléments de contrôle" text={g.controle} />
-          {!compact && <Block title="Commentaires" text={g.commentaires} />}
+          <Block title={tr("Fonctionnement")} text={g.fonctionnement} />
+          <Block title={tr("Exclusions")} text={g.exclusions} />
+          {!compact && <Block title={tr("Contenu")} text={g.contenu} />}
+          <Block title={tr("Éléments de contrôle")} text={g.controle} />
+          {!compact && <Block title={tr("Commentaires")} text={g.commentaires} />}
         </>
       )}
     </div>
