@@ -14,6 +14,225 @@ export type Database = {
   }
   public: {
     Tables: {
+      acc_accruals: {
+        Row: {
+          account_code: string
+          amount: number
+          created_at: string
+          created_by: string | null
+          entry_date: string
+          entry_id: string | null
+          id: string
+          kind: string
+          label: string
+          reversal_entry_id: string | null
+          third_party_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          account_code: string
+          amount: number
+          created_at?: string
+          created_by?: string | null
+          entry_date: string
+          entry_id?: string | null
+          id?: string
+          kind: string
+          label: string
+          reversal_entry_id?: string | null
+          third_party_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          account_code?: string
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          entry_date?: string
+          entry_id?: string | null
+          id?: string
+          kind?: string
+          label?: string
+          reversal_entry_id?: string | null
+          third_party_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "acc_accruals_third_party_id_fkey"
+            columns: ["third_party_id"]
+            isOneToOne: false
+            referencedRelation: "crm_contreparties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      acc_loan_schedule: {
+        Row: {
+          due_date: string
+          due_no: number
+          id: string
+          interest: number
+          loan_id: string
+          movement_id: string | null
+          paid_at: string | null
+          principal: number
+          remaining: number
+        }
+        Insert: {
+          due_date: string
+          due_no: number
+          id?: string
+          interest: number
+          loan_id: string
+          movement_id?: string | null
+          paid_at?: string | null
+          principal: number
+          remaining: number
+        }
+        Update: {
+          due_date?: string
+          due_no?: number
+          id?: string
+          interest?: number
+          loan_id?: string
+          movement_id?: string | null
+          paid_at?: string | null
+          principal?: number
+          remaining?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "acc_loan_schedule_loan_id_fkey"
+            columns: ["loan_id"]
+            isOneToOne: false
+            referencedRelation: "acc_loans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "acc_loan_schedule_movement_id_fkey"
+            columns: ["movement_id"]
+            isOneToOne: false
+            referencedRelation: "treasury_movements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      acc_loans: {
+        Row: {
+          annual_rate: number
+          created_at: string
+          created_by: string | null
+          duration_months: number
+          id: string
+          interest_account: string
+          label: string
+          lender: string
+          loan_account: string
+          principal: number
+          start_date: string
+          status: string
+          treasury_account_id: string
+          updated_at: string
+        }
+        Insert: {
+          annual_rate?: number
+          created_at?: string
+          created_by?: string | null
+          duration_months: number
+          id?: string
+          interest_account?: string
+          label: string
+          lender: string
+          loan_account?: string
+          principal: number
+          start_date: string
+          status?: string
+          treasury_account_id: string
+          updated_at?: string
+        }
+        Update: {
+          annual_rate?: number
+          created_at?: string
+          created_by?: string | null
+          duration_months?: number
+          id?: string
+          interest_account?: string
+          label?: string
+          lender?: string
+          loan_account?: string
+          principal?: number
+          start_date?: string
+          status?: string
+          treasury_account_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "acc_loans_treasury_account_id_fkey"
+            columns: ["treasury_account_id"]
+            isOneToOne: false
+            referencedRelation: "treasury_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      acc_provisions: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string | null
+          entry_date: string
+          entry_id: string | null
+          id: string
+          kind: string
+          label: string
+          movement: string
+          pl_account: string
+          provision_account: string
+          third_party_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          created_by?: string | null
+          entry_date: string
+          entry_id?: string | null
+          id?: string
+          kind: string
+          label: string
+          movement: string
+          pl_account: string
+          provision_account: string
+          third_party_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          entry_date?: string
+          entry_id?: string | null
+          id?: string
+          kind?: string
+          label?: string
+          movement?: string
+          pl_account?: string
+          provision_account?: string
+          third_party_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "acc_provisions_third_party_id_fkey"
+            columns: ["third_party_id"]
+            isOneToOne: false
+            referencedRelation: "crm_contreparties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       account_deletion_requests: {
         Row: {
           cancelled_at: string | null
@@ -186,6 +405,7 @@ export type Database = {
           created_by: string | null
           currency: string
           entry_date: string
+          establishment_id: string | null
           fiscal_year_id: string | null
           grant_id: string | null
           id: string
@@ -209,6 +429,7 @@ export type Database = {
           created_by?: string | null
           currency?: string
           entry_date?: string
+          establishment_id?: string | null
           fiscal_year_id?: string | null
           grant_id?: string | null
           id?: string
@@ -232,6 +453,7 @@ export type Database = {
           created_by?: string | null
           currency?: string
           entry_date?: string
+          establishment_id?: string | null
           fiscal_year_id?: string | null
           grant_id?: string | null
           id?: string
@@ -251,6 +473,13 @@ export type Database = {
           validated_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "accounting_entries_establishment_id_fkey"
+            columns: ["establishment_id"]
+            isOneToOne: false
+            referencedRelation: "establishments"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "accounting_entries_fiscal_year_id_fkey"
             columns: ["fiscal_year_id"]
@@ -411,6 +640,7 @@ export type Database = {
           method: string
           notes: string | null
           project_id: string | null
+          prorata_mode: string
           residual_value: number
           service_date: string
           status: string
@@ -437,6 +667,7 @@ export type Database = {
           method?: string
           notes?: string | null
           project_id?: string | null
+          prorata_mode?: string
           residual_value?: number
           service_date: string
           status?: string
@@ -463,6 +694,7 @@ export type Database = {
           method?: string
           notes?: string | null
           project_id?: string | null
+          prorata_mode?: string
           residual_value?: number
           service_date?: string
           status?: string
@@ -938,6 +1170,54 @@ export type Database = {
             columns: ["startup_id"]
             isOneToOne: false
             referencedRelation: "startups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bank_statement_lines: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          label: string
+          line_date: string
+          matched_movement_id: string | null
+          reference: string | null
+          treasury_account_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          label: string
+          line_date: string
+          matched_movement_id?: string | null
+          reference?: string | null
+          treasury_account_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          label?: string
+          line_date?: string
+          matched_movement_id?: string | null
+          reference?: string | null
+          treasury_account_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bank_statement_lines_matched_movement_id_fkey"
+            columns: ["matched_movement_id"]
+            isOneToOne: false
+            referencedRelation: "treasury_movements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bank_statement_lines_treasury_account_id_fkey"
+            columns: ["treasury_account_id"]
+            isOneToOne: false
+            referencedRelation: "treasury_accounts"
             referencedColumns: ["id"]
           },
         ]
@@ -1798,12 +2078,14 @@ export type Database = {
           is_client: boolean | null
           is_demo: boolean
           is_funder: boolean | null
+          is_related_party: boolean
           is_supplier: boolean | null
           name: string
           ninea: string | null
           notes: string | null
           party_type: Database["public"]["Enums"]["crm_party_type"]
           phone: string | null
+          related_kind: string | null
           startup_id: string | null
           tax_id: string | null
           updated_at: string
@@ -1823,12 +2105,14 @@ export type Database = {
           is_client?: boolean | null
           is_demo?: boolean
           is_funder?: boolean | null
+          is_related_party?: boolean
           is_supplier?: boolean | null
           name: string
           ninea?: string | null
           notes?: string | null
           party_type: Database["public"]["Enums"]["crm_party_type"]
           phone?: string | null
+          related_kind?: string | null
           startup_id?: string | null
           tax_id?: string | null
           updated_at?: string
@@ -1848,12 +2132,14 @@ export type Database = {
           is_client?: boolean | null
           is_demo?: boolean
           is_funder?: boolean | null
+          is_related_party?: boolean
           is_supplier?: boolean | null
           name?: string
           ninea?: string | null
           notes?: string | null
           party_type?: Database["public"]["Enums"]["crm_party_type"]
           phone?: string | null
+          related_kind?: string | null
           startup_id?: string | null
           tax_id?: string | null
           updated_at?: string
@@ -3031,6 +3317,36 @@ export type Database = {
         }
         Relationships: []
       }
+      establishments: {
+        Row: {
+          city: string | null
+          code: string
+          created_at: string
+          id: string
+          kind: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          city?: string | null
+          code: string
+          created_at?: string
+          id?: string
+          kind?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          city?: string | null
+          code?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       evaluation_criteria: {
         Row: {
           created_at: string | null
@@ -3174,6 +3490,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      exchange_rates: {
+        Row: {
+          created_at: string
+          currency: string
+          id: string
+          rate: number
+          rate_date: string
+        }
+        Insert: {
+          created_at?: string
+          currency: string
+          id?: string
+          rate: number
+          rate_date: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          id?: string
+          rate?: number
+          rate_date?: string
+        }
+        Relationships: []
       }
       grant_activities: {
         Row: {
@@ -7899,6 +8239,42 @@ export type Database = {
           },
         ]
       }
+      shareholders: {
+        Row: {
+          created_at: string
+          id: string
+          is_related_party: boolean
+          kind: string
+          name: string
+          nominal: number
+          paid_amount: number
+          shares: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_related_party?: boolean
+          kind?: string
+          name: string
+          nominal?: number
+          paid_amount?: number
+          shares?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_related_party?: boolean
+          kind?: string
+          name?: string
+          nominal?: number
+          paid_amount?: number
+          shares?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       startup_investments: {
         Row: {
           amount_currency: string
@@ -8156,6 +8532,103 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "cohorts"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      stock_items: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          is_active: boolean
+          label: string
+          stock_account: string
+          unit: string
+          updated_at: string
+          variation_account: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          label: string
+          stock_account?: string
+          unit?: string
+          updated_at?: string
+          variation_account?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          label?: string
+          stock_account?: string
+          unit?: string
+          updated_at?: string
+          variation_account?: string
+        }
+        Relationships: []
+      }
+      stock_moves: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          establishment_id: string | null
+          id: string
+          item_id: string
+          kind: string
+          move_date: string
+          quantity: number
+          reference: string | null
+          unit_cost: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          establishment_id?: string | null
+          id?: string
+          item_id: string
+          kind: string
+          move_date?: string
+          quantity: number
+          reference?: string | null
+          unit_cost?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          establishment_id?: string | null
+          id?: string
+          item_id?: string
+          kind?: string
+          move_date?: string
+          quantity?: number
+          reference?: string | null
+          unit_cost?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_moves_establishment_id_fkey"
+            columns: ["establishment_id"]
+            isOneToOne: false
+            referencedRelation: "establishments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_moves_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "stock_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_moves_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "stock_valuation"
+            referencedColumns: ["item_id"]
           },
         ]
       }
@@ -8578,6 +9051,8 @@ export type Database = {
           entry_id: string | null
           grant_id: string | null
           id: string
+          interest_account: string | null
+          interest_amount: number
           invoice_id: string | null
           label: string
           method: string
@@ -8602,6 +9077,8 @@ export type Database = {
           entry_id?: string | null
           grant_id?: string | null
           id?: string
+          interest_account?: string | null
+          interest_amount?: number
           invoice_id?: string | null
           label: string
           method?: string
@@ -8626,6 +9103,8 @@ export type Database = {
           entry_id?: string | null
           grant_id?: string | null
           id?: string
+          interest_account?: string | null
+          interest_amount?: number
           invoice_id?: string | null
           label?: string
           method?: string
@@ -8772,6 +9251,51 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      vat_returns: {
+        Row: {
+          collected: number
+          created_at: string
+          created_by: string | null
+          credit_next: number
+          credit_previous: number
+          deductible: number
+          due: number
+          entry_id: string | null
+          id: string
+          period: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          collected?: number
+          created_at?: string
+          created_by?: string | null
+          credit_next?: number
+          credit_previous?: number
+          deductible?: number
+          due?: number
+          entry_id?: string | null
+          id?: string
+          period: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          collected?: number
+          created_at?: string
+          created_by?: string | null
+          credit_next?: number
+          credit_previous?: number
+          deductible?: number
+          due?: number
+          entry_id?: string | null
+          id?: string
+          period?: string
+          status?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -9079,6 +9603,19 @@ export type Database = {
           },
         ]
       }
+      stock_valuation: {
+        Row: {
+          cmup: number | null
+          code: string | null
+          item_id: string | null
+          label: string | null
+          quantity: number | null
+          stock_account: string | null
+          unit: string | null
+          variation_account: string | null
+        }
+        Relationships: []
+      }
       system_health_overview: {
         Row: {
           active_users_24h: number | null
@@ -9110,6 +9647,17 @@ export type Database = {
       }
     }
     Functions: {
+      acc_allocate_result: {
+        Args: {
+          _date: string
+          _dividends: number
+          _legal_reserve: number
+          _other_reserves: number
+          _result: number
+          _retained: number
+        }
+        Returns: string
+      }
       acc_asset_dotation: {
         Args: {
           _a: Database["public"]["Tables"]["accounting_fixed_assets"]["Row"]
@@ -9118,12 +9666,37 @@ export type Database = {
         }
         Returns: number
       }
+      acc_close_checks: { Args: { _fy: string }; Returns: Json }
       acc_dispose_asset: {
         Args: { _date: string; _id: string; _price: number }
         Returns: string
       }
+      acc_fx_revaluation: {
+        Args: { _currency: string; _date: string; _rate: number }
+        Returns: number
+      }
       acc_generate_depreciation: { Args: { _fy: string }; Returns: number }
+      acc_make_entry: {
+        Args: {
+          _date: string
+          _journal: string
+          _label: string
+          _lines: Json
+          _piece: string
+          _source: string
+          _source_id: string
+        }
+        Returns: string
+      }
       acc_open_fy: { Args: { _d: string }; Returns: string }
+      acc_pay_loan_installment: {
+        Args: { _date?: string; _id: string }
+        Returns: string
+      }
+      acc_reverse_accruals: { Args: { _next_fy: string }; Returns: number }
+      acc_stock_variation: { Args: { _date: string }; Returns: number }
+      acc_vat_compute: { Args: { _period: string }; Returns: string }
+      acc_vat_post: { Args: { _id: string }; Returns: string }
       anonymize_user_data: { Args: { _user_id: string }; Returns: undefined }
       can_access_grant: {
         Args: { _grant_id: string; _user_id: string }
