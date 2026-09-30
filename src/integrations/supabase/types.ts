@@ -411,6 +411,7 @@ export type Database = {
           method: string
           notes: string | null
           project_id: string | null
+          prorata_mode: string
           residual_value: number
           service_date: string
           status: string
@@ -437,6 +438,7 @@ export type Database = {
           method?: string
           notes?: string | null
           project_id?: string | null
+          prorata_mode?: string
           residual_value?: number
           service_date: string
           status?: string
@@ -463,6 +465,7 @@ export type Database = {
           method?: string
           notes?: string | null
           project_id?: string | null
+          prorata_mode?: string
           residual_value?: number
           service_date?: string
           status?: string
