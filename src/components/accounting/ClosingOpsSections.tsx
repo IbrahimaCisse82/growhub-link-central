@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Trash2, CheckCircle2, AlertTriangle, Upload, Link2 } from "lucide-react";
+import { Plus, Trash2, CheckCircle2, AlertTriangle, Upload, Link2, Loader2 } from "lucide-react";
+
+interface StatementInfo {
+  bank_name?: string; account_number?: string; period_start?: string; period_end?: string;
+  total_debit?: number; total_credit?: number; closing_balance?: number;
+  lines: Array<{ date: string; label: string; reference?: string; debit: number; credit: number }>;
+}
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import GhCard from "@/components/shared/GhCard";
@@ -328,6 +334,37 @@ export function ReconciliationSection() {
   const myLines = lines.filter((l) => l.treasury_account_id === acct);
   const myMoves = moves.filter((m) => m.treasury_account_id === acct);
   const [csv, setCsv] = useState("");
+  type Draft = { line_date: string; label: string; amount: number; reference: string | null; dup: boolean };
+  const [preview, setPreview] = useState<{ rows: Draft[]; info: StatementInfo } | null>(null);
+  const [reading, setReading] = useState(false);
+  const isDup = (d: string, l: string, a: number) => myLines.some((x) => x.line_date === d && x.label === l && Math.abs(Number(x.amount) - a) < 0.5);
+  const readFile = async (fl: File) => {
+    if (/\.(csv|txt)$/i.test(fl.name)) { setCsv(await fl.text()); return; }
+    if (fl.size > 10 * 1024 * 1024) { toast.error(tr("Fichier trop volumineux (10 Mo max)")); return; }
+    setReading(true);
+    try {
+      const buf = new Uint8Array(await fl.arrayBuffer());
+      let bin = ""; for (let i = 0; i < buf.length; i += 0x8000) bin += String.fromCharCode(...buf.subarray(i, i + 0x8000));
+      const { data, error } = await supabase.functions.invoke<StatementInfo & { error?: string }>("parse-bank-statement", { body: { fileBase64: btoa(bin), mimeType: fl.type || "application/pdf" } });
+      if (error || !data || data.error) throw new Error(data?.error || tr("Lecture du relevé impossible"));
+      const rows = (data.lines ?? []).map((l) => {
+        const amount = Number(l.credit || 0) - Number(l.debit || 0);
+        return { line_date: l.date, label: l.label.trim(), amount, reference: l.reference?.trim() || null, dup: isDup(l.date, l.label.trim(), amount) };
+      });
+      setPreview({ rows, info: data });
+    } catch (e) { toast.error(e instanceof Error ? e.message : String(e)); }
+    finally { setReading(false); }
+  };
+  const impPreview = useMutation({
+    mutationFn: async () => {
+      const payload = (preview?.rows ?? []).filter((r) => !r.dup).map(({ line_date, label, amount, reference }) => ({ treasury_account_id: acct, line_date, label, amount, reference }));
+      if (!payload.length) throw new Error(tr("Aucune nouvelle ligne à importer"));
+      const { error } = await supabase.from("bank_statement_lines").insert(payload);
+      if (error) throw error;
+      return payload.length;
+    },
+    onSuccess: (n) => { toast.success(`${n} ${tr("lignes importées")}`); setPreview(null); inv("bank_statement_lines"); }, onError: err,
+  });
   const imp = useMutation({
     mutationFn: async () => {
       const rows = csv.split(/\r?\n/).map((l) => l.split(/[;\t]/)).filter((c) => c.length >= 3 && /\d{4}-\d{2}-\d{2}|\d{2}\/\d{2}\/\d{4}/.test(c[0]));
@@ -379,10 +416,43 @@ export function ReconciliationSection() {
         </div>
         {isAdmin && <>
           <textarea className={input + " w-full h-24 font-mono"} placeholder={"2026-10-01;VIR CLIENT X;1180000;FAC-2026-0002\n2026-10-02;FRAIS BANCAIRES;-5000;"} value={csv} onChange={(e) => setCsv(e.target.value)} />
-          <div className="flex gap-2 items-center">
-            <input type="file" accept=".csv,.txt" className="text-[11px]" onChange={async (e) => { const fl = e.target.files?.[0]; if (fl) setCsv(await fl.text()); }} />
+          <div className="flex flex-wrap gap-2 items-center">
+            <label className="text-[11px]">{tr("Relevé PDF, photo ou CSV")}{" "}
+              <input type="file" accept=".csv,.txt,.pdf,image/png,image/jpeg,image/webp" className="text-[11px]" disabled={reading || !acct} onChange={(e) => { const fl = e.target.files?.[0]; if (fl) void readFile(fl); e.target.value = ""; }} />
+            </label>
+            {reading && <span className="text-[11px] text-muted-foreground flex items-center gap-1"><Loader2 size={12} className="animate-spin" /> {tr("Lecture du relevé en cours…")}</span>}
             <GhButton disabled={!csv || !acct} onClick={() => imp.mutate()}><Upload size={13} /> {tr("Importer le relevé")}</GhButton>
           </div>
+          {preview && (() => {
+            const deb = preview.rows.reduce((a, r) => a + (r.amount < 0 ? -r.amount : 0), 0);
+            const cre = preview.rows.reduce((a, r) => a + (r.amount > 0 ? r.amount : 0), 0);
+            const i = preview.info;
+            const ok = (i.total_debit == null || Math.abs(i.total_debit - deb) < 1) && (i.total_credit == null || Math.abs(i.total_credit - cre) < 1);
+            const fresh = preview.rows.filter((r) => !r.dup).length;
+            return (
+              <div className="border border-border rounded-md p-3 space-y-2">
+                <div className="flex flex-wrap gap-4 text-[12px]">
+                  <span>{tr("Banque")} : <b>{i.bank_name || "—"}</b></span>
+                  <span>{tr("Compte")} : <b>{i.account_number || "—"}</b></span>
+                  <span>{tr("Période")} : <b>{i.period_start || "?"} → {i.period_end || "?"}</b></span>
+                  <span>{tr("Lignes lues")} : <b>{preview.rows.length}</b></span>
+                </div>
+                <div className={"text-[12px] flex items-center gap-1 " + (ok ? "text-primary" : "text-destructive")}>
+                  {ok ? <CheckCircle2 size={13} /> : <AlertTriangle size={13} />}
+                  {tr("Débits")} {fmt(deb)}{i.total_debit != null && ` / ${fmt(i.total_debit)}`} · {tr("Crédits")} {fmt(cre)}{i.total_credit != null && ` / ${fmt(i.total_credit)}`}
+                  {ok ? ` — ${tr("totaux conformes au relevé")}` : ` — ${tr("écart avec les totaux du relevé, vérifiez les lignes")}`}
+                </div>
+                <div className="max-h-72 overflow-auto">
+                  <table className="w-full"><thead><tr><th className={th}>{tr("Date")}</th><th className={th}>{tr("Libellé")}</th><th className={th}>{tr("Référence")}</th><th className={th}>{tr("Montant")}</th><th className={th}></th></tr></thead>
+                    <tbody>{preview.rows.map((r, k) => <tr key={k} className={r.dup ? "opacity-50" : ""}><td className={td}>{r.line_date}</td><td className={td}>{r.label}</td><td className={td}>{r.reference || "—"}</td><td className={td}>{fmt(r.amount)}</td><td className={td}>{r.dup ? tr("déjà importée") : ""}</td></tr>)}</tbody></table>
+                </div>
+                <div className="flex gap-2">
+                  <GhButton disabled={!fresh || impPreview.isPending} onClick={() => impPreview.mutate()}><Upload size={13} /> {tr("Valider l'import")} ({fresh})</GhButton>
+                  <button className="text-[12px] text-muted-foreground" onClick={() => setPreview(null)}>{tr("Annuler")}</button>
+                </div>
+              </div>
+            );
+          })()}
         </>}
       </GhCard>
       <GhCard title="" className="p-4">
