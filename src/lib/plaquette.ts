@@ -80,24 +80,25 @@ export const matches = (code: string, m: Pick<MapLine, "prefixes" | "exclude" | 
 export const unmapped = (codes: string[]) => codes.filter((c) => /^[1-8]/.test(c) && !STATEMENT_MAP.some((m) => matches(c, m)));
 
 export type PlaquetteKind = "etat" | "auto" | "manuel";
-export interface PlaquetteDoc { file: string; code: string; title: string; kind: PlaquetteKind; prefixes?: string[]; view?: "garde" | "bilan" | "actif" | "passif" | "resultat" | "flux" }
+export type AnnexSource = "organisation" | "governance" | "workforce" | "financial" | "manual";
+export interface PlaquetteDoc { file: string; code: string; title: string; kind: PlaquetteKind; prefixes?: string[]; view?: "garde" | "bilan" | "actif" | "passif" | "resultat" | "flux"; source?: AnnexSource }
 
-const N = (file: string, code: string, title: string, prefixes?: string[]): PlaquetteDoc => ({ file, code, title, kind: prefixes ? "auto" : "manuel", prefixes });
+const N = (file: string, code: string, title: string, prefixes?: string[], source?: AnnexSource): PlaquetteDoc => ({ file, code, title, kind: prefixes ? "auto" : "manuel", prefixes, source });
 
 /** Les 57 plaquettes reçues, dans l'ordre officiel. */
 export const PLAQUETTE: PlaquetteDoc[] = [
   { file: "00_Pagedegarde", code: "PG", title: "Page de garde", kind: "etat", view: "garde" },
-  N("01_FicheR1", "R1", "Fiche d'identification et renseignements divers"),
-  N("02_FicheR2", "R2", "Activité de l'entité"),
-  N("03_FicheR3", "R3", "Dirigeants et membres du conseil"),
-  N("03_FicheR4", "R4", "Fiche récapitulative des notes annexes"),
+  N("01_FicheR1", "R1", "Fiche d'identification et renseignements divers", undefined, "organisation"),
+  N("02_FicheR2", "R2", "Activité de l'entité", undefined, "organisation"),
+  N("03_FicheR3", "R3", "Dirigeants et membres du conseil", undefined, "governance"),
+  N("03_FicheR4", "R4", "Fiche récapitulative des notes annexes", undefined, "financial"),
   { file: "04_Bilan", code: "BIL", title: "Bilan (actif et passif)", kind: "etat", view: "bilan" },
   { file: "05_Bilan1", code: "BIL-A", title: "Bilan — Actif", kind: "etat", view: "actif" },
   { file: "06_Bilan2", code: "BIL-P", title: "Bilan — Passif", kind: "etat", view: "passif" },
   { file: "07_CompteResultat", code: "CR", title: "Compte de résultat", kind: "etat", view: "resultat" },
   { file: "08_Tft", code: "TFT", title: "Tableau des flux de trésorerie", kind: "etat", view: "flux" },
-  N("Note01", "Note 1", "Dettes garanties par des sûretés réelles et engagements"),
-  N("Note02", "Note 2", "Informations obligatoires (règles et méthodes comptables)"),
+  N("Note01", "Note 1", "Dettes garanties par des sûretés réelles et engagements", undefined, "manual"),
+  N("Note02", "Note 2", "Informations obligatoires (règles et méthodes comptables)", undefined, "manual"),
   N("Note03A", "Note 3A", "Immobilisations brutes", ["20", "21", "22", "23", "24", "25", "26", "27"]),
   N("Note03B", "Note 3B", "Biens pris en location acquisition", ["17"]),
   N("Note03C", "Note 3C", "Immobilisations : amortissements", ["28"]),
@@ -116,11 +117,11 @@ export const PLAQUETTE: PlaquetteDoc[] = [
   N("Note13", "Note 13", "Capital : valeur nominale des actions ou parts", ["101", "102", "103", "104", "109"]),
   N("Note14", "Note 14", "Primes et réserves", ["105", "11"]),
   N("Note15A", "Note 15A", "Subventions et provisions réglementées", ["14", "15"]),
-  N("Note15B", "Note 15B", "Autres fonds propres"),
+  N("Note15B", "Note 15B", "Autres fonds propres", undefined, "financial"),
   N("Note16A", "Note 16A", "Dettes financières et ressources assimilées", ["16", "17", "18", "19"]),
-  N("Note16B", "Note 16B", "Engagements de retraite et avantages assimilés (méthode actuarielle)"),
-  N("Note16Bbis", "Note 16B bis", "Engagements de retraite : hypothèses actuarielles"),
-  N("Note16C", "Note 16C", "Actifs et passifs éventuels"),
+  N("Note16B", "Note 16B", "Engagements de retraite et avantages assimilés (méthode actuarielle)", undefined, "workforce"),
+  N("Note16Bbis", "Note 16B bis", "Engagements de retraite : hypothèses actuarielles", undefined, "workforce"),
+  N("Note16C", "Note 16C", "Actifs et passifs éventuels", undefined, "manual"),
   N("Note17", "Note 17", "Fournisseurs d'exploitation", ["40"]),
   N("Note18", "Note 18", "Dettes fiscales et sociales", ["42", "43", "44"]),
   N("Note19", "Note 19", "Autres dettes et provisions pour risques à court terme", ["45", "46", "47", "499"]),
@@ -133,14 +134,14 @@ export const PLAQUETTE: PlaquetteDoc[] = [
   N("Note25", "Note 25", "Impôts et taxes", ["64"]),
   N("Note26", "Note 26", "Autres charges", ["65"]),
   N("Note27A", "Note 27A", "Charges de personnel", ["66"]),
-  N("Note27B", "Note 27B", "Effectifs, masse salariale et personnel extérieur"),
+  N("Note27B", "Note 27B", "Effectifs, masse salariale et personnel extérieur", undefined, "workforce"),
   N("Note28", "Note 28", "Provisions et dépréciations inscrites au bilan", ["19", "29", "39", "49", "59", "68", "69", "79"]),
   N("Note29", "Note 29", "Charges et revenus financiers", ["67", "77", "697", "797"]),
   N("Note30", "Note 30", "Autres charges et produits HAO", ["83", "84", "85", "86", "88"]),
-  N("Note31", "Note 31", "Répartition du résultat et éléments des cinq derniers exercices"),
+  N("Note31", "Note 31", "Répartition du résultat et éléments des cinq derniers exercices", undefined, "financial"),
   N("Note32", "Note 32", "Production de l'exercice", ["70", "72", "73"]),
   N("Note33", "Note 33", "Achats destinés à la production", ["602", "6032"]),
-  N("Note34", "Note 34", "Fiche de synthèse des principaux indicateurs financiers"),
-  N("Note35", "Note 35", "Informations sociales, environnementales et sociétales"),
-  N("Note36", "Note 36", "Table des codes"),
+  N("Note34", "Note 34", "Fiche de synthèse des principaux indicateurs financiers", undefined, "financial"),
+  N("Note35", "Note 35", "Informations sociales, environnementales et sociétales", undefined, "manual"),
+  N("Note36", "Note 36", "Table des codes", undefined, "financial"),
 ];
