@@ -106,6 +106,7 @@ function useNavGroups() {
             { label: t("nav.accLedger"), path: "/app/comptabilite/grand-livre" },
             { label: t("nav.accBalance"), path: "/app/comptabilite/balance" },
             { label: t("nav.accLettering"), path: "/app/comptabilite/lettrage" },
+            { label: tr("Auxiliaires clients & fournisseurs"), path: "/app/comptabilite/auxiliaires" },
             { label: t("nav.accAssets"), path: "/app/comptabilite/immobilisations" },
             { label: t("nav.accSettlements"), path: "/app/comptabilite/reglements" },
             { label: tr("Rapprochement bancaire"), path: "/app/comptabilite/rapprochement" },

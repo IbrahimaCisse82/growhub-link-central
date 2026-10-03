@@ -9,6 +9,7 @@ import LetteringSection from "@/components/accounting/LetteringSection";
 import FixedAssetsSection from "@/components/accounting/FixedAssetsSection";
 import SettlementsSection from "@/components/accounting/SettlementsSection";
 import { ClosingSection, LoansSection, AccrualsSection, StocksSection, VatSection, ShareholdersSection, ReconciliationSection } from "@/components/accounting/ClosingOpsSections";
+import SubledgerSection from "@/components/accounting/SubledgerSection";
 import { MappingView, PlaquetteView } from "@/components/accounting/PlaquetteSection";
 import { normalSide, bilanActif, bilanPassif, compteResultat, fluxTresorerie, type BalLine, type StatementLine } from "@/lib/syscohada";
 import { supabase } from "@/integrations/supabase/client";
@@ -39,6 +40,7 @@ export const ACCOUNTING_SECTIONS = [
   { key: "grand-livre", label: "Grand livre" },
   { key: "balance", label: "Balance" },
   { key: "lettrage", label: "Lettrage" },
+  { key: "auxiliaires", label: "Auxiliaires clients & fournisseurs" },
   { key: "immobilisations", label: "Immobilisations" },
   { key: "reglements", label: "Trésorerie & règlements" },
   { key: "rapprochement", label: "Rapprochement bancaire" },
@@ -573,7 +575,7 @@ function FiscalYearsSection() {
 
 const SECTIONS: Record<string, () => JSX.Element> = {
   plan: PlanSection, journaux: JournalsSection, ecritures: EntriesSection, "grand-livre": LedgerSection,
-  balance: BalanceSection, lettrage: LetteringSection, immobilisations: FixedAssetsSection, reglements: SettlementsSection, rapprochement: ReconciliationSection, emprunts: LoansSection, regularisations: AccrualsSection, stocks: StocksSection, tva: VatSection, actionnaires: ShareholdersSection, cloture: ClosingSection, etats: StatementsSection, exercices: FiscalYearsSection,
+  balance: BalanceSection, lettrage: LetteringSection, auxiliaires: SubledgerSection, immobilisations: FixedAssetsSection, reglements: SettlementsSection, rapprochement: ReconciliationSection, emprunts: LoansSection, regularisations: AccrualsSection, stocks: StocksSection, tva: VatSection, actionnaires: ShareholdersSection, cloture: ClosingSection, etats: StatementsSection, exercices: FiscalYearsSection,
 };
 
 export default function AccountingPage() {
