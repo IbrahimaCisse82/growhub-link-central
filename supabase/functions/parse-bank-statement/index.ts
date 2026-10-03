@@ -68,7 +68,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: "Tu extrais fidèlement les relevés bancaires d'Afrique de l'Ouest (FCFA). Les points sont des séparateurs de milliers (1.000.000 = un million). Recopie chaque ligne de mouvement, sans inventer ni regrouper. Ignore les lignes de solde et de totaux dans la liste des lignes, mais renseigne-les dans les champs dédiés." },
+          { role: "system", content: "Tu extrais fidèlement les relevés bancaires d'Afrique de l'Ouest (FCFA). Les points sont des séparateurs de milliers (1.000.000 = un million). Recopie chaque ligne de mouvement, sans inventer ni regrouper. Utilise toujours la date d opération (première colonne « Date »), jamais la « Date de valeur ». Renvoie les dates complètes YYYY-MM-DD. Ignore les lignes de solde et de totaux dans la liste des lignes, mais renseigne-les dans les champs dédiés." },
           { role: "user", content: [{ type: "text", text: "Extrais toutes les lignes de ce relevé." }, ...content] },
         ],
         tools: [tool],
