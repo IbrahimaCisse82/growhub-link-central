@@ -7,3 +7,4 @@
 - Scheduled jobs call edge functions via pg_cron (e.g. `milestone-reminders` daily 07:30 UTC) — consistent with existing hr/crm daily jobs.
 - Page-level phrase translations use `tr()` from `src/lib/phrases.ts`; I18nProvider remounts children on locale change — avoids threading hooks through every sub-component.
 - Fixed assets: register in `accounting_fixed_assets`; acquisition/depreciation/disposal entries created as drafts by DB functions (journal OD), depreciation tracked per FY in `accounting_depreciations` — prevents double dotations.
+- SYSCOHADA annexes combine live accounting/organisation data with structured overrides in `accounting_annex_data`; the complete 57-document package exports through one Unicode PDF pipeline — keeps screen and delivered statements aligned.
