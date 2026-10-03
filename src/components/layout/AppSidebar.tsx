@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useSidebarCounts } from "@/hooks/useSidebarCounts";
 import { useTranslation } from "@/lib/i18n";
+import { tr } from "@/lib/phrases";
 import logo from "@/assets/logo-growhublink.png";
 import {
   LayoutDashboard, Activity, Briefcase, FolderKanban, ListChecks, Flag, CheckSquare, GanttChart,
@@ -107,6 +108,13 @@ function useNavGroups() {
             { label: t("nav.accLettering"), path: "/app/comptabilite/lettrage" },
             { label: t("nav.accAssets"), path: "/app/comptabilite/immobilisations" },
             { label: t("nav.accSettlements"), path: "/app/comptabilite/reglements" },
+            { label: tr("Rapprochement bancaire"), path: "/app/comptabilite/rapprochement" },
+            { label: tr("Emprunts"), path: "/app/comptabilite/emprunts" },
+            { label: tr("Régularisations & provisions"), path: "/app/comptabilite/regularisations" },
+            { label: tr("Stocks"), path: "/app/comptabilite/stocks" },
+            { label: tr("Déclaration de TVA"), path: "/app/comptabilite/tva" },
+            { label: tr("Actionnaires"), path: "/app/comptabilite/actionnaires" },
+            { label: tr("Assistant de clôture"), path: "/app/comptabilite/cloture" },
             { label: t("nav.accStatements"), path: "/app/comptabilite/etats" },
             { label: t("nav.accFiscalYears"), path: "/app/comptabilite/exercices" },
           ],

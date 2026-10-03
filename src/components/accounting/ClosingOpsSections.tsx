@@ -349,7 +349,7 @@ export function ReconciliationSection() {
       for (const l of myLines.filter((x) => !x.matched_movement_id)) {
         const cand = myMoves.find((m) => {
           if (used.has(m.id)) return false;
-          const signed = m.direction === "in" ? Number(m.amount) : -Number(m.amount);
+          const signed = m.direction === "encaissement" ? Number(m.amount) : -Number(m.amount);
           if (Math.abs(signed - Number(l.amount)) > 0.5) return false;
           if (l.reference && m.reference && l.reference === m.reference) return true;
           return Math.abs(new Date(m.movement_date).getTime() - new Date(l.line_date).getTime()) <= 5 * 864e5;
@@ -366,7 +366,7 @@ export function ReconciliationSection() {
     onSuccess: (n) => { toast.success(`${n} ${tr("lignes rapprochées")}`); inv("bank_statement_lines", "treasury_movements"); }, onError: err,
   });
   const bankBal = myLines.reduce((a, l) => a + Number(l.amount), 0);
-  const bookBal = myMoves.reduce((a, m) => a + (m.direction === "in" ? 1 : -1) * Number(m.amount), 0);
+  const bookBal = myMoves.reduce((a, m) => a + (m.direction === "encaissement" ? 1 : m.direction === "decaissement" ? -1 : 0) * Number(m.amount), 0);
   const unmatchedLines = myLines.filter((l) => !l.matched_movement_id);
   const matchedIds = new Set(myLines.map((l) => l.matched_movement_id));
   const unmatchedMoves = myMoves.filter((m) => !matchedIds.has(m.id) && !m.reconciled);
@@ -395,7 +395,7 @@ export function ReconciliationSection() {
           <div><p className="text-[11px] text-muted-foreground mb-1">{tr("Lignes du relevé non rapprochées")} ({unmatchedLines.length})</p>
             <table className="w-full"><tbody>{unmatchedLines.map((l) => <tr key={l.id}><td className={td}>{l.line_date}</td><td className={td}>{l.label}</td><td className={td}>{fmt(Number(l.amount))}</td></tr>)}</tbody></table></div>
           <div><p className="text-[11px] text-muted-foreground mb-1">{tr("Mouvements comptables non rapprochés")} ({unmatchedMoves.length})</p>
-            <table className="w-full"><tbody>{unmatchedMoves.map((m) => <tr key={m.id}><td className={td}>{m.movement_date}</td><td className={td}>{m.label}</td><td className={td}>{fmt((m.direction === "in" ? 1 : -1) * Number(m.amount))}</td></tr>)}</tbody></table></div>
+            <table className="w-full"><tbody>{unmatchedMoves.map((m) => <tr key={m.id}><td className={td}>{m.movement_date}</td><td className={td}>{m.label}</td><td className={td}>{fmt((m.direction === "encaissement" ? 1 : m.direction === "decaissement" ? -1 : 0) * Number(m.amount))}</td></tr>)}</tbody></table></div>
         </div>
       </GhCard>
     </div>
