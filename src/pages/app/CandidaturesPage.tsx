@@ -301,7 +301,7 @@ export default function CandidaturesPage() {
   });
 
   const saveRound = useMutation({
-    mutationFn: async ({ id, patch }: { id: string; patch: Record<string, unknown> }) => {
+    mutationFn: async ({ id, patch }: { id: string; patch: Database["public"]["Tables"]["application_rounds"]["Update"] }) => {
       const { error } = await supabase.from("application_rounds").update(patch).eq("id", id);
       if (error) throw error;
     },
