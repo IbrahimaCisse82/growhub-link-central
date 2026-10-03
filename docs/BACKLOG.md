@@ -16,15 +16,15 @@ Source : `docs/MASTER_PROMPT.md`. Statuts : À FAIRE / EN COURS / FAIT / BLOQUÉ
 ## Phase 1 — Intégrité comptable
 | ID | Prio | Statut | Tâche |
 |---|---|---|---|
-| P1-01 | P0 | À FAIRE | Lien unique BC → réception → facture → paiement ; unicité (source_type, source_id) ; écran revue doublons (ACH-2026-0001 / BC-2026-0001) |
-| P1-02 | P0 | À FAIRE | Idempotence des triggers d'écritures |
-| P1-03 | P0 | À FAIRE | Contraintes : règlement ≥ facture, montants, anti-surpaiement, devise/taux |
-| P1-04 | P0 | À FAIRE | Équilibre en base + blocage modif écritures validées (lignes incluses) — partiellement existant (acc_guard_*) à vérifier |
-| P1-05 | P0 | À FAIRE | Clôture de période appliquée en base sur tous chemins |
+| P1-01 | P0 | FAIT | Lien unique BC → réception → facture → paiement ; unicité (source_type, source_id) ; écran revue doublons (ACH-2026-0001 / BC-2026-0001) |
+| P1-02 | P0 | FAIT | Idempotence des triggers d'écritures |
+| P1-03 | P0 | FAIT | Contraintes : règlement ≥ facture, montants, anti-surpaiement, devise/taux |
+| P1-04 | P0 | FAIT | Équilibre en base + blocage modif écritures validées (lignes incluses) — partiellement existant (acc_guard_*) à vérifier |
+| P1-05 | P0 | FAIT | Clôture de période appliquée en base sur tous chemins |
 | P1-06 | P0 | À FAIRE | Numérotation sans rupture par journal/exercice, verrouillée |
 | P1-07 | P1 | À FAIRE | Piste d'audit chaînée (hash) + écran vérification |
 | P1-08 | P1 | À FAIRE | Taux de change historisés USD/EUR/XOF (table exchange_rates existante à étendre) |
-| P1-09 | P1 | À FAIRE | Écran « Contrôles d'intégrité » |
+| P1-09 | P1 | FAIT | Écran « Contrôles d'intégrité » |
 | P1-10 | P1 | À FAIRE | Jeu de test multi-exercices + non-régression |
 
 ## Phase 2 — Sécurité

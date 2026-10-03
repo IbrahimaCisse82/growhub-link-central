@@ -16,7 +16,7 @@ export default function IntegritySection() {
   });
 
   return (
-    <GhCard>
+    <GhCard title={tr("Contrôles d'intégrité")}>
       <div className="flex items-center justify-between mb-3">
         <p className="text-[12px] text-muted-foreground">{tr("Contrôles automatiques de cohérence de la comptabilité.")}</p>
         <GhButton onClick={() => refetch()} disabled={isFetching}><RefreshCw size={13} /> {tr("Relancer")}</GhButton>
