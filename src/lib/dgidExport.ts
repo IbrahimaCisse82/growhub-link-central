@@ -41,6 +41,10 @@ const put = (ws: XLSX.WorkSheet, addr: string, v: string | number) => {
   const prev = ws[addr] as XLSX.CellObject | undefined;
   ws[addr] = { ...(prev ?? {}), t: typeof v === "number" ? "n" : "s", v, f: undefined, w: undefined } as XLSX.CellObject;
 };
+const fx = (ws: XLSX.WorkSheet, addr: string, f: string) => {
+  const prev = ws[addr] as XLSX.CellObject | undefined;
+  ws[addr] = { ...(prev ?? {}), t: "n", v: 0, f, w: undefined } as XLSX.CellObject;
+};
 
 export async function exportDgidToExcel(rows: BalLine[], id: DgidIdentity, fileName = "Etats_financiers_DGID.xlsx") {
   const res = await fetch(template.url);
@@ -59,8 +63,23 @@ export async function exportDgidToExcel(rows: BalLine[], id: DgidIdentity, fileN
     }
     for (const [ref, row] of Object.entries(PASSIF_ROW)) put(bilan, `K${row}`, Math.round(passif[ref] ?? 0));
   }
+  if (bilan) {
+    for (const c of ["D", "E", "F"]) {
+      fx(bilan, `${c}24`, `${c}9+${c}14+${c}20+${c}21`); fx(bilan, `${c}31`, `${c}25+${c}26+${c}28+${c}29+${c}30`);
+      fx(bilan, `${c}35`, `${c}32+${c}33+${c}34`); fx(bilan, `${c}37`, `${c}24+${c}31+${c}35+${c}36`);
+    }
+    fx(bilan, "K19", "SUM(K9:K18)"); fx(bilan, "K23", "K20+K21+K22"); fx(bilan, "K24", "K19+K23");
+    fx(bilan, "K31", "SUM(K25:K30)"); fx(bilan, "K35", "K33+K34"); fx(bilan, "K37", "K24+K31+K35+K36");
+  }
   const cr = wb.Sheets["COMPTE DE RESULTAT"];
-  if (cr) for (const [ref, row] of Object.entries(RESULT_ROW)) put(cr, `E${row}`, Math.round(resultat[ref] ?? 0));
+  if (cr) {
+    for (const [ref, row] of Object.entries(RESULT_ROW)) put(cr, `E${row}`, Math.round(resultat[ref] ?? 0));
+    const t: Record<number, string> = {
+      11: "E8-E9-E10", 15: "E8+E12+E13+E14", 29: "E11+E12+E13+E14+SUM(E16:E20)-SUM(E21:E28)", 31: "E29-E30",
+      34: "E31+E32-E33", 40: "E35+E36+E37-E38-E39", 41: "E34+E40", 46: "E42+E43-E44-E45", 49: "E41+E46-E47-E48",
+    };
+    for (const [row, f] of Object.entries(t)) fx(cr, `E${row}`, f);
+  }
 
   wb.Workbook = { ...(wb.Workbook ?? {}), CalcPr: { fullCalcOnLoad: true } } as XLSX.WorkBook["Workbook"];
   XLSX.writeFile(wb, fileName, { bookType: "xlsx", cellStyles: true });
