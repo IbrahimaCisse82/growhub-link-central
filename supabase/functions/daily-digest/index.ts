@@ -1,6 +1,7 @@
 // Daily digest — aggregates each user's last 24h notifications
 // for users with email_digest_frequency='daily' and email_digest_enabled=true.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { authError, jsonResponse, requireIdentity, requireRole } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -11,6 +12,8 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
+    const identity = await requireIdentity(req);
+    requireRole(identity, ["super_admin", "coordinator"]);
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
@@ -29,7 +32,6 @@ Deno.serve(async (req) => {
 
     let processed = 0;
     let skipped = 0;
-    const results: Array<Record<string, unknown>> = [];
 
     for (const p of prefs ?? []) {
       // Idempotency: skip if a digest was logged in the last 20h for the user
@@ -50,12 +52,6 @@ Deno.serve(async (req) => {
         .limit(30);
 
       const count = notifs?.length ?? 0;
-      const { data: profile } = await supabase
-        .from("profiles_safe")
-        .select("email, full_name")
-        .eq("user_id", p.user_id)
-        .maybeSingle();
-
       await supabase.from("digest_email_log").insert({
         user_id: p.user_id,
         period_start: periodStart,
@@ -64,23 +60,15 @@ Deno.serve(async (req) => {
         status: count > 0 ? "queued" : "skipped_empty",
       });
 
-      results.push({
-        user_id: p.user_id,
-        email: profile?.email,
-        full_name: profile?.full_name,
-        count,
-      });
       processed++;
     }
 
-    return new Response(JSON.stringify({ ok: true, frequency: "daily", processed, skipped, period: { start: periodStart, end: periodEnd }, results }), {
+    return new Response(JSON.stringify({ ok: true, frequency: "daily", processed, skipped, period: { start: periodStart, end: periodEnd } }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     console.error("daily-digest error:", e);
-    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : String(e) }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    const response = authError(e, corsHeaders);
+    return response ?? jsonResponse({ error: "Traitement impossible" }, 500, corsHeaders);
   }
 });

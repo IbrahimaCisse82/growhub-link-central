@@ -3,6 +3,7 @@
 // Body: { user_id: string, title: string, body: string, url?: string, tag?: string }
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import webpush from "npm:web-push@3.6.7";
+import { authError, jsonResponse, requireIdentity, requireRole } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -27,8 +28,11 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { user_id, title, body, url, tag } = await req.json();
-    if (!user_id || !title || !body) {
+    const identity = await requireIdentity(req);
+    requireRole(identity, ["super_admin", "coordinator"]);
+    const input = await req.json().catch(() => null);
+    const { user_id, title, body, url, tag } = (input ?? {}) as Record<string, unknown>;
+    if (typeof user_id !== "string" || !/^[0-9a-f-]{36}$/i.test(user_id) || typeof title !== "string" || !title.trim() || title.length > 120 || typeof body !== "string" || !body.trim() || body.length > 1000 || (url !== undefined && (typeof url !== "string" || !url.startsWith("/app/") || url.length > 500)) || (tag !== undefined && (typeof tag !== "string" || tag.length > 100))) {
       return new Response(JSON.stringify({ error: "user_id, title and body are required" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -73,8 +77,7 @@ Deno.serve(async (req) => {
     });
   } catch (e) {
     console.error("send-web-push error:", e);
-    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : String(e) }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    const response = authError(e, corsHeaders);
+    return response ?? jsonResponse({ error: "Notification impossible" }, 500, corsHeaders);
   }
 });

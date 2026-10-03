@@ -4,6 +4,7 @@
 // - Anniversaires du jour
 // - Anniversaires de service du jour (1, 5, 10, 15, 20+ ans)
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
+import { authError, jsonResponse, requireIdentity, requireRole } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -54,6 +55,8 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
+    const identity = await requireIdentity(req);
+    requireRole(identity, ["super_admin", "coordinator"]);
     const supabase = createClient(SUPABASE_URL, SERVICE_ROLE);
     const today = new Date();
     const todayStr = today.toISOString().slice(0, 10);
@@ -200,10 +203,7 @@ Deno.serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    return new Response(JSON.stringify({ ok: false, error: msg }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    const response = authError(e, corsHeaders);
+    return response ?? jsonResponse({ ok: false, error: "Traitement impossible" }, 500, corsHeaders);
   }
 });

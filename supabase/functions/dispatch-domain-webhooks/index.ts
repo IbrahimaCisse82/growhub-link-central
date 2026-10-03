@@ -1,6 +1,7 @@
 // Dispatcher avec retry exponentiel + désactivation après 5 échecs
 // Backoff: 1min → 5min → 30min → 2h → 24h
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { authError, jsonResponse, requireIdentity, requireRole } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -21,13 +22,17 @@ async function hmacSha256(secret: string, message: string): Promise<string> {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
+  try {
+    const identity = await requireIdentity(req);
+    requireRole(identity, ["super_admin", "coordinator"]);
+
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   );
 
   const url = new URL(req.url);
-  const limit = Number(url.searchParams.get("limit") ?? "50");
+  const limit = Math.min(100, Math.max(1, Number(url.searchParams.get("limit") ?? "50") || 50));
   const force = url.searchParams.get("force") === "1";
 
   const { data: events, error } = await supabase
@@ -154,4 +159,8 @@ Deno.serve(async (req) => {
     JSON.stringify({ processed: events?.length ?? 0, dispatched, skipped, failures }),
     { headers: { ...corsHeaders, "Content-Type": "application/json" } },
   );
+  } catch (error) {
+    const response = authError(error, corsHeaders);
+    return response ?? jsonResponse({ error: "Traitement impossible" }, 500, corsHeaders);
+  }
 });

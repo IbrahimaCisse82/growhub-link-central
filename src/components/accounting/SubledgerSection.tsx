@@ -8,7 +8,7 @@ import { exportToCSV } from "@/lib/exportUtils";
 import { Download, ArrowLeft } from "lucide-react";
 
 const fmt = (n: number) => new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 }).format(Math.round(n) || 0) + " XOF";
-const th = "text-left font-mono text-[10px] uppercase tracking-wider text-muted-foreground px-3 py-2 border-b border-border";
+const th = "text-start font-mono text-[10px] uppercase tracking-wider text-muted-foreground px-3 py-2 border-b border-border";
 const td = "px-3 py-2 text-[12px] border-b border-border/50";
 const BUCKETS = ["Non échu", "1-30 j", "31-60 j", "61-90 j", "> 90 j"] as const;
 
