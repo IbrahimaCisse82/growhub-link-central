@@ -113,7 +113,7 @@ export default function FixedAssetsSection() {
                 <td className={td}>{a.status === "actif" ? "En service" : a.status === "cede" ? `Cédée le ${a.disposal_date}` : `Rebut le ${a.disposal_date}`}</td>
                 <td className={td}>{isAdmin && a.status === "actif" && <div className="flex gap-1">
                   <button title="Sortie (cession ou rebut)" onClick={() => setDispose(a)} className="p-1 text-muted-foreground hover:text-foreground"><LogOut className="w-3.5 h-3.5" /></button>
-                  <button title="Supprimer" onClick={() => confirm("Supprimer cette immobilisation ?") && remove.mutate(a)} className="p-1 text-muted-foreground hover:text-destructive"><Trash2 className="w-3.5 h-3.5" /></button></div>}</td></tr>); })}
+                  <button title="Supprimer" onClick={() => confirm(tr("Supprimer cette immobilisation ?")) && remove.mutate(a)} className="p-1 text-muted-foreground hover:text-destructive"><Trash2 className="w-3.5 h-3.5" /></button></div>}</td></tr>); })}
           </tbody></table>
       </GhCard>
       <p className="text-[11px] text-muted-foreground mt-3">{tr("Chaque acquisition, dotation et sortie crée une écriture en brouillon (journal OD) à valider dans « Saisie d'écritures ». Amortissement linéaire au prorata temporis. Les montants validés alimentent la balance, le bilan (AD, AI) et les notes 3A, 3C et 3D.")}</p>

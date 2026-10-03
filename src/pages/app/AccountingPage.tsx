@@ -351,8 +351,8 @@ function EntriesSection() {
     onSuccess: (init) => { if (!init.id) { toast.info("Écriture validée contre-passée : saisissez la version corrigée"); invalidate(); } setEditing(init); },
     onError: (err: Error) => toast.error(err.message),
   });
-  const askEdit = (e: Entry) => { if (e.status !== "validee" || confirm("Cette écriture est validée : elle sera annulée par une contre-passation, puis une écriture corrigée vous sera proposée. Continuer ?")) edit.mutate(e); };
-  const askDelete = (e: Entry) => { if (confirm(e.status === "validee" ? "Écriture validée : elle ne peut pas être effacée. Une contre-passation (écriture inverse) va l'annuler. Continuer ?" : "Supprimer définitivement ce brouillon ?")) remove.mutate(e); };
+  const askEdit = (e: Entry) => { if (e.status !== "validee" || confirm(tr("Cette écriture est validée : elle sera annulée par une contre-passation, puis une écriture corrigée vous sera proposée. Continuer ?"))) edit.mutate(e); };
+  const askDelete = (e: Entry) => { if (confirm(e.status === "validee" ? tr("Écriture validée : elle ne peut pas être effacée. Une contre-passation (écriture inverse) va l'annuler. Continuer ?") : tr("Supprimer définitivement ce brouillon ?"))) remove.mutate(e); };
   const jname = (id: string | null) => journals.find((j) => j.id === id)?.code ?? "—";
   return (
     <>
@@ -449,7 +449,7 @@ function StatementTable({ title, lines, withBrut }: { title: string; lines: Stat
         {withBrut && <><th className={th}>{tr("Brut")}</th><th className={th}>{tr("Amort./Dépr.")}</th></>}<th className={th}>{withBrut ? "Net" : "Montant"}</th></tr></thead>
         <tbody>{lines.map((l) => (
           <tr key={l.ref} className={l.total ? "bg-surface-2/50 font-semibold" : ""}>
-            <td className={`${td} font-mono`}>{l.ref}</td><td className={td}>{l.label}</td>
+            <td className={`${td} font-mono`}>{l.ref}</td><td className={td}>{tr(l.label)}</td>
             {withBrut && <><td className={`${td} font-mono whitespace-nowrap`}>{l.brut !== undefined ? fmt(l.brut) : ""}</td><td className={`${td} font-mono whitespace-nowrap`}>{l.amort !== undefined ? fmt(l.amort) : ""}</td></>}
             <td className={`${td} font-mono whitespace-nowrap`}>{fmt(l.value)}</td></tr>))}</tbody></table>
     </GhCard>
@@ -492,7 +492,7 @@ function StatementsSection() {
       </div>
       {tab === "bilan" && <>
         <p className={`text-[12px] mb-2 ${Math.abs(ecart) < 1 ? "text-primary" : "text-destructive"}`}>
-          {Math.abs(ecart) < 1 ? "Bilan équilibré (actif = passif)." : `Écart actif − passif : ${fmt(ecart)} — vérifiez les écritures en attente ou les comptes hors bilan.`}</p>
+          {Math.abs(ecart) < 1 ? tr("Bilan équilibré (actif = passif).") : `${tr("Écart actif − passif")} : ${fmt(ecart)} — ${tr("vérifiez les écritures en attente ou les comptes hors bilan.")}`}</p>
         <div className="grid xl:grid-cols-2 gap-4"><StatementTable title={tr("Bilan — Actif")} lines={actif} withBrut /><StatementTable title={tr("Bilan — Passif")} lines={passif} /></div></>}
       {tab === "resultat" && <StatementTable title={tr("Compte de résultat (avec soldes intermédiaires de gestion)")} lines={cr} />}
       {tab === "mappage" && <MappingView rows={balRows} />}
@@ -567,7 +567,7 @@ function FiscalYearsSection() {
       <table className="w-full"><thead><tr><th className={th}>{tr("Exercice")}</th><th className={th}>{tr("Début")}</th><th className={th}>{tr("Fin")}</th><th className={th}>{tr("Statut")}</th><th className={th}></th></tr></thead>
         <tbody>{data.map((fy) => <tr key={fy.id}><td className={td}>{fy.label}</td><td className={td}>{fy.start_date}</td><td className={td}>{fy.end_date}</td>
           <td className={td}>{fy.status === "closed" ? <span className="flex items-center gap-1"><Lock size={11} /> {tr("Clôturé")}</span> : <span className="text-primary">{tr("Ouvert")}</span>}</td>
-          <td className={td}>{isAdmin && fy.status !== "closed" && <button className="text-destructive text-[11px]" onClick={() => confirm(`Clôturer ${fy.label} ? Cette action est définitive.`) && close.mutate(fy)}>{tr("Clôturer")}</button>}
+          <td className={td}>{isAdmin && fy.status !== "closed" && <button className="text-destructive text-[11px]" onClick={() => confirm(`${tr("Clôturer")} ${fy.label} ? ${tr("Cette action est définitive.")}`) && close.mutate(fy)}>{tr("Clôturer")}</button>}
             {isAdmin && fy.status === "closed" && <button className="text-primary text-[11px] flex items-center gap-1" onClick={() => reopen.mutate(fy)}><RotateCcw size={11} /> {tr("Générer les à-nouveaux")}</button>}</td></tr>)}</tbody></table>
     </GhCard>
   );
