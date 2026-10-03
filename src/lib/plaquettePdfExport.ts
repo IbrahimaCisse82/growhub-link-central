@@ -46,7 +46,6 @@ export async function exportPlaquettePdf(
   const copy = labels[locale];
   const rtl = locale === "ar";
   const font = rtl ? "NotoSansArabic" : "DejaVuSans";
-  pdf.setR2L(rtl);
   pdf.setFont(font, "normal");
   const margin = 14;
   const pageWidth = 210;

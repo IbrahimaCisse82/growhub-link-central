@@ -146,10 +146,35 @@ export function PlaquetteView({ rows, onOpenState }: { rows: BalRow[]; onOpenSta
   const counts = useMemo(() => ({ etat: PLAQUETTE.filter((d) => d.kind === "etat").length, auto: PLAQUETTE.filter((d) => d.kind === "auto").length, manuel: PLAQUETTE.filter((d) => d.kind === "manuel").length }), []);
   const icon = (d: PlaquetteDoc) => d.kind === "etat" ? <FileText className="w-3.5 h-3.5 text-primary" /> : d.kind === "auto" ? <Calculator className="w-3.5 h-3.5 text-primary" /> : <PenLine className="w-3.5 h-3.5 text-muted-foreground" />;
   const download = async () => {
+    const [shareholdersResult, employeesResult, payrollResult] = await Promise.all([
+      supabase.from("shareholders").select("name,kind,shares,paid_amount,is_related_party").order("name"),
+      supabase.from("hr_employees").select("sexe,is_active").eq("is_active", true),
+      supabase.from("hr_payroll_runs").select("total_charges,total_masse"),
+    ]);
+    const shareholders = shareholdersResult.data ?? [];
+    const employees = employeesResult.data ?? [];
+    const payroll = payrollResult.data ?? [];
+    const organisationRows = [
+      { label: tr("Dénomination"), value: org?.company_name ?? "—" }, { label: tr("Forme juridique"), value: org?.legal_form ?? "—" },
+      { label: "NINEA", value: org?.ninea ?? "—" }, { label: "RCCM", value: org?.rccm ?? "—" },
+      { label: tr("Adresse"), value: [org?.address, org?.city, org?.country].filter(Boolean).join(", ") || "—" },
+    ];
+    const governanceRows = shareholders.map((row) => ({ label: row.name, value: `${row.kind} · ${row.shares} ${tr("parts")} · ${fmt(Number(row.paid_amount))}${row.is_related_party ? ` · ${tr("Partie liée")}` : ""}` }));
+    const workforceRows = [
+      { label: tr("Effectif actif"), value: String(employees.length) },
+      { label: tr("Femmes"), value: String(employees.filter((row) => row.sexe?.toLowerCase().startsWith("f")).length) },
+      { label: tr("Hommes"), value: String(employees.filter((row) => row.sexe?.toLowerCase().startsWith("m")).length) },
+      { label: tr("Masse salariale"), value: fmt(payroll.reduce((sum, row) => sum + Number(row.total_masse), 0)) },
+      { label: tr("Charges sociales"), value: fmt(payroll.reduce((sum, row) => sum + Number(row.total_charges), 0)) },
+    ];
     const sections: PlaquettePdfSection[] = PLAQUETTE.map((item) => {
       const financial = item.prefixes ? rows.filter((row) => item.prefixes?.some((prefix) => row.code.startsWith(prefix))).map((row) => ({ label: `${row.code} — ${row.label}`, value: fmt(row.solde) })) : [];
       const manual = annexes.filter((row) => row.document_code === item.code).map((row) => ({ label: row.label, value: [row.description, row.amount === null ? null : fmt(row.amount)].filter(Boolean).join(" · ") || "—" }));
-      return { code: item.code, title: tr(item.title), rows: financial.length > 0 ? financial : manual };
+      const derived = item.view === "garde" || item.source === "organisation" ? organisationRows
+        : item.source === "governance" ? governanceRows
+        : item.source === "workforce" ? workforceRows
+        : item.kind === "etat" ? rows.map((row) => ({ label: `${row.code} — ${row.label}`, value: fmt(row.solde) })) : [];
+      return { code: item.code, title: tr(item.title), rows: financial.length > 0 ? financial : manual.length > 0 ? manual : derived };
     });
     try { await exportPlaquettePdf(sections, org?.company_name ?? tr("Organisation"), locale); toast.success(tr("Plaquette PDF téléchargée")); }
     catch (error) { toast.error(error instanceof Error ? error.message : tr("Erreur pendant l'export PDF")); }
