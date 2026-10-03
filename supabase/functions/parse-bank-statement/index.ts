@@ -20,10 +20,10 @@ const tool = {
         account_number: { type: "string" },
         period_start: { type: "string", description: "YYYY-MM-DD" },
         period_end: { type: "string", description: "YYYY-MM-DD" },
-        opening_balance: { type: "number" },
-        closing_balance: { type: "number" },
-        total_debit: { type: "number" },
-        total_credit: { type: "number" },
+        opening_balance: { type: "string", description: "Recopié exactement comme imprimé" },
+        closing_balance: { type: "string", description: "Recopié exactement comme imprimé" },
+        total_debit: { type: "string", description: "Recopié exactement comme imprimé" },
+        total_credit: { type: "string", description: "Recopié exactement comme imprimé" },
         lines: {
           type: "array",
           items: {
@@ -32,8 +32,8 @@ const tool = {
               date: { type: "string", description: "Date d'opération YYYY-MM-DD (année déduite de la période)" },
               label: { type: "string" },
               reference: { type: "string", description: "N° de chèque ou de pièce si présent, sinon vide" },
-              debit: { type: "number", description: "Montant au débit, 0 sinon" },
-              credit: { type: "number", description: "Montant au crédit, 0 sinon" },
+              debit: { type: "string", description: "Montant au débit recopié EXACTEMENT comme imprimé (ex. 1.000.000), vide sinon" },
+              credit: { type: "string", description: "Montant au crédit recopié EXACTEMENT comme imprimé, vide sinon" },
             },
             required: ["date", "label", "debit", "credit"],
             additionalProperties: false,
@@ -99,7 +99,16 @@ Deno.serve(async (req) => {
       if (start && end && start.slice(0, 4) !== end.slice(0, 4) && `${mm}-${dd}` < start.slice(5)) year = Number(end.slice(0, 4));
       return `${year}-${mm}-${dd}`;
     };
-    out.lines = (out.lines ?? []).map((l: { date: string }) => ({ ...l, date: norm(l.date) })).filter((l: { date: string | null }) => l.date);
+    const amt = (v: unknown): number => {
+      let t = String(v ?? "").replace(/[\s\u00a0F CFAXOF]/g, "");
+      if (!t) return 0;
+      if (/,\d{1,2}$/.test(t)) t = t.replace(/\./g, "").replace(",", ".");
+      else t = t.replace(/[.,](?=\d{3}(\D|$))/g, "");
+      const n = Number(t);
+      return Number.isFinite(n) ? Math.round(n) : 0;
+    };
+    for (const k of ["opening_balance", "closing_balance", "total_debit", "total_credit"]) if (out[k] != null && out[k] !== "") out[k] = amt(out[k]); else delete out[k];
+    out.lines = (out.lines ?? []).map((l: { date: string; debit: unknown; credit: unknown }) => ({ ...l, date: norm(l.date), debit: amt(l.debit), credit: amt(l.credit) })).filter((l: { date: string | null }) => l.date);
     return jsonResponse(out, 200, corsHeaders);
   } catch (e) {
     return authError(e, corsHeaders) ?? jsonResponse({ error: "Erreur interne" }, 500, corsHeaders);
