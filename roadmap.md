@@ -21,3 +21,13 @@
 - [x] Traduire les postes officiels SYSCOHADA et les messages de confirmation
 - [ ] Décider : le bailleur doit-il voir risques et partenaires du projet ?
 - [x] Comptes de test entrepreneur/mentor/bailleur créés et cloisonnement vérifié
+
+## Finalisation comptable en cours
+- [ ] Automatiser les 14 annexes et leur saisie structurée
+- [ ] Télécharger la plaquette en PDF FR/AR
+- [ ] Finaliser et vérifier la clôture 2026 sans justificatifs inventés
+- [ ] Tester les 7 parcours comptables dans l’interface
+- [ ] Auditer et durcir les alertes/fonctions comptables
+- [ ] Ajouter les tests automatisés des fonctions
+- [ ] Vérifier traductions EN/AR, RTL et mobile
+- [ ] Vérifier les droits bailleur/mentor dans l’interface et par accès direct
