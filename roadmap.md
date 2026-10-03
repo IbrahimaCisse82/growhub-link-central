@@ -15,6 +15,9 @@
 - [x] Comptabilité : écriture auto de paie
 - [x] Comptabilité : exports CSV/PDF des états et de la balance
 - [x] Traduction EN/AR des pages Comptabilité, Trésorerie, Corbeille, Rapports bailleurs (titres, boutons, colonnes)
+- [x] Écrans clôture/emprunts/stocks/TVA/actionnaires/rapprochement testés + recette vague 1
+- [x] Auxiliaires clients & fournisseurs (balance âgée, relevé de compte)
+- [ ] Export Excel DGID (modèle reçu vide — à renvoyer)
 - [ ] Traduire les postes officiels SYSCOHADA et les messages de confirmation
 - [ ] Décider : le bailleur doit-il voir risques et partenaires du projet ?
 - [x] Comptes de test entrepreneur/mentor/bailleur créés et cloisonnement vérifié
