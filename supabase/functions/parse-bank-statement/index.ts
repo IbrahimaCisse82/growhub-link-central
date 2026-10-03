@@ -81,7 +81,26 @@ Deno.serve(async (req) => {
     const json = await res.json();
     const args = json.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments;
     if (!args) return jsonResponse({ error: "Aucune ligne reconnue" }, 422, corsHeaders);
-    return jsonResponse(JSON.parse(args), 200, corsHeaders);
+    const out = JSON.parse(args);
+    const start = /^\d{4}-\d{2}-\d{2}$/.test(out.period_start ?? "") ? out.period_start : null;
+    const end = /^\d{4}-\d{2}-\d{2}$/.test(out.period_end ?? "") ? out.period_end : null;
+    const norm = (raw: string): string | null => {
+      const s = String(raw ?? "").trim();
+      if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+      let m = s.match(/^(\d{2})\/(\d{2})\/(\d{2,4})$/);
+      if (m) return `${m[3].length === 2 ? "20" + m[3] : m[3]}-${m[2]}-${m[1]}`;
+      let mm: string, dd: string;
+      if ((m = s.match(/^(\d{2})-(\d{2})$/))) { mm = m[1]; dd = m[2]; }
+      else if ((m = s.match(/^(\d{2})\/(\d{2})$/))) { dd = m[1]; mm = m[2]; }
+      else return null;
+      const ref = start ?? end;
+      if (!ref) return null;
+      let year = Number(ref.slice(0, 4));
+      if (start && end && start.slice(0, 4) !== end.slice(0, 4) && `${mm}-${dd}` < start.slice(5)) year = Number(end.slice(0, 4));
+      return `${year}-${mm}-${dd}`;
+    };
+    out.lines = (out.lines ?? []).map((l: { date: string }) => ({ ...l, date: norm(l.date) })).filter((l: { date: string | null }) => l.date);
+    return jsonResponse(out, 200, corsHeaders);
   } catch (e) {
     return authError(e, corsHeaders) ?? jsonResponse({ error: "Erreur interne" }, 500, corsHeaders);
   }
