@@ -18,6 +18,6 @@
 - [x] Écrans clôture/emprunts/stocks/TVA/actionnaires/rapprochement testés + recette vague 1
 - [x] Auxiliaires clients & fournisseurs (balance âgée, relevé de compte)
 - [ ] Export Excel DGID (modèle reçu vide — à renvoyer)
-- [ ] Traduire les postes officiels SYSCOHADA et les messages de confirmation
+- [x] Traduire les postes officiels SYSCOHADA et les messages de confirmation
 - [ ] Décider : le bailleur doit-il voir risques et partenaires du projet ?
 - [x] Comptes de test entrepreneur/mentor/bailleur créés et cloisonnement vérifié
