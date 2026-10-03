@@ -32,3 +32,5 @@
 - [ ] Ajouter les tests automatisés des fonctions
 - [ ] Vérifier traductions EN/AR, RTL et mobile
 - [ ] Vérifier les droits bailleur/mentor dans l’interface et par accès direct
+- [ ] Connecter le domaine growhub-managementsystem.online
+- [ ] Vérifier l'envoi des e-mails

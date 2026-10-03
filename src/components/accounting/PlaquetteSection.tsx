@@ -11,6 +11,7 @@ import { useTranslation } from "@/lib/i18n";
 import { tr } from "@/lib/phrases";
 import { STATEMENT_MAP, PLAQUETTE, matches, unmapped, type PlaquetteDoc } from "@/lib/plaquette";
 import { exportPlaquettePdf, type PlaquettePdfSection } from "@/lib/plaquettePdfExport";
+import { exportDgidToExcel } from "@/lib/dgidExport";
 import type { BalLine } from "@/lib/syscohada";
 
 const fmt = (n: number) => new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 }).format(Math.round(n) || 0) + " XOF";
@@ -179,9 +180,22 @@ export function PlaquetteView({ rows, onOpenState }: { rows: BalRow[]; onOpenSta
     try { await exportPlaquettePdf(sections, org?.company_name ?? tr("Organisation"), locale); toast.success(tr("Plaquette PDF téléchargée")); }
     catch (error) { toast.error(error instanceof Error ? error.message : tr("Erreur pendant l'export PDF")); }
   };
+  const downloadDgid = async () => {
+    try {
+      await exportDgidToExcel(rows, {
+        denomination: org?.company_name ?? "", ninea: org?.ninea ?? null,
+        adresse: [org?.address, org?.city, org?.country].filter(Boolean).join(", "),
+        exerciceClos: `31/12/${new Date().getFullYear()}`, dureeMois: 12,
+      });
+      toast.success(tr("Excel DGID téléchargé"));
+    } catch (error) { toast.error(error instanceof Error ? error.message : tr("Erreur pendant l'export Excel")); }
+  };
   return (
     <div>
-      <div className="flex justify-end mb-3"><GhButton onClick={download}><Download size={13} />{tr("Télécharger la plaquette PDF")}</GhButton></div>
+      <div className="flex justify-end gap-2 mb-3">
+        <GhButton onClick={downloadDgid}><Download size={13} />{tr("Télécharger Excel DGID")}</GhButton>
+        <GhButton onClick={download}><Download size={13} />{tr("Télécharger la plaquette PDF")}</GhButton>
+      </div>
       <div className="grid lg:grid-cols-[280px_1fr] gap-4">
       <GhCard title={tr("Plaquette SYSCOHADA")} badge={`${PLAQUETTE.length} documents`} noPadding>
         <p className="px-3 py-2 text-[11px] text-muted-foreground">{counts.etat} {tr("états")} · {counts.auto} {tr("notes calculées")} · {counts.manuel} {tr("annexes structurées")}</p>
