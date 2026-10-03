@@ -70,7 +70,7 @@ export function ClosingSection() {
   ];
   return (
     <div className="space-y-4">
-      <GhCard className="p-4">
+      <GhCard title="" className="p-4">
         <div className="flex items-center gap-2 mb-3">
           <span className="text-[12px] text-muted-foreground">{tr("Exercice")}</span>
           <select className={input} value={cur?.id ?? ""} onChange={(e) => setFy(e.target.value)}>
@@ -88,7 +88,7 @@ export function ClosingSection() {
         </ul>
       </GhCard>
       {isAdmin && cur && (
-        <GhCard className="p-4 space-y-3">
+        <GhCard title="" className="p-4 space-y-3">
           <h3 className="font-semibold text-[13px]">{tr("2. Écritures d'inventaire")}</h3>
           <div className="flex flex-wrap gap-2">
             <GhButton onClick={() => run.mutate(() => supabase.rpc("acc_generate_depreciation", { _fy: cur.id }))}>{tr("Générer les dotations")}</GhButton>
@@ -132,7 +132,7 @@ export function LoansSection() {
     onSuccess: () => { toast.success(tr("Échéance payée — écriture en brouillon")); inv("acc_loan_schedule"); }, onError: err,
   });
   return (
-    <GhCard className="p-4">
+    <GhCard title="" className="p-4">
       {isAdmin && <div className="flex flex-wrap gap-2 mb-4 items-end text-[11px]">
         <input className={input} placeholder={tr("Libellé")} value={f.label} onChange={(e) => setF({ ...f, label: e.target.value })} />
         <input className={input} placeholder={tr("Prêteur")} value={f.lender} onChange={(e) => setF({ ...f, lender: e.target.value })} />
@@ -187,7 +187,7 @@ export function AccrualsSection() {
   const setMove = (m: string) => { const d = PROV_DEFAULTS[p.kind]; setP({ ...p, movement: m, pl_account: m === "dotation" ? d[2] : d[2].replace(/^6/, "7") }); };
   return (
     <div className="space-y-4">
-      <GhCard className="p-4">
+      <GhCard title="" className="p-4">
         <h3 className="font-semibold text-[13px] mb-2">{tr("Régularisations (extournées au 1er jour de l'exercice suivant)")}</h3>
         {isAdmin && <div className="flex flex-wrap gap-2 mb-3">
           <select className={input} value={a.kind} onChange={(e) => setA({ ...a, kind: e.target.value })}>{Object.entries(ACCRUAL_KINDS).map(([k, v]) => <option key={k} value={k}>{tr(v[0])}</option>)}</select>
@@ -200,7 +200,7 @@ export function AccrualsSection() {
         <table className="w-full"><thead><tr><th className={th}>{tr("Date")}</th><th className={th}>{tr("Type")}</th><th className={th}>{tr("Libellé")}</th><th className={th}>{tr("Compte")}</th><th className={th}>{tr("Montant")}</th><th className={th}>{tr("Extournée")}</th></tr></thead>
           <tbody>{acc.map((r) => <tr key={r.id}><td className={td}>{r.entry_date}</td><td className={td}>{r.kind.toUpperCase()}</td><td className={td}>{r.label}</td><td className={td}>{r.account_code}</td><td className={td}>{fmt(Number(r.amount))}</td><td className={td}>{r.reversal_entry_id ? tr("Oui") : "—"}</td></tr>)}</tbody></table>
       </GhCard>
-      <GhCard className="p-4">
+      <GhCard title="" className="p-4">
         <h3 className="font-semibold text-[13px] mb-2">{tr("Provisions et dépréciations")}</h3>
         {isAdmin && <div className="flex flex-wrap gap-2 mb-3">
           <select className={input} value={p.kind} onChange={(e) => setKind(e.target.value)}>{Object.entries(PROV_DEFAULTS).map(([k, v]) => <option key={k} value={k}>{tr(v[0])}</option>)}</select>
@@ -242,7 +242,7 @@ export function StocksSection() {
   const total = [...val.values()].reduce((a, s) => a + s.v, 0);
   return (
     <div className="space-y-4">
-      {isAdmin && <GhCard className="p-4 flex flex-wrap gap-2">
+      {isAdmin && <GhCard title="" className="p-4 flex flex-wrap gap-2">
         <input className={input + " w-24"} placeholder={tr("Code")} value={it.code} onChange={(e) => setIt({ ...it, code: e.target.value })} />
         <input className={input} placeholder={tr("Article")} value={it.label} onChange={(e) => setIt({ ...it, label: e.target.value })} />
         <input className={input + " w-16"} value={it.unit} onChange={(e) => setIt({ ...it, unit: e.target.value })} />
@@ -258,7 +258,7 @@ export function StocksSection() {
         <input className={input} placeholder={tr("Référence")} value={mv.reference} onChange={(e) => setMv({ ...mv, reference: e.target.value })} />
         <GhButton disabled={!mv.item_id || mv.quantity < 0} onClick={() => addMv.mutate()}><Plus size={13} /> {tr("Mouvement")}</GhButton>
       </GhCard>}
-      <GhCard className="p-4">
+      <GhCard title="" className="p-4">
         <p className="text-[12px] mb-2">{tr("Valeur totale du stock (CMUP)")} : <b>{fmt(total)}</b></p>
         <table className="w-full"><thead><tr><th className={th}>{tr("Code")}</th><th className={th}>{tr("Article")}</th><th className={th}>{tr("Quantité")}</th><th className={th}>{tr("CMUP")}</th><th className={th}>{tr("Valeur")}</th></tr></thead>
           <tbody>{items.map((i) => { const s = val.get(i.id) ?? { q: 0, v: 0 }; return <tr key={i.id}><td className={td}>{i.code}</td><td className={td}>{i.label}</td><td className={td}>{s.q} {i.unit}</td><td className={td}>{fmt(s.q ? s.v / s.q : 0)}</td><td className={td}>{fmt(s.v)}</td></tr>; })}</tbody></table>
@@ -276,7 +276,7 @@ export function VatSection() {
   const compute = useMutation({ mutationFn: async () => { const { error } = await supabase.rpc("acc_vat_compute", { _period: period + "-01" }); if (error) throw error; }, onSuccess: () => { toast.success(tr("Déclaration calculée")); inv("vat_returns"); }, onError: err });
   const post = useMutation({ mutationFn: async (id: string) => { const { error } = await supabase.rpc("acc_vat_post", { _id: id }); if (error) throw error; }, onSuccess: () => { toast.success(tr("Écriture de TVA créée en brouillon")); inv("vat_returns"); }, onError: err });
   return (
-    <GhCard className="p-4">
+    <GhCard title="" className="p-4">
       {isAdmin && <div className="flex gap-2 mb-3"><input type="month" className={input} value={period} onChange={(e) => setPeriod(e.target.value)} /><GhButton onClick={() => compute.mutate()}>{tr("Calculer la déclaration")}</GhButton></div>}
       <table className="w-full"><thead><tr><th className={th}>{tr("Période")}</th><th className={th}>{tr("TVA collectée")}</th><th className={th}>{tr("TVA déductible")}</th><th className={th}>{tr("Crédit antérieur")}</th><th className={th}>{tr("TVA due (4441)")}</th><th className={th}>{tr("Crédit à reporter")}</th><th className={th}>{tr("Statut")}</th><th className={th}></th></tr></thead>
         <tbody>{rows.map((r) => <tr key={r.id}><td className={td}>{r.period.slice(0, 7)}</td><td className={td}>{fmt(Number(r.collected))}</td><td className={td}>{fmt(Number(r.deductible))}</td><td className={td}>{fmt(Number(r.credit_previous))}</td><td className={td}><b>{fmt(Number(r.due))}</b></td><td className={td}>{fmt(Number(r.credit_next))}</td><td className={td}>{r.status}</td>
@@ -298,7 +298,7 @@ export function ShareholdersSection() {
   const capital = rows.reduce((a, r) => a + Number(r.shares ?? 0) * Number(r.nominal ?? 0), 0);
   const paid = rows.reduce((a, r) => a + Number(r.paid_amount ?? 0), 0);
   return (
-    <GhCard className="p-4">
+    <GhCard title="" className="p-4">
       <div className="flex gap-6 text-[12px] mb-3"><span>{tr("Capital social (101)")} : <b>{fmt(capital)}</b></span><span>{tr("Libéré")} : <b>{fmt(paid)}</b></span><span>{tr("Non appelé / non versé (109)")} : <b>{fmt(capital - paid)}</b></span></div>
       {isAdmin && <div className="flex flex-wrap gap-2 mb-3 items-center">
         <input className={input} placeholder={tr("Nom")} value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} />
@@ -372,7 +372,7 @@ export function ReconciliationSection() {
   const unmatchedMoves = myMoves.filter((m) => !matchedIds.has(m.id) && !m.reconciled);
   return (
     <div className="space-y-4">
-      <GhCard className="p-4 space-y-2">
+      <GhCard title="" className="p-4 space-y-2">
         <div className="flex gap-2 items-center">
           <select className={input} value={acct} onChange={(e) => setTa(e.target.value)}>{tas.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}</select>
           {isAdmin && <GhButton onClick={() => auto.mutate()}><Link2 size={13} /> {tr("Rapprocher automatiquement")}</GhButton>}
@@ -385,7 +385,7 @@ export function ReconciliationSection() {
           </div>
         </>}
       </GhCard>
-      <GhCard className="p-4">
+      <GhCard title="" className="p-4">
         <h3 className="font-semibold text-[13px] mb-2">{tr("État de rapprochement")}</h3>
         <div className="grid grid-cols-3 gap-3 text-[12px] mb-3">
           <div>{tr("Solde relevé")} : <b>{fmt(bankBal)}</b></div><div>{tr("Solde comptable")} : <b>{fmt(bookBal)}</b></div>
