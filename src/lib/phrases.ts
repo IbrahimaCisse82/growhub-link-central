@@ -4,7 +4,10 @@ type Loc = "fr" | "en" | "ar";
 let current: Loc = (typeof localStorage !== "undefined" && (localStorage.getItem("gh-locale") as Loc)) || "fr";
 export const setPhraseLocale = (l: Loc) => { current = l; };
 
+import { SYSCOHADA_PHRASES } from "./phrasesSyscohada";
+
 const P: Record<string, [string, string]> = {
+  ...SYSCOHADA_PHRASES,
   "Activités prévues / prochaines étapes": ["Planned activities / next steps", "الأنشطة المخطط لها / الخطوات التالية"],
   "Affichage limité à 100 lignes. Exporter en CSV pour le détail complet.": ["Limited to 100 rows. Export to CSV for full detail.", "العرض محدود بـ 100 سطر. صدّر إلى CSV للتفاصيل الكاملة."],
   "Affinez la recherche pour voir plus de comptes.": ["Refine your search to see more accounts.", "حسّن البحث لعرض المزيد من الحسابات."],

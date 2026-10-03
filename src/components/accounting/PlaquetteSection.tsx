@@ -27,7 +27,7 @@ export function MappingView({ rows }: { rows: BalRow[] }) {
             const key = m.statement + m.ref;
             return (<Fragment key={key}>
               <tr className="cursor-pointer hover:bg-surface-2/40" onClick={() => setOpen(open === key ? null : key)}>
-                <td className={td}>{m.statement}</td><td className={`${td} font-mono`}>{m.ref}</td><td className={td}>{m.label}</td>
+                <td className={td}>{m.statement}</td><td className={`${td} font-mono`}>{m.ref}</td><td className={td}>{tr(m.label)}</td>
                 <td className={`${td} font-mono text-[11px]`}>{m.prefixes.join(", ")}{m.exclude ? ` (sauf ${m.exclude.join(", ")})` : ""}{m.amort ? ` · amort./dépr. ${m.amort.join(", ")}` : ""}</td>
                 <td className={`${td} font-mono`}>{hit.length}</td></tr>
               {open === key && hit.map((r) => (
