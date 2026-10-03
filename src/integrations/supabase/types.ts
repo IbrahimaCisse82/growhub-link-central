@@ -350,6 +350,54 @@ export type Database = {
         }
         Relationships: []
       }
+      accounting_annex_data: {
+        Row: {
+          amount: number | null
+          created_at: string
+          created_by: string | null
+          data: Json
+          description: string | null
+          document_code: string
+          end_date: string | null
+          id: string
+          item_type: string
+          label: string
+          sort_order: number
+          start_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          created_by?: string | null
+          data?: Json
+          description?: string | null
+          document_code: string
+          end_date?: string | null
+          id?: string
+          item_type?: string
+          label: string
+          sort_order?: number
+          start_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          created_by?: string | null
+          data?: Json
+          description?: string | null
+          document_code?: string
+          end_date?: string | null
+          id?: string
+          item_type?: string
+          label?: string
+          sort_order?: number
+          start_date?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       accounting_depreciations: {
         Row: {
           amount: number
@@ -9778,6 +9826,10 @@ export type Database = {
         Returns: boolean
       }
       is_demo_user: { Args: { _user_id?: string }; Returns: boolean }
+      is_restricted_project_viewer: {
+        Args: { _project_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_startup_founder: {
         Args: { _startup_id: string; _user_id: string }
         Returns: boolean
