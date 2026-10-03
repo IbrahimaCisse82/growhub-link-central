@@ -9724,6 +9724,14 @@ export type Database = {
         Returns: number
       }
       acc_generate_depreciation: { Args: { _fy: string }; Returns: number }
+      acc_integrity_checks: {
+        Args: never
+        Returns: {
+          check_code: string
+          issues: number
+          label: string
+        }[]
+      }
       acc_make_entry: {
         Args: {
           _date: string
