@@ -1,5 +1,6 @@
 // Rappels quotidiens des jalons : J-7, J-3, J-1, jour J et retards (notification au responsable du projet et aux coordinateurs)
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
+import { authError, jsonResponse, requireIdentity, requireRole } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -24,6 +25,8 @@ function daysUntil(d: string): number {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
+    const identity = await requireIdentity(req);
+    requireRole(identity, ["super_admin", "coordinator"]);
     const supabase = createClient(Deno.env.get("SUPABASE_URL") ?? "", Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "");
     const { data: ms, error } = await supabase
       .from("milestones")
@@ -53,8 +56,7 @@ Deno.serve(async (req) => {
     }
     return new Response(JSON.stringify({ ok: true, sent }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (e) {
-    return new Response(JSON.stringify({ ok: false, error: e instanceof Error ? e.message : String(e) }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    const response = authError(e, corsHeaders);
+    return response ?? jsonResponse({ ok: false, error: "Traitement impossible" }, 500, corsHeaders);
   }
 });

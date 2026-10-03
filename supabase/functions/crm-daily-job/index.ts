@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
+import { authError, jsonResponse, requireIdentity, requireRole } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -17,6 +18,8 @@ Deno.serve(async (req) => {
   const result: Record<string, any> = { today };
 
   try {
+    const identity = await requireIdentity(req);
+    requireRole(identity, ["super_admin", "coordinator"]);
     // 1) Mark overdue invoices
     const { data: overdueUpdated, error: overdueErr } = await supabase
       .from("crm_invoices")
@@ -133,11 +136,9 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.error("crm-daily-job error", e);
-    return new Response(JSON.stringify({ error: e.message, partial: result }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    const response = authError(e, corsHeaders);
+    return response ?? jsonResponse({ error: "Traitement impossible", partial: result }, 500, corsHeaders);
   }
 });

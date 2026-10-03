@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
+import { authError, escapeHtml, jsonResponse, requireIdentity, requireRole } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -12,9 +13,16 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { invoice_id, recipient_email, custom_message, mode } = await req.json();
+    const identity = await requireIdentity(req);
+    requireRole(identity, ["super_admin", "coordinator", "staff"]);
+    const body = await req.json().catch(() => null);
+    if (!body || typeof body !== "object") return jsonResponse({ error: "Requête invalide" }, 400, corsHeaders);
+    const { invoice_id, recipient_email, custom_message, mode } = body as Record<string, unknown>;
     // mode: "send" (first send) | "reminder"
-    if (!invoice_id) throw new Error("invoice_id requis");
+    if (typeof invoice_id !== "string" || !/^[0-9a-f-]{36}$/i.test(invoice_id)) return jsonResponse({ error: "Facture invalide" }, 400, corsHeaders);
+    if (recipient_email !== undefined && (typeof recipient_email !== "string" || recipient_email.length > 254 || !recipient_email.includes("@"))) return jsonResponse({ error: "Email invalide" }, 400, corsHeaders);
+    if (custom_message !== undefined && (typeof custom_message !== "string" || custom_message.length > 2000)) return jsonResponse({ error: "Message invalide" }, 400, corsHeaders);
+    if (mode !== undefined && mode !== "send" && mode !== "reminder") return jsonResponse({ error: "Mode invalide" }, 400, corsHeaders);
 
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
@@ -40,7 +48,7 @@ Deno.serve(async (req) => {
       .sort((a: any, b: any) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
       .map((l: any) => `
         <tr>
-          <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb">${l.description}</td>
+          <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb">${escapeHtml(l.description)}</td>
           <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right">${l.quantity}</td>
           <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right">${fmt(Number(l.unit_price), inv.currency)}</td>
           <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right">${fmt(Number(l.line_total), inv.currency)}</td>
@@ -50,7 +58,7 @@ Deno.serve(async (req) => {
       ? `<p>Nous nous permettons de vous relancer concernant la facture <strong>${inv.invoice_number}</strong> qui demeure impayée${inv.due_date ? ` (échéance du ${new Date(inv.due_date).toLocaleDateString("fr-FR")})` : ""}.</p>`
       : `<p>Veuillez trouver ci-dessous le détail de la facture <strong>${inv.invoice_number}</strong>.</p>`;
 
-    const customBlock = custom_message ? `<p style="background:#f8fafc;padding:12px;border-left:3px solid #00a283;border-radius:4px">${custom_message}</p>` : "";
+    const customBlock = custom_message ? `<p style="background:#f8fafc;padding:12px;border-left:3px solid #00a283;border-radius:4px">${escapeHtml(custom_message)}</p>` : "";
 
     const html = `<!doctype html>
 <html><body style="font-family:Arial,sans-serif;color:#0d1f2e;background:#f8fafc;margin:0;padding:24px">
@@ -60,7 +68,7 @@ Deno.serve(async (req) => {
       <div style="font-size:20px;font-weight:bold;margin-top:4px">${mode === "reminder" ? "Relance de paiement" : "Nouvelle facture"}</div>
     </div>
     <div style="padding:24px">
-      <p>Bonjour ${inv.contrepartie?.contact_person || inv.contrepartie?.name || ""},</p>
+      <p>Bonjour ${escapeHtml(inv.contrepartie?.contact_person || inv.contrepartie?.name || "")},</p>
       ${intro}
       ${customBlock}
       <table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:14px">
@@ -112,11 +120,9 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({ ok: true, recipient: to }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.error("send-invoice-email error", e);
-    return new Response(JSON.stringify({ error: e.message }), {
-      status: 400,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    const response = authError(e, corsHeaders);
+    return response ?? jsonResponse({ error: "Envoi impossible" }, 500, corsHeaders);
   }
 });

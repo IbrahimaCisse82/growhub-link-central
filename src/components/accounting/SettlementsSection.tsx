@@ -15,7 +15,7 @@ type Direction = "encaissement" | "decaissement" | "virement";
 
 const fmt = (n: number) => new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 }).format(Math.round(n) || 0) + " XOF";
 const input = "bg-surface-2 border border-border rounded-lg px-2.5 py-1.5 text-[12px] text-foreground outline-none focus:border-primary w-full";
-const th = "text-left font-mono text-[10px] uppercase tracking-wider text-muted-foreground px-3 py-2 border-b border-border";
+const th = "text-start font-mono text-[10px] uppercase tracking-wider text-muted-foreground px-3 py-2 border-b border-border";
 const td = "px-3 py-2 text-[12px] border-b border-border/50";
 
 /** Catégories de règlement et compte de contrepartie SYSCOHADA proposé. */
@@ -142,7 +142,7 @@ export default function SettlementsSection() {
     <div className="space-y-4">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {taccs.map((t) => (
-          <button key={t.id} onClick={() => setFilter(filter === t.id ? "" : t.id)} className={`text-left rounded-xl border p-3 bg-surface-1 ${filter === t.id ? "border-primary" : "border-border"}`}>
+          <button key={t.id} onClick={() => setFilter(filter === t.id ? "" : t.id)} className={`text-start rounded-xl border p-3 bg-surface-1 ${filter === t.id ? "border-primary" : "border-border"}`}>
             <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground"><Wallet className="w-3.5 h-3.5" />{t.name} · {t.account_code}</div>
             <div className="font-display text-[16px] mt-1">{fmt(balances.get(t.id) ?? 0)}</div>
           </button>

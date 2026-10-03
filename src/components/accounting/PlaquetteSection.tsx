@@ -14,7 +14,7 @@ import { exportPlaquettePdf, type PlaquettePdfSection } from "@/lib/plaquettePdf
 import type { BalLine } from "@/lib/syscohada";
 
 const fmt = (n: number) => new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 }).format(Math.round(n) || 0) + " XOF";
-const th = "text-left font-mono text-[10px] uppercase tracking-wider text-muted-foreground px-3 py-2 border-b border-border";
+const th = "text-start font-mono text-[10px] uppercase tracking-wider text-muted-foreground px-3 py-2 border-b border-border";
 const td = "px-3 py-2 text-[12px] border-b border-border/50";
 
 export interface BalRow extends BalLine { label: string }
@@ -28,17 +28,17 @@ export function MappingView({ rows }: { rows: BalRow[] }) {
   return (
     <>
       {orphans.length > 0
-        ? <p className="text-[12px] text-destructive mb-2 flex items-center gap-1.5"><AlertTriangle className="w-3.5 h-3.5" />{orphans.length} compte(s) mouvementé(s) repris par aucune ligne : {orphans.join(", ")}</p>
+        ? <p className="text-[12px] text-destructive mb-2 flex items-center gap-1.5"><AlertTriangle className="w-3.5 h-3.5" />{orphans.length} {tr("compte(s) mouvementé(s) repris par aucune ligne")} : {orphans.join(", ")}</p>
         : <p className="text-[12px] text-primary mb-2 flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5" />{tr("Tous les comptes mouvementés sont repris dans une ligne des états.")}</p>}
       <GhCard title={tr("Mappage des comptes SYSCOHADA vers les lignes des états")} badge={`${STATEMENT_MAP.length} lignes`} noPadding>
-        <table className="w-full"><thead><tr><th className={th}>État</th><th className={th}>Réf.</th><th className={th}>{tr("Poste")}</th><th className={th}>{tr("Comptes repris")}</th><th className={th}>{tr("Comptes mouvementés")}</th></tr></thead>
+        <table className="w-full"><thead><tr><th className={th}>{tr("État")}</th><th className={th}>{tr("Réf.")}</th><th className={th}>{tr("Poste")}</th><th className={th}>{tr("Comptes repris")}</th><th className={th}>{tr("Comptes mouvementés")}</th></tr></thead>
           <tbody>{STATEMENT_MAP.map((m) => {
             const hit = rows.filter((r) => matches(r.code, m));
             const key = m.statement + m.ref;
             return (<Fragment key={key}>
               <tr className="cursor-pointer hover:bg-surface-2/40" onClick={() => setOpen(open === key ? null : key)}>
                 <td className={td}>{m.statement}</td><td className={`${td} font-mono`}>{m.ref}</td><td className={td}>{tr(m.label)}</td>
-                <td className={`${td} font-mono text-[11px]`}>{m.prefixes.join(", ")}{m.exclude ? ` (sauf ${m.exclude.join(", ")})` : ""}{m.amort ? ` · amort./dépr. ${m.amort.join(", ")}` : ""}</td>
+                <td className={`${td} font-mono text-[11px]`}>{m.prefixes.join(", ")}{m.exclude ? ` (${tr("sauf")} ${m.exclude.join(", ")})` : ""}{m.amort ? ` · ${tr("amort./dépr.")} ${m.amort.join(", ")}` : ""}</td>
                 <td className={`${td} font-mono`}>{hit.length}</td></tr>
               {open === key && hit.map((r) => (
                 <tr key={key + r.code} className="bg-surface-2/30"><td className={td} /><td className={`${td} font-mono`}>{r.code}</td><td className={td} colSpan={2}>{r.label}</td><td className={`${td} font-mono whitespace-nowrap`}>{fmt(r.solde)}</td></tr>))}
@@ -186,7 +186,7 @@ export function PlaquetteView({ rows, onOpenState }: { rows: BalRow[]; onOpenSta
       <GhCard title={tr("Plaquette SYSCOHADA")} badge={`${PLAQUETTE.length} documents`} noPadding>
         <p className="px-3 py-2 text-[11px] text-muted-foreground">{counts.etat} {tr("états")} · {counts.auto} {tr("notes calculées")} · {counts.manuel} {tr("annexes structurées")}</p>
         <div className="max-h-[640px] overflow-y-auto">{PLAQUETTE.map((d) => (
-          <button key={d.file} onClick={() => setSel(d.file)} className={`w-full text-left px-3 py-1.5 text-[12px] flex items-center gap-2 border-b border-border/40 ${sel === d.file ? "bg-surface-2 text-foreground" : "text-muted-foreground hover:bg-surface-2/50"}`}>
+          <button key={d.file} onClick={() => setSel(d.file)} className={`w-full text-start px-3 py-1.5 text-[12px] flex items-center gap-2 border-b border-border/40 ${sel === d.file ? "bg-surface-2 text-foreground" : "text-muted-foreground hover:bg-surface-2/50"}`}>
             {icon(d)}<span className="font-mono w-20 shrink-0">{d.code}</span><span className="truncate">{tr(d.title)}</span></button>))}</div>
       </GhCard>
       <div>

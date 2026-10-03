@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { authError, jsonResponse, requireIdentity } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -9,10 +10,16 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
+    await requireIdentity(req);
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const { action, messages, topic, level, modules_count } = await req.json();
+    const input = await req.json().catch(() => null) as Record<string, unknown> | null;
+    if (!input) return jsonResponse({ error: "Requête invalide" }, 400, corsHeaders);
+    const { action, messages, topic, level, modules_count } = input;
+    if (action !== "generate_course" && action !== "chat") return jsonResponse({ error: "Action inconnue" }, 400, corsHeaders);
+    if (action === "generate_course" && (typeof topic !== "string" || !topic.trim() || topic.length > 300 || (level !== undefined && !["beginner", "intermediate", "advanced"].includes(String(level))) || (modules_count !== undefined && (!Number.isInteger(modules_count) || Number(modules_count) < 1 || Number(modules_count) > 12)))) return jsonResponse({ error: "Paramètres du cours invalides" }, 400, corsHeaders);
+    if (action === "chat" && (!Array.isArray(messages) || messages.length > 30 || messages.some((message) => typeof message !== "object" || message === null || !["user", "assistant"].includes(String((message as Record<string, unknown>).role)) || typeof (message as Record<string, unknown>).content !== "string" || String((message as Record<string, unknown>).content).length > 10000))) return jsonResponse({ error: "Messages invalides" }, 400, corsHeaders);
 
     let aiMessages: Array<{ role: string; content: string }> = [];
 
@@ -55,6 +62,7 @@ IMPORTANT: Retourne UNIQUEMENT le JSON, sans texte avant ou après. Chaque modul
         }
       ];
     } else if (action === "chat") {
+      const chatMessages = messages as Array<{ role: string; content: string }>;
       aiMessages = [
         {
           role: "system",
@@ -65,7 +73,7 @@ IMPORTANT: Retourne UNIQUEMENT le JSON, sans texte avant ou après. Chaque modul
 - Suggérer des améliorations pédagogiques
 Sois concis, pratique et bienveillant. Utilise le markdown pour formater tes réponses.`
         },
-        ...(messages || [])
+        ...chatMessages
       ];
     } else {
       return new Response(JSON.stringify({ error: "Action inconnue" }), {
@@ -161,8 +169,7 @@ Sois concis, pratique et bienveillant. Utilise le markdown pour formater tes ré
     }
   } catch (e) {
     console.error("elearning-ai error:", e);
-    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Erreur inconnue" }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    const response = authError(e, corsHeaders);
+    return response ?? jsonResponse({ error: "Service indisponible" }, 500, corsHeaders);
   }
 });

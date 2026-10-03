@@ -30,7 +30,7 @@ type BalanceRow = Database["public"]["Views"]["accounting_balance"]["Row"];
 
 const fmt = (n: number) => new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 }).format(Math.round(n) || 0) + " XOF";
 const input = "bg-surface-2 border border-border rounded-lg px-2.5 py-1.5 text-[12px] text-foreground outline-none focus:border-primary";
-const th = "text-left font-mono text-[10px] uppercase tracking-wider text-muted-foreground px-3 py-2 border-b border-border";
+const th = "text-start font-mono text-[10px] uppercase tracking-wider text-muted-foreground px-3 py-2 border-b border-border";
 const td = "px-3 py-2 text-[12px] border-b border-border/50";
 
 export const ACCOUNTING_SECTIONS = [
@@ -153,7 +153,7 @@ function JournalsSection() {
       const { error } = await supabase.from("accounting_journals").insert({ ...f, code: f.code.toUpperCase(), counterpart_account: f.counterpart_account || null });
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Journal créé"); setF({ code: "", label: "", journal_type: "od", counterpart_account: "" }); qc.invalidateQueries({ queryKey: ["acc-journals"] }); },
+    onSuccess: () => { toast.success(tr("Journal créé")); setF({ code: "", label: "", journal_type: "od", counterpart_account: "" }); qc.invalidateQueries({ queryKey: ["acc-journals"] }); },
     onError: (e: Error) => toast.error(e.message),
   });
   return (
@@ -162,13 +162,13 @@ function JournalsSection() {
         <input className={`${input} w-20`} placeholder={tr("Code")} value={f.code} onChange={(e) => setF({ ...f, code: e.target.value })} />
         <input className={`${input} flex-1`} placeholder={tr("Libellé")} value={f.label} onChange={(e) => setF({ ...f, label: e.target.value })} />
         <select className={input} value={f.journal_type} onChange={(e) => setF({ ...f, journal_type: e.target.value })}>
-          {["achats","ventes","banque","caisse","paie","od"].map((t) => <option key={t}>{t}</option>)}
+          {["achats","ventes","banque","caisse","paie","od"].map((t) => <option key={t}>{tr(t)}</option>)}
         </select>
         <input className={`${input} w-32`} placeholder={tr("Compte contrepartie")} value={f.counterpart_account} onChange={(e) => setF({ ...f, counterpart_account: e.target.value })} />
         <GhButton onClick={() => f.code && f.label && add.mutate()}><Plus size={13} /> {tr("Ajouter")}</GhButton>
       </div>}
       <table className="w-full"><thead><tr><th className={th}>{tr("Code")}</th><th className={th}>{tr("Libellé")}</th><th className={th}>{tr("Type")}</th><th className={th}>{tr("Contrepartie")}</th></tr></thead>
-        <tbody>{data.map((j) => <tr key={j.id}><td className={`${td} font-mono`}>{j.code}</td><td className={td}>{j.label}</td><td className={td}>{j.journal_type}</td><td className={`${td} font-mono`}>{j.counterpart_account ?? "—"}</td></tr>)}</tbody></table>
+        <tbody>{data.map((j) => <tr key={j.id}><td className={`${td} font-mono`}>{j.code}</td><td className={td}>{j.label}</td><td className={td}>{tr(j.journal_type)}</td><td className={`${td} font-mono`}>{j.counterpart_account ?? "—"}</td></tr>)}</tbody></table>
     </GhCard>
   );
 }

@@ -12,7 +12,7 @@ import { tr } from "@/lib/phrases";
 type T = Database["public"]["Tables"];
 const fmt = (n: number) => new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 }).format(Math.round(n) || 0) + " XOF";
 const input = "bg-surface-2 border border-border rounded-lg px-2.5 py-1.5 text-[12px] text-foreground outline-none focus:border-primary";
-const th = "text-left font-mono text-[10px] uppercase tracking-wider text-muted-foreground px-3 py-2 border-b border-border";
+const th = "text-start font-mono text-[10px] uppercase tracking-wider text-muted-foreground px-3 py-2 border-b border-border";
 const td = "px-3 py-2 text-[12px] border-b border-border/50";
 const today = () => new Date().toISOString().slice(0, 10);
 const err = (e: unknown) => toast.error(e instanceof Error ? e.message : String((e as { message?: string })?.message ?? e));
@@ -133,7 +133,7 @@ export function LoansSection() {
   });
   return (
     <GhCard title="" className="p-4">
-      {isAdmin && <div className="flex flex-wrap gap-2 mb-4 items-end text-[11px]">
+      {isAdmin && <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2 mb-4 items-end text-[11px]">
         <input className={input} placeholder={tr("Libellé")} value={f.label} onChange={(e) => setF({ ...f, label: e.target.value })} />
         <input className={input} placeholder={tr("Prêteur")} value={f.lender} onChange={(e) => setF({ ...f, lender: e.target.value })} />
         <select className={input} value={f.treasury_account_id} onChange={(e) => setF({ ...f, treasury_account_id: e.target.value })}>
@@ -189,7 +189,7 @@ export function AccrualsSection() {
     <div className="space-y-4">
       <GhCard title="" className="p-4">
         <h3 className="font-semibold text-[13px] mb-2">{tr("Régularisations (extournées au 1er jour de l'exercice suivant)")}</h3>
-        {isAdmin && <div className="flex flex-wrap gap-2 mb-3">
+        {isAdmin && <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2 mb-3">
           <select className={input} value={a.kind} onChange={(e) => setA({ ...a, kind: e.target.value })}>{Object.entries(ACCRUAL_KINDS).map(([k, v]) => <option key={k} value={k}>{tr(v[0])}</option>)}</select>
           <input className={input} placeholder={tr("Libellé")} value={a.label} onChange={(e) => setA({ ...a, label: e.target.value })} />
           <input className={input + " w-28"} placeholder={`${tr("Compte")} ${ACCRUAL_KINDS[a.kind][1]}…`} value={a.account_code} onChange={(e) => setA({ ...a, account_code: e.target.value })} />
@@ -202,7 +202,7 @@ export function AccrualsSection() {
       </GhCard>
       <GhCard title="" className="p-4">
         <h3 className="font-semibold text-[13px] mb-2">{tr("Provisions et dépréciations")}</h3>
-        {isAdmin && <div className="flex flex-wrap gap-2 mb-3">
+        {isAdmin && <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2 mb-3">
           <select className={input} value={p.kind} onChange={(e) => setKind(e.target.value)}>{Object.entries(PROV_DEFAULTS).map(([k, v]) => <option key={k} value={k}>{tr(v[0])}</option>)}</select>
           <select className={input} value={p.movement} onChange={(e) => setMove(e.target.value)}><option value="dotation">{tr("Dotation")}</option><option value="reprise">{tr("Reprise")}</option></select>
           <input className={input} placeholder={tr("Libellé")} value={p.label} onChange={(e) => setP({ ...p, label: e.target.value })} />
@@ -242,14 +242,14 @@ export function StocksSection() {
   const total = [...val.values()].reduce((a, s) => a + s.v, 0);
   return (
     <div className="space-y-4">
-      {isAdmin && <GhCard title="" className="p-4 flex flex-wrap gap-2">
+      {isAdmin && <GhCard title="" className="p-4 grid sm:grid-cols-2 lg:grid-cols-4 gap-2">
         <input className={input + " w-24"} placeholder={tr("Code")} value={it.code} onChange={(e) => setIt({ ...it, code: e.target.value })} />
         <input className={input} placeholder={tr("Article")} value={it.label} onChange={(e) => setIt({ ...it, label: e.target.value })} />
         <input className={input + " w-16"} value={it.unit} onChange={(e) => setIt({ ...it, unit: e.target.value })} />
         <input className={input + " w-20"} value={it.stock_account} onChange={(e) => setIt({ ...it, stock_account: e.target.value })} />
         <input className={input + " w-20"} value={it.variation_account} onChange={(e) => setIt({ ...it, variation_account: e.target.value })} />
         <GhButton disabled={!it.code || !it.label} onClick={() => addIt.mutate()}><Plus size={13} /> {tr("Article")}</GhButton>
-        <span className="w-full" />
+        <span className="hidden lg:block lg:col-span-4" />
         <select className={input} value={mv.item_id} onChange={(e) => setMv({ ...mv, item_id: e.target.value })}><option value="">{tr("Article")}</option>{items.map((i) => <option key={i.id} value={i.id}>{i.code} — {i.label}</option>)}</select>
         <select className={input} value={mv.kind} onChange={(e) => setMv({ ...mv, kind: e.target.value })}><option value="entree">{tr("Entrée")}</option><option value="sortie">{tr("Sortie")}</option><option value="inventaire">{tr("Inventaire")}</option></select>
         <input type="number" className={input + " w-20"} placeholder={tr("Qté")} value={mv.quantity} onChange={(e) => setMv({ ...mv, quantity: +e.target.value })} />
@@ -299,8 +299,8 @@ export function ShareholdersSection() {
   const paid = rows.reduce((a, r) => a + Number(r.paid_amount ?? 0), 0);
   return (
     <GhCard title="" className="p-4">
-      <div className="flex gap-6 text-[12px] mb-3"><span>{tr("Capital social (101)")} : <b>{fmt(capital)}</b></span><span>{tr("Libéré")} : <b>{fmt(paid)}</b></span><span>{tr("Non appelé / non versé (109)")} : <b>{fmt(capital - paid)}</b></span></div>
-      {isAdmin && <div className="flex flex-wrap gap-2 mb-3 items-center">
+      <div className="flex flex-wrap gap-4 text-[12px] mb-3"><span>{tr("Capital social (101)")} : <b>{fmt(capital)}</b></span><span>{tr("Libéré")} : <b>{fmt(paid)}</b></span><span>{tr("Non appelé / non versé (109)")} : <b>{fmt(capital - paid)}</b></span></div>
+      {isAdmin && <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2 mb-3 items-center">
         <input className={input} placeholder={tr("Nom")} value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} />
         <select className={input} value={f.kind} onChange={(e) => setF({ ...f, kind: e.target.value })}><option value="personne_physique">{tr("Personne physique")}</option><option value="personne_morale">{tr("Personne morale")}</option></select>
         <input type="number" className={input + " w-24"} placeholder={tr("Actions")} value={f.shares} onChange={(e) => setF({ ...f, shares: +e.target.value })} />
