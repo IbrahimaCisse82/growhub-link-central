@@ -37,7 +37,8 @@ export default function InlineEditField({ projectId, fieldKey, label, value, isA
           if (error) throw error;
         }
       } else {
-        const { error } = await supabase.from("projects").update({ [fieldKey]: draft }).eq("id", projectId);
+        const patch: Database["public"]["Tables"]["projects"]["Update"] = { [fieldKey]: draft };
+        const { error } = await supabase.from("projects").update(patch).eq("id", projectId);
         if (error) throw error;
       }
     },
