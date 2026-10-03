@@ -177,6 +177,83 @@ export type Database = {
           },
         ]
       }
+      acc_periods: {
+        Row: {
+          closed_at: string | null
+          closed_by: string | null
+          created_at: string
+          fiscal_year_id: string
+          id: string
+          period_end: string
+          period_start: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          closed_at?: string | null
+          closed_by?: string | null
+          created_at?: string
+          fiscal_year_id: string
+          id?: string
+          period_end: string
+          period_start: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          closed_at?: string | null
+          closed_by?: string | null
+          created_at?: string
+          fiscal_year_id?: string
+          id?: string
+          period_end?: string
+          period_start?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "acc_periods_fiscal_year_id_fkey"
+            columns: ["fiscal_year_id"]
+            isOneToOne: false
+            referencedRelation: "accounting_fiscal_years"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      acc_piece_counters: {
+        Row: {
+          fiscal_year_id: string
+          journal_id: string
+          last_seq: number
+        }
+        Insert: {
+          fiscal_year_id: string
+          journal_id: string
+          last_seq?: number
+        }
+        Update: {
+          fiscal_year_id?: string
+          journal_id?: string
+          last_seq?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "acc_piece_counters_fiscal_year_id_fkey"
+            columns: ["fiscal_year_id"]
+            isOneToOne: false
+            referencedRelation: "accounting_fiscal_years"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "acc_piece_counters_journal_id_fkey"
+            columns: ["journal_id"]
+            isOneToOne: false
+            referencedRelation: "accounting_journals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       acc_provisions: {
         Row: {
           amount: number
@@ -453,6 +530,7 @@ export type Database = {
           created_by: string | null
           currency: string
           entry_date: string
+          entry_hash: string | null
           establishment_id: string | null
           fiscal_year_id: string | null
           grant_id: string | null
@@ -462,6 +540,8 @@ export type Database = {
           label: string
           notes: string | null
           piece_ref: string | null
+          piece_seq: number | null
+          prev_hash: string | null
           project_id: string | null
           source_id: string | null
           source_type: string | null
@@ -477,6 +557,7 @@ export type Database = {
           created_by?: string | null
           currency?: string
           entry_date?: string
+          entry_hash?: string | null
           establishment_id?: string | null
           fiscal_year_id?: string | null
           grant_id?: string | null
@@ -486,6 +567,8 @@ export type Database = {
           label: string
           notes?: string | null
           piece_ref?: string | null
+          piece_seq?: number | null
+          prev_hash?: string | null
           project_id?: string | null
           source_id?: string | null
           source_type?: string | null
@@ -501,6 +584,7 @@ export type Database = {
           created_by?: string | null
           currency?: string
           entry_date?: string
+          entry_hash?: string | null
           establishment_id?: string | null
           fiscal_year_id?: string | null
           grant_id?: string | null
@@ -510,6 +594,8 @@ export type Database = {
           label?: string
           notes?: string | null
           piece_ref?: string | null
+          piece_seq?: number | null
+          prev_hash?: string | null
           project_id?: string | null
           source_id?: string | null
           source_type?: string | null
@@ -9719,6 +9805,10 @@ export type Database = {
         Args: { _date: string; _id: string; _price: number }
         Returns: string
       }
+      acc_fx_rate: {
+        Args: { _currency: string; _date: string }
+        Returns: number
+      }
       acc_fx_revaluation: {
         Args: { _currency: string; _date: string; _rate: number }
         Returns: number
@@ -9749,10 +9839,26 @@ export type Database = {
         Args: { _date?: string; _id: string }
         Returns: string
       }
+      acc_piece_gaps: {
+        Args: { _fy: string }
+        Returns: {
+          journal_code: string
+          missing_seq: number
+        }[]
+      }
       acc_reverse_accruals: { Args: { _next_fy: string }; Returns: number }
+      acc_seed_periods: { Args: { _fy: string }; Returns: number }
       acc_stock_variation: { Args: { _date: string }; Returns: number }
       acc_vat_compute: { Args: { _period: string }; Returns: string }
       acc_vat_post: { Args: { _id: string }; Returns: string }
+      acc_verify_hash_chain: {
+        Args: { _fy: string }
+        Returns: {
+          entry_id: string
+          piece_ref: string
+          problem: string
+        }[]
+      }
       anonymize_user_data: { Args: { _user_id: string }; Returns: undefined }
       can_access_grant: {
         Args: { _grant_id: string; _user_id: string }
