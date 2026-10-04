@@ -1,0 +1,16 @@
+REVOKE EXECUTE ON FUNCTION public.acc_assign_piece_seq() FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.acc_chain_hash() FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.acc_guard_period() FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.acc_guard_entry() FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.acc_guard_closed_period() FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.crm_payment_checks() FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.acc_seed_periods(uuid) FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.acc_fx_rate(text, date) FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.acc_piece_gaps(uuid) FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.acc_integrity_checks() FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.acc_verify_hash_chain(uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.acc_fx_rate(text, date) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.acc_piece_gaps(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.acc_integrity_checks() TO authenticated;
+GRANT EXECUTE ON FUNCTION public.acc_verify_hash_chain(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.acc_seed_periods(uuid) TO service_role;
