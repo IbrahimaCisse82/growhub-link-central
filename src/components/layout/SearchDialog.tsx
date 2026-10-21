@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { isPathEnabled } from "@/lib/featureFlags";
 import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
@@ -46,7 +47,7 @@ export default function SearchDialog({ open, onOpenChange }: { open: boolean; on
         ...(events.data ?? []).map(e => ({ type: "Événement", id: e.id, name: e.title, path: `/app/evenements` })),
         ...(courses.data ?? []).map(c => ({ type: "Cours", id: c.id, name: c.title, path: `/app/lms` })),
       ];
-      setResults(r);
+      setResults(r.filter((item) => isPathEnabled(item.path)));
       setLoading(false);
     }, 300);
     return () => clearTimeout(timer);

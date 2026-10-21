@@ -8,6 +8,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { I18nProvider } from "@/lib/i18n";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import AdminRoute from "@/components/auth/AdminRoute";
+import FeatureRoute from "@/components/auth/FeatureRoute";
 import AppLayout from "@/components/layout/AppLayout";
 import PWAInstallPrompt from "@/components/shared/PWAInstallPrompt";
 import KeyboardShortcutsProvider from "@/components/shared/KeyboardShortcutsProvider";
@@ -148,8 +149,8 @@ const App = () => (
                 <Route path="mentors" element={<MentorsPage />} />
                 <Route path="coaching" element={<CoachingPage />} />
                 <Route path="rdv" element={<SchedulingPage />} />
-                <Route path="matching" element={<MatchingPage />} />
-                <Route path="lms" element={<LmsPage />} />
+                <Route path="matching" element={<FeatureRoute module="matching"><MatchingPage /></FeatureRoute>} />
+                <Route path="lms" element={<FeatureRoute module="lms"><LmsPage /></FeatureRoute>} />
                 <Route path="projets" element={<ProjetsPage />} />
                 <Route path="projets/nouveau" element={<ProjectWizardPage />} />
                 <Route path="projets/:id" element={<ProjetDetailPage />} />
@@ -168,14 +169,14 @@ const App = () => (
                 <Route path="ressources" element={<ResourcesPage />} />
                 <Route path="analytics" element={<AnalyticsPage />} />
                 <Route path="analytics/impact" element={<ImpactPage />} />
-                <Route path="afridatahub" element={<AdminRoute><AfriDataHubPage /></AdminRoute>} />
+                <Route path="afridatahub" element={<FeatureRoute module="afridatahub"><AdminRoute><AfriDataHubPage /></AdminRoute></FeatureRoute>} />
                 <Route path="rapports" element={<AdminRoute><RapportsPage /></AdminRoute>} />
                 <Route path="partenaires" element={<PartnersPage />} />
-                <Route path="enquetes" element={<SurveysPage />} />
-                <Route path="alumni" element={<AlumniPage />} />
-                <Route path="collecte-donnees" element={<DataCollectionPage />} />
-                <Route path="marketplace" element={<MarketplacePage />} />
-                <Route path="webhooks" element={<AdminRoute><WebhooksPage /></AdminRoute>} />
+                <Route path="enquetes" element={<FeatureRoute module="surveys"><SurveysPage /></FeatureRoute>} />
+                <Route path="alumni" element={<FeatureRoute module="alumni"><AlumniPage /></FeatureRoute>} />
+                <Route path="collecte-donnees" element={<FeatureRoute module="dataCollection"><DataCollectionPage /></FeatureRoute>} />
+                <Route path="marketplace" element={<FeatureRoute module="marketplace"><MarketplacePage /></FeatureRoute>} />
+                <Route path="webhooks" element={<FeatureRoute module="webhooks"><AdminRoute><WebhooksPage /></AdminRoute></FeatureRoute>} />
                 <Route path="events" element={<AdminRoute><EventsPage /></AdminRoute>} />
                 <Route path="corbeille" element={<AdminRoute><TrashPage /></AdminRoute>} />
                 <Route path="utilisateurs" element={<AdminRoute><UsersPage /></AdminRoute>} />
@@ -191,12 +192,12 @@ const App = () => (
                 <Route path="comptabilite" element={<Navigate to="/app/comptabilite/ecritures" replace />} />
                 <Route path="comptabilite/:section" element={<RoleRoute allow={["staff"]}><AccountingPage /></RoleRoute>} />
                 <Route path="finance/tresorerie" element={<AdminRoute><TreasuryPage /></AdminRoute>} />
-                <Route path="finance/cap-table" element={<CapTablePage />} />
+                <Route path="finance/cap-table" element={<FeatureRoute module="capTable"><CapTablePage /></FeatureRoute>} />
                 <Route path="me" element={<MePage />} />
                 <Route path="rapports/bailleurs" element={<DonorReportsPage />} />
-                <Route path="terrain" element={<FieldCollectionPage />} />
+                <Route path="terrain" element={<FeatureRoute module="dataCollection"><FieldCollectionPage /></FeatureRoute>} />
                 <Route path="admin/system-health" element={<AdminRoute><SystemHealthPage /></AdminRoute>} />
-                <Route path="admin/api-keys" element={<ApiKeysPage />} />
+                <Route path="admin/api-keys" element={<FeatureRoute module="apiKeys"><AdminRoute><ApiKeysPage /></AdminRoute></FeatureRoute>} />
 
               </Route>
               <Route path="*" element={<NotFound />} />

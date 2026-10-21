@@ -53,8 +53,9 @@ Deno.serve(async (req) => {
       });
     }
 
-    let { data: invitation, error: invError } = await adminClient
+    const { data: foundInvitation, error: invError } = await adminClient
       .from("invitations").select("*").eq("id", invitationId).maybeSingle();
+    let invitation = foundInvitation;
     if (invError || !invitation) {
       return new Response(JSON.stringify({ error: "Invitation introuvable" }), {
         status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },

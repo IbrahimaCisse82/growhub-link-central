@@ -104,7 +104,9 @@ export async function exportGrowhubPdf(doc: GrowhubPdfDoc, org: OrgSettings | nu
       logoW = targetH * ratio;
       try {
         pdf.addImage(img.dataUrl, "PNG", M, 10, logoW, targetH);
-      } catch {}
+      } catch {
+        // Image illisible : le PDF est produit sans elle.
+      }
     }
   }
 
@@ -263,7 +265,9 @@ export async function exportGrowhubPdf(doc: GrowhubPdfDoc, org: OrgSettings | nu
       const w = h * ratio;
       try {
         pdf.addImage(stamp.dataUrl, "PNG", PAGE_W - M - w, sigY + 6, w, h);
-      } catch {}
+      } catch {
+        // Image illisible : le PDF est produit sans elle.
+      }
     }
   }
 
