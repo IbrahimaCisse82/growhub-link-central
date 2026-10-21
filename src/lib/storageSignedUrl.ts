@@ -6,7 +6,10 @@ import { supabase } from "@/integrations/supabase/client";
  * - une ancienne URL publique du type ".../object/public/<bucket>/<path>"
  * Dans tous les cas, on extrait le path puis on signe à la volée.
  */
-const PRIVATE_BUCKETS = new Set(["grant-documents", "entity-documents", "receipts", "hr-expense-receipts"]);
+const PRIVATE_BUCKETS = new Set([
+  "grant-documents", "entity-documents", "receipts", "hr-expense-receipts",
+  "message-attachments", "resources",
+]);
 
 export function isPrivateBucket(bucket: string) {
   return PRIVATE_BUCKETS.has(bucket);
@@ -24,6 +27,8 @@ export function extractPathFromUrl(bucket: string, urlOrPath: string): string {
 export async function resolveStorageUrl(bucket: string, urlOrPath: string | null | undefined): Promise<string | null> {
   if (!urlOrPath) return null;
   if (!isPrivateBucket(bucket)) return urlOrPath;
+  // Lien externe saisi à la main (ex. ressource hébergée ailleurs) : on l'ouvre tel quel.
+  if (/^https?:\/\//i.test(urlOrPath) && !urlOrPath.includes("/storage/v1/object/")) return urlOrPath;
   const path = extractPathFromUrl(bucket, urlOrPath);
   const { data, error } = await supabase.storage.from(bucket).createSignedUrl(path, 3600);
   if (error || !data) return null;

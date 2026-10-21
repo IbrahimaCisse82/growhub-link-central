@@ -3,6 +3,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { ChannelMessage, ReactionGroup, Attachment } from "@/hooks/useMessaging";
 import { MessageSquare, Smile, Pin, MoreHorizontal, Pencil, Trash2, Download } from "lucide-react";
+import SignedDownloadLink, { useSignedUrl } from "@/components/shared/SignedDownloadLink";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 const QUICK_EMOJIS = ["👍", "❤️", "😂", "🎉", "🚀", "👀", "✅", "🔥"];
@@ -51,14 +52,6 @@ export default function MessageBubble({
     );
   };
 
-  const fileIcon = (type: string | null) => {
-    if (!type) return "📄";
-    if (type.startsWith("image/")) return "🖼️";
-    if (type.includes("pdf")) return "📕";
-    if (type.includes("spreadsheet") || type.includes("excel")) return "📊";
-    if (type.includes("presentation") || type.includes("powerpoint")) return "📽️";
-    return "📄";
-  };
 
   return (
     <div className={`group flex gap-2.5 px-4 py-1.5 hover:bg-secondary/50 transition-colors ${isPinned ? "border-l-2 border-primary/50" : ""}`}>
@@ -117,24 +110,7 @@ export default function MessageBubble({
         {/* Attachments */}
         {attachments.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-1.5">
-            {attachments.map(a => {
-              const isImage = a.file_type?.startsWith("image/");
-              return isImage ? (
-                <a key={a.id} href={a.file_url} target="_blank" rel="noopener" className="block rounded-lg overflow-hidden border border-border max-w-[250px] hover:opacity-80 transition-opacity">
-                  <img src={a.file_url} alt={a.file_name} className="max-h-[180px] object-cover" />
-                  <div className="px-2 py-1 text-[10px] text-muted-foreground truncate">{a.file_name}</div>
-                </a>
-              ) : (
-                <a key={a.id} href={a.file_url} target="_blank" rel="noopener" className="flex items-center gap-2 px-3 py-2 border border-border rounded-lg hover:bg-secondary transition-colors">
-                  <span className="text-lg">{fileIcon(a.file_type)}</span>
-                  <div className="min-w-0">
-                    <div className="text-[11.5px] font-medium text-foreground truncate max-w-[180px]">{a.file_name}</div>
-                    {a.file_size && <div className="text-[9px] text-muted-foreground">{(a.file_size / 1024).toFixed(0)} KB</div>}
-                  </div>
-                  <Download className="w-3.5 h-3.5 text-muted-foreground" />
-                </a>
-              );
-            })}
+            {attachments.map(a => <AttachmentItem key={a.id} attachment={a} />)}
           </div>
         )}
 
@@ -221,5 +197,40 @@ export default function MessageBubble({
         </DropdownMenu>
       </div>
     </div>
+  );
+}
+
+function fileIcon(type: string | null) {
+  if (!type) return "📄";
+  if (type.startsWith("image/")) return "🖼️";
+  if (type.includes("pdf")) return "📕";
+  if (type.includes("spreadsheet") || type.includes("excel")) return "📊";
+  if (type.includes("presentation") || type.includes("powerpoint")) return "📽️";
+  return "📄";
+}
+
+/** Pièce jointe d'un espace privé : image pré-signée, fichier signé au clic. */
+function AttachmentItem({ attachment: a }: { attachment: Attachment }) {
+  const isImage = a.file_type?.startsWith("image/");
+  const imageUrl = useSignedUrl("message-attachments", isImage ? a.file_url : null);
+  if (isImage) {
+    return (
+      <SignedDownloadLink bucket="message-attachments" pathOrUrl={a.file_url} className="block rounded-lg overflow-hidden border border-border max-w-[250px] hover:opacity-80 transition-opacity">
+        {imageUrl
+          ? <img src={imageUrl} alt={a.file_name} className="max-h-[180px] object-cover" />
+          : <div className="h-[120px] w-[200px] bg-secondary animate-pulse" />}
+        <div className="px-2 py-1 text-[10px] text-muted-foreground truncate">{a.file_name}</div>
+      </SignedDownloadLink>
+    );
+  }
+  return (
+    <SignedDownloadLink bucket="message-attachments" pathOrUrl={a.file_url} className="flex items-center gap-2 px-3 py-2 border border-border rounded-lg hover:bg-secondary transition-colors">
+      <span className="text-lg">{fileIcon(a.file_type)}</span>
+      <div className="min-w-0">
+        <div className="text-[11.5px] font-medium text-foreground truncate max-w-[180px]">{a.file_name}</div>
+        {a.file_size && <div className="text-[9px] text-muted-foreground">{(a.file_size / 1024).toFixed(0)} KB</div>}
+      </div>
+      <Download className="w-3.5 h-3.5 text-muted-foreground" />
+    </SignedDownloadLink>
   );
 }

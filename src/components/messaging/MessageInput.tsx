@@ -2,6 +2,7 @@ import { useState, useRef, useCallback } from "react";
 import { Send, Paperclip, Smile, AtSign, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 
 const QUICK_EMOJIS = ["👍", "❤️", "😂", "🎉", "🚀", "👀", "✅", "🔥", "💯", "🤔", "👏", "🙏"];
 
@@ -19,6 +20,8 @@ type Props = {
 };
 
 export default function MessageInput({ onSend, onTyping, placeholder = "Écrire un message…", disabled, members = [] }: Props) {
+  const { user } = useAuth();
+  const userId = user?.id;
   const [content, setContent] = useState("");
   const [files, setFiles] = useState<PendingFile[]>([]);
   const [showEmoji, setShowEmoji] = useState(false);
@@ -72,19 +75,22 @@ export default function MessageInput({ onSend, onTyping, placeholder = "Écrire 
 
   const handleSend = useCallback(async () => {
     if (!content.trim() && files.length === 0) return;
+    if (files.length > 0 && !userId) { toast.error("Session expirée, reconnectez-vous"); return; }
     setUploading(true);
 
     try {
       // Upload files
       const uploadedAttachments: { file_name: string; file_url: string; file_size: number; file_type: string }[] = [];
       for (const pf of files) {
-        const path = `${Date.now()}-${pf.file.name}`;
+        // La politique de dépôt exige un premier dossier = identifiant de l'utilisateur.
+        const safeName = pf.file.name.replace(/[^\w.-]+/g, "_");
+        const path = `${userId}/${Date.now()}-${safeName}`;
         const { error } = await supabase.storage.from("message-attachments").upload(path, pf.file);
         if (error) { toast.error(`Erreur upload: ${pf.file.name}`); continue; }
-        const { data: urlData } = supabase.storage.from("message-attachments").getPublicUrl(path);
+        // Espace privé : on stocke le chemin, l'affichage passe par une URL signée.
         uploadedAttachments.push({
           file_name: pf.file.name,
-          file_url: urlData.publicUrl,
+          file_url: path,
           file_size: pf.file.size,
           file_type: pf.file.type,
         });
@@ -103,7 +109,7 @@ export default function MessageInput({ onSend, onTyping, placeholder = "Écrire 
     } finally {
       setUploading(false);
     }
-  }, [content, files, members, onSend]);
+  }, [content, files, members, onSend, userId]);
 
   const filteredMembers = members.filter(m =>
     m.full_name.toLowerCase().includes(mentionFilter)

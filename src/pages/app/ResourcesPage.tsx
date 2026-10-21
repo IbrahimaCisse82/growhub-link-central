@@ -1,4 +1,5 @@
 import { useState } from "react";
+import SignedDownloadLink from "@/components/shared/SignedDownloadLink";
 import { motion } from "framer-motion";
 import RecordActions, { STATUS_OPTIONS } from "@/components/shared/RecordActions";
 import SectionHeader from "@/components/shared/SectionHeader";
@@ -63,7 +64,7 @@ export default function ResourcesPage() {
                 {r.category && <Pill color={categoryColor[r.category.toLowerCase()] ?? "gray"}>{r.category}</Pill>}
                 {r.is_public && <Pill color="green">Public</Pill>}
               </div>
-              {r.file_url && <a href={r.file_url} target="_blank" rel="noreferrer" onClick={e => e.stopPropagation()}><GhButton variant="ghost">↓</GhButton></a>}
+              {r.file_url && <span onClick={e => e.stopPropagation()}><SignedDownloadLink bucket="resources" pathOrUrl={r.file_url}><GhButton variant="ghost">↓</GhButton></SignedDownloadLink></span>}
             </div>
           </div>
         ))}

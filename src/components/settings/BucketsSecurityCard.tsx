@@ -4,8 +4,8 @@ import { Lock, Unlock } from "lucide-react";
 const BUCKETS: Array<{ name: string; visibility: "public" | "private"; purpose: string }> = [
   { name: "avatars", visibility: "public", purpose: "Photos de profil utilisateurs" },
   { name: "logos", visibility: "public", purpose: "Logos organisations & programmes" },
-  { name: "resources", visibility: "public", purpose: "Ressources pédagogiques (LMS)" },
-  { name: "message-attachments", visibility: "public", purpose: "Pièces jointes messagerie" },
+  { name: "resources", visibility: "private", purpose: "Ressources pédagogiques (URL signée 1h)" },
+  { name: "message-attachments", visibility: "private", purpose: "Pièces jointes messagerie (URL signée 1h)" },
   { name: "grant-documents", visibility: "private", purpose: "Documents contractuels subventions (URL signée 1h)" },
   { name: "entity-documents", visibility: "private", purpose: "Documents projets/programmes (URL signée 1h)" },
   { name: "receipts", visibility: "private", purpose: "Pièces justificatives transactions (URL signée 1h)" },
