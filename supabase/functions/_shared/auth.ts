@@ -8,13 +8,24 @@ interface RequestIdentity {
   roles: AppRole[];
 }
 
+/** Comparaison en temps constant : ne révèle pas, par la durée, combien de caractères correspondent. */
+export function timingSafeEqual(a: string, b: string): boolean {
+  const enc = new TextEncoder();
+  const x = enc.encode(a);
+  const y = enc.encode(b);
+  let diff = x.length ^ y.length;
+  const len = Math.max(x.length, y.length);
+  for (let i = 0; i < len; i++) diff |= (x[i] ?? 0) ^ (y[i] ?? 0);
+  return diff === 0;
+}
+
 export async function requireIdentity(req: Request): Promise<RequestIdentity> {
   const authorization = req.headers.get("Authorization");
   if (!authorization?.startsWith("Bearer ")) throw new Error("UNAUTHORIZED");
 
   const token = authorization.slice(7).trim();
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  if (serviceKey && token === serviceKey) return { kind: "service", roles: [] };
+  if (serviceKey && timingSafeEqual(token, serviceKey)) return { kind: "service", roles: [] };
 
   const url = Deno.env.get("SUPABASE_URL");
   const publishableKey = Deno.env.get("SUPABASE_ANON_KEY") ?? Deno.env.get("SUPABASE_PUBLISHABLE_KEY");

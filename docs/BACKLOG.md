@@ -30,8 +30,8 @@ Source : `docs/MASTER_PROMPT.md`. Statuts : À FAIRE / EN COURS / FAIT / BLOQUÉ
 ## Phase 2 — Sécurité
 | ID | Prio | Statut | Tâche |
 |---|---|---|---|
-| P2-01 | P0 | À FAIRE | 7 vues sans security_invoker ; 4 fonctions file e-mail sans search_path (voir audit) |
-| P2-02 | P0 | À FAIRE | Policies stockage des 9 espaces de fichiers |
+| P2-01 | P0 | FAIT | Vues : 9/10 en security_invoker ; profiles_safe reste en definer (vue masquante, voulu). Fonctions file e-mail : à revérifier en base |
+| P2-02 | P0 | EN COURS | message-attachments et resources privés + URL signées (migration 20261021140000) ; avatars et logos restent publics (images d'affichage) |
 | P2-03 | P0 | À FAIRE | Tests RLS automatisés par persona sur tables sensibles |
 | P2-04 | P0 | À FAIRE | Droits restrictifs bailleur/mentor testés en accès direct |
 | P2-05 | P0 | À FAIRE | Audit + tests des 23 fonctions serverless |

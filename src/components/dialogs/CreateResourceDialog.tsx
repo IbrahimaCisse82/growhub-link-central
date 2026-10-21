@@ -33,8 +33,8 @@ export default function CreateResourceDialog({ children }: { children: React.Rea
       const path = `resources/${Date.now()}.${ext}`;
       const { error } = await supabase.storage.from("resources").upload(path, file);
       if (error) throw error;
-      const { data: urlData } = supabase.storage.from("resources").getPublicUrl(path);
-      setFileUrl(urlData.publicUrl);
+      // Espace privé : on stocke le chemin, l'affichage passe par une URL signée.
+      setFileUrl(path);
       setFileName(file.name);
       toast({ title: "Fichier uploadé" });
     } catch (err) {
