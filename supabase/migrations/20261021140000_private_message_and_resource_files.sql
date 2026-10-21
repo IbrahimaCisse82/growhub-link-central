@@ -19,6 +19,8 @@ DROP POLICY IF EXISTS "Public read resources" ON storage.objects;
 DROP POLICY IF EXISTS "Authenticated read message attachments" ON storage.objects;
 DROP POLICY IF EXISTS "Authenticated read resources files" ON storage.objects;
 DROP POLICY IF EXISTS "Anyone can view resources files" ON storage.objects;
+DROP POLICY IF EXISTS "Members read message attachments" ON storage.objects;
+DROP POLICY IF EXISTS "Allowed users read resource files" ON storage.objects;
 
 CREATE POLICY "Members read message attachments"
   ON storage.objects FOR SELECT TO authenticated
