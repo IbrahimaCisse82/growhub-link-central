@@ -34,7 +34,9 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) setConsent(JSON.parse(raw));
-    } catch {}
+    } catch {
+      // Stockage indisponible ou valeur corrompue : on repart sans consentement enregistré.
+    }
     setLoading(false);
   }, []);
 

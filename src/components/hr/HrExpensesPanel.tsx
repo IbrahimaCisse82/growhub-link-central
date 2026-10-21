@@ -337,7 +337,7 @@ export default function HrExpensesPanel({ restrictedEmployeeId, canManageHr }: P
             <AlertDialogAction
               onClick={() => {
                 if (!rejectReason.trim()) { toast.error("Motif requis"); return; }
-                rejectOpen && rejectReport.mutate({ id: rejectOpen.id, reason: rejectReason.trim() });
+                if (rejectOpen) rejectReport.mutate({ id: rejectOpen.id, reason: rejectReason.trim() });
                 setRejectOpen(null);
               }}
             >Rejeter</AlertDialogAction>
@@ -375,7 +375,7 @@ export default function HrExpensesPanel({ restrictedEmployeeId, canManageHr }: P
             <AlertDialogCancel>Annuler</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
-                reimburseOpen && markReimbursed.mutate({ id: reimburseOpen.id, mois: reimburseMois, annee: reimburseAnnee });
+                if (reimburseOpen) markReimbursed.mutate({ id: reimburseOpen.id, mois: reimburseMois, annee: reimburseAnnee });
                 setReimburseOpen(null);
               }}
             >Confirmer</AlertDialogAction>
@@ -392,7 +392,7 @@ export default function HrExpensesPanel({ restrictedEmployeeId, canManageHr }: P
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction onClick={() => { confirmDelete && removeReport.mutate(confirmDelete); setConfirmDelete(null); }}>Supprimer</AlertDialogAction>
+            <AlertDialogAction onClick={() => { if (confirmDelete) removeReport.mutate(confirmDelete); setConfirmDelete(null); }}>Supprimer</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

@@ -24,6 +24,7 @@ import { useTranslation } from "@/lib/i18n";
 import { useStartupKpis } from "@/hooks/useStartupKpis";
 import { exportToCSV } from "@/lib/exportUtils";
 import { useMilestones } from "@/hooks/useMilestones";
+import { isPathEnabled } from "@/lib/featureFlags";
 import DashboardAlerts from "@/components/dashboard/DashboardAlerts";
 import OnboardingBadge from "@/components/onboarding/OnboardingBadge";
 import { useHrEmployees } from "@/hooks/useHrEmployees";
@@ -56,18 +57,26 @@ import FunderDashboard from "@/components/dashboard/FunderDashboard";
 import StaffDashboard from "@/components/dashboard/StaffDashboard";
 
 export default function DashboardPage() {
-  const navigate = useNavigate();
-  const { roles, isAdmin, profile, persona } = useAuth();
-  const { t } = useTranslation();
-  const isMentor = roles.includes("mentor") || roles.includes("consultant_expert") || roles.includes("consultant_coach");
-  const isEntrepreneur = roles.includes("entrepreneur");
+  const { isAdmin, persona } = useAuth();
 
-  // Routing par persona : nouveaux layouts dédiés
+  // Routing par persona : nouveaux layouts dédiés.
+  // Le tableau de bord général vit dans son propre composant pour que ses hooks
+  // soient toujours appelés dans le même ordre, quelle que soit la persona.
   if (!isAdmin) {
     if (persona === "project_manager") return <ProjectManagerDashboard />;
     if (persona === "funder") return <FunderDashboard />;
     if (persona === "staff") return <StaffDashboard />;
   }
+
+  return <GeneralDashboard />;
+}
+
+function GeneralDashboard() {
+  const navigate = useNavigate();
+  const { roles, isAdmin, profile } = useAuth();
+  const { t } = useTranslation();
+  const isMentor = roles.includes("mentor") || roles.includes("consultant_expert") || roles.includes("consultant_coach");
+  const isEntrepreneur = roles.includes("entrepreneur");
 
   const { data: startupsCount, isLoading: loadingStartups } = useStartupsCount();
   const { data: projects, isLoading: loadingProjects } = useProjects();
@@ -382,7 +391,7 @@ export default function DashboardPage() {
                   { label: t("nav.events"), path: "/app/evenements", icon: "📅" },
                   { label: t("nav.resources"), path: "/app/ressources", icon: "📁" },
                   { label: t("common.myProfile"), path: "/app/profil", icon: "👤" },
-                ].map(item => (
+                ].filter(item => isPathEnabled(item.path)).map(item => (
                   <div key={item.path} onClick={() => navigate(item.path)} className="flex items-center gap-2.5 py-2 px-2 rounded-lg hover:bg-secondary cursor-pointer transition-colors">
                     <span className="text-lg">{item.icon}</span>
                     <span className="text-[12.5px] font-medium text-foreground">{item.label}</span>
@@ -401,7 +410,7 @@ export default function DashboardPage() {
                   { label: t("nav.resources"), path: "/app/ressources", icon: "📁" },
                   { label: t("nav.messaging"), path: "/app/messagerie", icon: "💬" },
                   { label: t("common.myProfile"), path: "/app/profil", icon: "👤" },
-                ].map(item => (
+                ].filter(item => isPathEnabled(item.path)).map(item => (
                   <div key={item.path} onClick={() => navigate(item.path)} className="flex items-center gap-2.5 py-2 px-2 rounded-lg hover:bg-secondary cursor-pointer transition-colors">
                     <span className="text-lg">{item.icon}</span>
                     <span className="text-[12.5px] font-medium text-foreground">{item.label}</span>

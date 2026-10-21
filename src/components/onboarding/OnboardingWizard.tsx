@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { isPathEnabled } from "@/lib/featureFlags";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import GhButton from "@/components/shared/GhButton";
@@ -189,7 +190,7 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
                 <p className="text-sm text-muted-foreground mt-2">Voici les modules clés à explorer pour démarrer dès maintenant.</p>
               </div>
               <div className="space-y-2 mb-5">
-                {recap.map((item) => (
+                {recap.filter((item) => isPathEnabled(item.path)).map((item) => (
                   <button key={item.path} onClick={() => { complete.mutate(persona); onComplete(); navigate(item.path); }}
                     className="w-full flex items-center justify-between bg-surface-2 hover:bg-secondary border border-border rounded-lg px-3.5 py-2.5 transition group text-left">
                     <span className="text-[12.5px] font-medium text-foreground">{item.label}</span>

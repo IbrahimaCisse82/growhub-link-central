@@ -3,6 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useSidebarCounts } from "@/hooks/useSidebarCounts";
 import { useTranslation } from "@/lib/i18n";
 import { tr } from "@/lib/phrases";
+import { isPathEnabled } from "@/lib/featureFlags";
 import logo from "@/assets/logo-growhublink.png";
 import {
   LayoutDashboard, Activity, Briefcase, FolderKanban, ListChecks, Flag, CheckSquare, GanttChart,
@@ -265,9 +266,10 @@ export default function AppSidebar({ mobile, onNavigate }: AppSidebarProps) {
         {navGroups.map((group) => {
           if (group.adminOnly && !isAdmin) return null;
           // Filtrage par persona : on garde uniquement les items autorisés
-          const visibleItems = allowedPaths === null
+          const visibleItems = (allowedPaths === null
             ? group.items
-            : group.items.filter((it) => allowedPaths.includes(it.path));
+            : group.items.filter((it) => allowedPaths.includes(it.path))
+          ).filter((it) => isPathEnabled(it.path));
           if (visibleItems.length === 0) return null;
           return (
             <div key={group.label} className="mb-5">
