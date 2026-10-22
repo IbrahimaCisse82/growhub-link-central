@@ -21,7 +21,7 @@ Source : `docs/MASTER_PROMPT.md`. Statuts : À FAIRE / EN COURS / FAIT / BLOQUÉ
 | P1-03 | P0 | FAIT | Contraintes : règlement ≥ facture, montants, anti-surpaiement, devise/taux |
 | P1-04 | P0 | FAIT | Équilibre en base + blocage modif écritures validées (lignes incluses) — partiellement existant (acc_guard_*) à vérifier |
 | P1-05 | P0 | FAIT | Clôture de période appliquée en base sur tous chemins |
-| P1-06 | P0 | À FAIRE | Numérotation sans rupture par journal/exercice, verrouillée |
+| P1-06 | P0 | FAIT | Numérotation à la validation, continue par journal/exercice, figée (migration 20261022100000, 13 tests SQL PGlite) ; N° d'écriture affiché dans le journal et le grand livre |
 | P1-07 | P1 | À FAIRE | Piste d'audit chaînée (hash) + écran vérification |
 | P1-08 | P1 | À FAIRE | Taux de change historisés USD/EUR/XOF (table exchange_rates existante à étendre) |
 | P1-09 | P1 | FAIT | Écran « Contrôles d'intégrité » |
