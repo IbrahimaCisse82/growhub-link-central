@@ -1,4 +1,5 @@
 import { tr } from "@/lib/phrases";
+import { formatEntryNumber } from "@/lib/accountingNumber";
 import { exportToCSV, exportToPDF } from "@/lib/exportUtils";
 import { useMemo, useState } from "react";
 import { useParams, Navigate } from "react-router-dom";
@@ -361,10 +362,10 @@ function EntriesSection() {
       <GhCard title={tr("Écritures comptables")} badge={String(entries.length)} noPadding
         action={<div className="flex gap-2"><FySelect value={fy} onChange={setFy} />{isAdmin && <GhButton onClick={() => setOpen(true)}><Plus size={13} /> {tr("Nouvelle écriture")}</GhButton>}</div>}>
         {entries.length === 0 ? <p className="p-5 text-sm text-muted-foreground">{tr("Aucune écriture sur cet exercice.")}</p> : (
-          <table className="w-full"><thead><tr><th className={th}>{tr("Date")}</th><th className={th}>{tr("Journal")}</th><th className={th}>{tr("Pièce")}</th><th className={th}>{tr("Libellé")}</th><th className={th}>{tr("Débit")}</th><th className={th}>{tr("Crédit")}</th><th className={th}>{tr("Statut")}</th><th className={th}></th></tr></thead>
+          <table className="w-full"><thead><tr><th className={th}>{tr("N° écriture")}</th><th className={th}>{tr("Date")}</th><th className={th}>{tr("Journal")}</th><th className={th}>{tr("Pièce")}</th><th className={th}>{tr("Libellé")}</th><th className={th}>{tr("Débit")}</th><th className={th}>{tr("Crédit")}</th><th className={th}>{tr("Statut")}</th><th className={th}></th></tr></thead>
             <tbody>{entries.map((e) => (<>
               <tr key={e.id} className="hover:bg-surface-2/50 cursor-pointer" onClick={() => setExpanded(expanded === e.id ? null : e.id)}>
-                <td className={td}>{e.entry_date}</td><td className={`${td} font-mono`}>{jname(e.journal_id)}</td><td className={td}>{e.piece_ref ?? "—"}</td>
+                <td className={`${td} font-mono`}>{formatEntryNumber(jname(e.journal_id), e.piece_seq)}</td><td className={td}>{e.entry_date}</td><td className={`${td} font-mono`}>{jname(e.journal_id)}</td><td className={td}>{e.piece_ref ?? "—"}</td>
                 <td className={td}>{e.label}</td><td className={`${td} font-mono`}>{fmt(Number(e.total_debit))}</td><td className={`${td} font-mono`}>{fmt(Number(e.total_credit))}</td>
                 <td className={td}>{e.status === "validee" ? <span className="text-primary flex items-center gap-1"><Lock size={11} /> {tr("Validée")}</span> : <span className="text-muted-foreground">{tr("Brouillon")}</span>}</td>
                 <td className={td}>{isAdmin && <div className="flex items-center gap-2" onClick={(ev) => ev.stopPropagation()}>
@@ -374,7 +375,7 @@ function EntriesSection() {
                 </div>}</td>
               </tr>
               {expanded === e.id && lines.map((l) => (
-                <tr key={l.id} className="bg-surface-2/30"><td /><td colSpan={2} className={`${td} font-mono`}>{l.account_code}</td><td className={td}>{l.label}</td>
+                <tr key={l.id} className="bg-surface-2/30"><td /><td /><td colSpan={2} className={`${td} font-mono`}>{l.account_code}</td><td className={td}>{l.label}</td>
                   <td className={`${td} font-mono`}>{Number(l.debit) ? fmt(Number(l.debit)) : ""}</td><td className={`${td} font-mono`}>{Number(l.credit) ? fmt(Number(l.credit)) : ""}</td><td colSpan={2} /></tr>))}
             </>))}</tbody></table>)}
       </GhCard>
@@ -391,7 +392,7 @@ function LedgerSection() {
   const { data: accounts = [] } = useAccounts();
   const { data = [] } = useQuery({ queryKey: ["acc-ledger", fy, code], enabled: !!fy && code.length >= 2, queryFn: async () => {
     const { data, error } = await supabase.from("accounting_entry_lines")
-      .select("id, account_code, label, debit, credit, accounting_entries!inner(entry_date, label, piece_ref, status, fiscal_year_id)")
+      .select("id, account_code, label, debit, credit, accounting_entries!inner(entry_date, label, piece_ref, piece_seq, status, fiscal_year_id, accounting_journals(code))")
       .like("account_code", `${code}%`).eq("accounting_entries.fiscal_year_id", fy!).eq("accounting_entries.status", "validee").limit(1000);
     if (error) throw error;
     return (data ?? []).sort((a, b) => a.accounting_entries.entry_date.localeCompare(b.accounting_entries.entry_date));
@@ -403,9 +404,9 @@ function LedgerSection() {
       <datalist id="acc-ledger-codes">{accounts.slice(0, 1200).map((a) => <option key={a.id} value={a.code}>{a.label}</option>)}</datalist></div>}>
       {code.length < 2 ? <p className="p-5 text-sm text-muted-foreground">{tr("Saisissez un compte ou une racine de compte (2 chiffres minimum).")}</p> :
         data.length === 0 ? <p className="p-5 text-sm text-muted-foreground">{tr("Aucun mouvement validé.")}</p> : (
-        <table className="w-full"><thead><tr><th className={th}>{tr("Date")}</th><th className={th}>{tr("Compte")}</th><th className={th}>{tr("Pièce")}</th><th className={th}>{tr("Libellé")}</th><th className={th}>{tr("Débit")}</th><th className={th}>{tr("Crédit")}</th><th className={th}>{tr("Solde")}</th></tr></thead>
+        <table className="w-full"><thead><tr><th className={th}>{tr("Date")}</th><th className={th}>{tr("N° écriture")}</th><th className={th}>{tr("Compte")}</th><th className={th}>{tr("Pièce")}</th><th className={th}>{tr("Libellé")}</th><th className={th}>{tr("Débit")}</th><th className={th}>{tr("Crédit")}</th><th className={th}>{tr("Solde")}</th></tr></thead>
           <tbody>{data.map((l) => { run += Number(l.debit) - Number(l.credit); return (
-            <tr key={l.id}><td className={td}>{l.accounting_entries.entry_date}</td><td className={`${td} font-mono`}>{l.account_code}</td><td className={td}>{l.accounting_entries.piece_ref ?? "—"}</td>
+            <tr key={l.id}><td className={td}>{l.accounting_entries.entry_date}</td><td className={`${td} font-mono`}>{formatEntryNumber(l.accounting_entries.accounting_journals?.code, l.accounting_entries.piece_seq)}</td><td className={`${td} font-mono`}>{l.account_code}</td><td className={td}>{l.accounting_entries.piece_ref ?? "—"}</td>
               <td className={td}>{l.label ?? l.accounting_entries.label}</td><td className={`${td} font-mono`}>{Number(l.debit) ? fmt(Number(l.debit)) : ""}</td>
               <td className={`${td} font-mono`}>{Number(l.credit) ? fmt(Number(l.credit)) : ""}</td><td className={`${td} font-mono font-semibold`}>{fmt(run)}</td></tr>); })}</tbody></table>)}
     </GhCard>

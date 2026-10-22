@@ -98,6 +98,7 @@ const P: Record<string, [string, string]> = {
   "Notes": ["Notes", "ملاحظات"],
   "Nouvelle écriture": ["New entry", "قيد جديد"],
   "N° pièce": ["Voucher no.", "رقم المستند"],
+  "N° écriture": ["Entry no.", "رقم القيد"],
   "Ouvert": ["Open", "مفتوح"],
   "Ouvrir un exercice": ["Open a fiscal year", "فتح سنة مالية"],
   "Paramètres": ["Settings", "الإعدادات"],
